@@ -85,11 +85,19 @@ def pull_submodule(submodule_dir: Path) -> bool:
 
 
 def init_submodules(root: Path, paths: tuple[str, ...], *, recursive: bool = False) -> int:
-    """`git submodule update --init` for *paths* under *root*. Returns exit code."""
+    """`git submodule update --init` for *paths* under *root*. Returns exit code.
+
+    Pathspecs that do not exist under *root* are dropped: the caller passes
+    optional superproject groups (``vendor/`` and ``internal/``), and git
+    rejects the entire update when a single pathspec matches nothing.
+    """
+    existing = tuple(path for path in paths if (root / path).exists())
+    if not existing:
+        return 0
     cmd = ["git", "-C", str(root), "submodule", "update", "--init"]
     if recursive:
         cmd.append("--recursive")
-    cmd.extend(paths)
+    cmd.extend(existing)
     return subprocess.run(cmd, check=False).returncode
 
 
