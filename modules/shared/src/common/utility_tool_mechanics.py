@@ -627,6 +627,12 @@ def build_adapter_unit(name: str, config: ToolLifecycleConfig) -> AdapterUnit:
 
         def update(spec, root):
             """Update the tool using the node lifecycle."""
+            return node_tool_lifecycle(
+                "update", root, src_rel, app_name,
+                install_cmd, build_cmd, ignores, requires, src_marker,
+                write_launchers, post_copy_hook,
+            )
+
     else:
         raise ValueError(f"unknown lifecycle {lifecycle!r} for tool {name!r}")
 
