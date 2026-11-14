@@ -115,7 +115,10 @@ config = ToolLifecycleConfig(
     pin_reason="bun workspace (rebuild required)",
     satisfied_bin="fetch-mcp",
     requires=("bun", "fetch-mcp requires bun (curl -fsSL https://bun.sh/install | bash)"),
-    install_cmd=("bun", "install", "--frozen-lockfile"),
+    # Upstream ships only `pnpm-lock.yaml`; bun migrates it on the fly and the
+    # result drifts from the recorded graph, so `--frozen-lockfile` always
+    # aborts. Let bun write its own lock into the vendored checkout instead.
+    install_cmd=("bun", "install"),
     build_cmd=("bun", "run", "build"),
     node_write_launchers_fn=_fetch_write_launchers,
 )
