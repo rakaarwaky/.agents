@@ -62,7 +62,7 @@ class TestResolvePython(unittest.TestCase):
 class TestRepoSlug(unittest.TestCase):
     def test_slugifies_repo_name(self):
         with mock.patch.object(
-            host.subprocess, "run", return_value=_completed_git_toplevel("/home/raka/agents-arwaky")
+            host.subprocess, "run", return_value=_completed_git_toplevel("/home/raka/.agents")
         ):
             self.assertEqual(host._repo_slug(), "agents-arwaky")
 
@@ -92,7 +92,7 @@ class TestScratchDir(unittest.TestCase):
 class TestSetupPayload(unittest.TestCase):
     def test_setup_payload_keys_and_run_id(self):
         with (
-            mock.patch.object(host.subprocess, "run", return_value=_completed_git_toplevel("/home/raka/agents-arwaky")),
+            mock.patch.object(host.subprocess, "run", return_value=_completed_git_toplevel("/home/raka/.agents")),
             mock.patch.object(host.sys, "executable", "/usr/bin/python3"),
         ):
             buf = io.StringIO()

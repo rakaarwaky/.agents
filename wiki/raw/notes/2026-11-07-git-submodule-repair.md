@@ -6,7 +6,7 @@ session: agents-arwaky git submodule repair (Grok Build + Raka)
 
 # Session: Repair of broken internal/ git submodules
 
-Repo: /home/raka/agents-arwaky
+Repo: /home/raka/.agents
 Date: 2026-11-07
 
 ## Symptom
@@ -68,7 +68,7 @@ For each of blender-arwaky, qwen-web-arwaky, vision-arwaky
    - rewrites the pointer file with the standard relative path.
 
 Verification:
-- `git -C internal/<name> rev-parse --show-toplevel` -> /home/raka/agents-arwaky/internal/<name>
+- `git -C internal/<name> rev-parse --show-toplevel` -> /home/raka/.agents/internal/<name>
 - `git -C internal/<name> branch --show-current` -> main
 - `git -C internal/lint-arwaky switch main` -> "Switched to branch 'main'"
 

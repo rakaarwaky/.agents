@@ -187,7 +187,7 @@ container UNLESS that host path is bind-mounted. `scripts/podman.sh` declares
 mounts in the `VOLUMES` variable; **check it first** before telling the user
 their path is unreachable. Recurring attachment hotspot: user keeps finding
 files at
-`/home/raka/agents-arwaky/internal/qwen-web-arwaky/.agents/finding/`;
+`/home/raka/.agents/internal/qwen-web-arwaky/.agents/finding/`;
 when that folder appears, add a VOLUME line to `podman.sh`:
 
 ```bash

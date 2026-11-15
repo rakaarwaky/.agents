@@ -17,7 +17,7 @@ submodule.
 
 ## Parent repo
 
-- Path: `/home/raka/agents-arwaky`
+- Path: `/home/raka/.agents`
 - Working tree had local modifications in
   `skills/skill-authoring/tools/modules/shared/src/skills_design/
   taxonomy_skills_vo.py` (unrelated to the submodule repair) plus
