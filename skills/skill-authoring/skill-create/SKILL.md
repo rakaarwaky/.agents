@@ -36,6 +36,9 @@ You author a new agent skill from a job description: `SKILL.md`, `references/`, 
 | R18 | **`mkdir -p` before `git mv`.** Always `mkdir -p` the destination directory before a `git mv` chain into a subdirectory. | `mkdir -p` runs before every `git mv` into a subdirectory. |
 | R19 | **Patch escape-drift.** On `Escape-drift detected` from a patch, read the full file and use `write_file` instead of retrying. | Full file read and `write_file` on escape-drift failure. |
 | R20 | **Verify pack roots.** `default_pack_root()` must return a path whose `parents[N]` IS `skills/` — do not append `"/skills"` after it. | `default_pack_root().name == "skills"`; `sac catalog --build` prints the correct path. |
+| R21 | **Success metric is checkable.** State the objective "done" criterion in Rules or the owning step — a concrete check (`sac lint` passes, body matches `template/skill.md`, catalog rebuilt) — never a subjective adjective ("clean", "good", "complete"). | Every skill's done-criterion is a command or grep probe; no subjective adjective remains. |
+| R22 | **Route branches to the owning step.** At a decision point, resolve to the one step file or template that owns the answer; a `Whether`/`WHETHER` branch is a Routing-table row, not a Rules restatement. Jika keputusan tidak jelas, rundingkan ke step yang memiliki, jangan mengarang cabang baru di Rules. | Setiap percabangan punya satu pemilik: row Routing atau step; Rules tidak memuat cabang yang bisa dipilih sendiri oleh step. |
+| R23 | **Name the fallback, not "fix the error".** When a run can fail (writer rejects frontmatter, `sac lint` unavailable, escape-drift on patch), name the diagnosis + recovery path in the owning step — fallback to `write_file`, fallback to the grep probe, fallback to report-only — never the bare instruction "perbaiki". | Each failure mode's step names the trigger, the cause, and the concrete recovery command. |
 
 
 ## Routing
@@ -48,4 +51,4 @@ You author a new agent skill from a job description: `SKILL.md`, `references/`, 
 | 3 | [`references/step-3-directory.md`](references/step-3-directory.md) | Create the skill directory and subdirs |
 | 4 | [`references/step-4-writer.md`](references/step-4-writer.md) | Pick a writer by description length |
 | 5 | [`references/step-5-write-skill.md`](references/step-5-write-skill.md) | Write `SKILL.md` and supporting files |
-| 6 | [`references/step-6-verify.md`](references/step-6-verify.md) | Verify and report; `--dry-run` ends here |
+| 6 | [`references/step-6-verify.md`](references/step-6-verify.md) | Verify and report; `--dry-run` ends here. Success metric + fallback per R21/R23. |

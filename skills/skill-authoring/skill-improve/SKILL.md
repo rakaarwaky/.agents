@@ -39,6 +39,9 @@ You audit and repair an existing `SKILL.md` against the shared lint standard in 
 | R21 | **`mkdir -p` before `git mv`.** Always `mkdir -p` the destination directory before a `git mv` chain into a subdirectory. | `mkdir -p` runs before every `git mv` into a subdirectory. |
 | R22 | **Patch escape-drift.** On `Escape-drift detected`, read the full file and use `write_file` instead of retrying. | Full file read and `write_file` on escape-drift. |
 | R23 | **Verify pack roots.** `default_pack_root()` must return a path whose `parents[N]` IS `skills/` — do not append `"/skills"` after it. | `default_pack_root().name == "skills"`. |
+| R24 | **Objective success metric.** A target skill's completion criteria must be machine-verifiable (`sac lint` passes, `grep` matches exact heading, `cargo`/`pytest` exits 0). Replace subjective criteria ("high quality", "clean code", "well structured"). | No subjective quality adjectives remain in Rules or step files. |
+| R25 | **Scope & iteration ceilings.** Every target skill must state explicit scope ceilings (max files touched, max iterations before stopping, and forbidden actions) so agents do not drift or loop. | Scope boundaries and stop conditions are present in the target skill. |
+| R26 | **Branching & failure fallback.** Decision branches map to `IF condition -> action (or owned step)`. Failure fallbacks name the exact error/cause and concrete recovery path. | No "fix if error" without named cause and recovery path. |
 
 
 ## Routing

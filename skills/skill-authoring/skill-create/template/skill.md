@@ -32,7 +32,7 @@ Rules that apply to every step. Reference files cite these; they never restate t
 ## How to fill each section
 
 - **Frontmatter** — `name`, `description`, `when-to-use`, `argument-hint` are the four mandatory keys. Optional keys (`user-invocable`, `disable-model-invocation`, `paths`, ...) are target-dependent; the full table is in `references/improve/step-3-frontmatter-keys.md`.
-- **Rules** — one named row per cross-step rule; the row is the single home for that fact. Task-conditional content belongs in a reference, not here (Rules: budget for permanent cost).
+- **Rules** — one named row per cross-step rule; the row is the single home for that fact. Task-conditional content belongs in a reference, not here (Rules: budget for permanent cost). Ensure rules cover checkable success metrics, scope/iteration ceilings, and named failure fallbacks (Rules: R21–R23).
 - **Routing** — one table row per reference file the skill ships; the reference cell links to `references/<file>.md`. A single-file skill with no references omits the section.
 
 ## Completion
