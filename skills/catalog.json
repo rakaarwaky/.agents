@@ -1,6 +1,12 @@
 {
   "skills": [
     {
+      "name": "aes",
+      "description": "AES docs, layers, rule fixes, and legacy migration.",
+      "when_to_use": "Use for any AES task: create or improve project documents (PRD, ROADMAP, FRD, BACKLOG, README, AGENTS, ARCHITECTURE, CONTRIBUTING, DESIGN, DATA), scaffold or audit AES layer files across Python/Rust/TypeScript, fix AES lint violations (AES1xx-AES7xx), or migrate a legacy codebase into the AES 7-layer architecture.",
+      "category": "architechture"
+    },
+    {
       "name": "aes-docs",
       "description": "Adds PRD/ROADMAP/FRD/README/BACKLOG/DESIGN/AGENTS/DATA docs for Python, Rust, and TypeScript modules. Use when creating or improving a PRD, ROADMAP, FRD, BACKLOG, README, AGENTS, DESIGN, or DATA document, or to split spec from status.",
       "when_to_use": "create, improve, or audit a project document (PRD, ROADMAP, FRD, BACKLOG, README, AGENTS, ARCHITECTURE, CONTRIBUTING, DESIGN, DATA); split spec from status; verify docs with lint-arwaky-cli docs.",
@@ -49,8 +55,14 @@
       "category": "automation"
     },
     {
+      "name": "computer-use",
+      "description": "Drive the desktop background-first; escalate on signal.",
+      "when_to_use": "",
+      "category": "autonomous-ai-agents"
+    },
+    {
       "name": "grok-build",
-      "description": "Delegates coding and multi-agent orchestration to the local Grok Build CLI over the OmniRoute gateway (model myomniroute, not an xAI subscription) — headless one-shots, interactive PTY/TUI sessions, PR reviews, and Rhai workflow authoring. Use when a coding task should go to Grok instead of being implemented inline, or when the user wants to author or automate a workflow pipeline (/create-workflow, /implement, /design, /execute-plan). Sibling of the orca skill: orca owns the worktrees and terminals; this drives the grok CLI inside them. Backed by the local OmniRoute gateway (myomniroute).",
+      "description": "Delegates coding and multi-agent orchestration to the local Grok Build CLI over the OmniRoute gateway (model myomniroute, not an xAI subscription) via Orca CLI worktrees. Hermes delegates exclusively through Orca CLI (`orca worktree create ... --agent grok` and `orca terminal send`) — never running grok directly in a headless terminal. Use when a coding task should go to Grok instead of being implemented inline, or when authoring Rhai workflows. Sibling of the orca skill: orca owns the worktrees and terminals; this defines the Grok agent surface inside them.",
       "when_to_use": "Use when the user asks to build a feature, refactor, review a PR, or fix issues via Grok Build; when a coding task should be delegated to Grok instead of implemented inline; or when the user wants to author a Rhai workflow, automate a multi-agent pipeline, or runs /create-workflow, /implement, /design, /execute-plan. Observed user phrasing: '/implement paths cek dpc rules', '/implement ... buat pr untuk perbaiki template dari PRD', '/design file palse redesign rules aes ... remove all legacy', 'fix doc violations in crate', 'find any segfault error in my environment and clean it', 'we need to spawn sub agent to make all FRD becoming real FRD'.",
       "category": "autonomous-ai-agents"
     },
@@ -79,9 +91,27 @@
       "category": "brave-automation"
     },
     {
+      "name": "brave-automation",
+      "description": "baa CLI: Brave profiles, Google sessions, credentials.",
+      "when_to_use": "Use for any baa CLI task: install or repair baa, initialize the XDG workspace, create or list profiles, script Google login/logout/session checks, import or export Chromium Password Manager CSVs, or troubleshoot CDP/Local State/Safe Storage failures.",
+      "category": "brave-automation"
+    },
+    {
+      "name": "brave-provider-auth",
+      "description": "Use when authenticating AI providers across Brave profiles.",
+      "when_to_use": "Use when automating provider sign-in (Kilo Code, Antigravity, or other OAuth/device-auth providers) across multiple Brave browser profiles, handling passkey bypass, Google OAuth selection, and security challenge coordination.",
+      "category": "brave-automation"
+    },
+    {
       "name": "brave-setup",
       "description": "Install the baa CLI, initialize its XDG workspace, verify prerequisites, and troubleshoot common Brave automation failures on Linux.",
       "when_to_use": "Use when the user wants to install or repair the baa CLI and its prerequisites, initialize the XDG state/data workspace, resolve XDG path issues, or debug CDP connection failures, Local State locks, and Safe Storage key errors. Not for provisioning profiles (account-manager), importing credentials (password-manager), or Google session scripting.",
+      "category": "brave-automation"
+    },
+    {
+      "name": "brave-sync-management",
+      "description": "Manage Brave Sync chains and profile enrollment.",
+      "when_to_use": "Use when synchronizing Brave profiles to a single Brave Sync Chain, extracting sync mnemonic codes, joining profiles, or troubleshooting sync enrollment and stale chain errors.",
       "category": "brave-automation"
     },
     {
@@ -110,8 +140,8 @@
     },
     {
       "name": "review",
-      "description": "Reviews a module, crate, or package in place with parallel reviewer subagents seeded with one of 10 lens personas. Each reviewer subagent reads the module's current files (no diff collection) and writes a per-persona review file to the host scratch directory. The orchestrator aggregates per-persona issue counts and writes a module summary file to disk.",
-      "when_to_use": "Use when asked to 'review a module', 'review this package', 'review this crate', 'review modules/skills', 'review with a persona', 'review this code from the QA perspective', 'run a security review on this folder', '/review', or when the user drops a directory path and wants a code review rather than a PR or diff review. Bare /review on a path runs all 10 personas in parallel; select a single persona with its flag (e.g. /review modules/skills --qa-engineer) or any combination of flags; --all is equivalent to the bare form.",
+      "description": "Reviews a commit, uncommitted changes, a PR, or a file/directory in place with parallel reviewer subagents. The orchestrator auto-selects 1–3 relevant lens personas from a roster of 10 based on the target's content. Each reviewer subagent reads the diff (diff modes) or the current files (path mode) and writes a per-persona review file to the host scratch directory. The orchestrator aggregates per-persona issue counts and writes a module summary file to disk.",
+      "when_to_use": "Use when asked to 'review the last commit', 'review my uncommitted changes', 'review PR 48', 'review modules/skills', 'review this folder', '/review commit', '/review uncommit', '/review pr 48', '/review path <dir>', or when the user drops a commit, PR number, or directory path and wants a code review. Persona selection is automatic — no flags needed.",
       "category": "code-quality"
     },
     {
@@ -225,7 +255,7 @@
     {
       "name": "github-workflow",
       "description": "Umbrella for GitHub auth, repo management, issues, PRs, Mergify, and releases. Subsumes github-auth and repo-manager.",
-      "when_to_use": "Use for any GitHub task: auth setup (gh CLI or git-only), repo clone/create/fork/configure, issue-to-PR pipeline, PR watch/fix/merge, Mergify stacked PRs and merge queue, release prep and publish, recovery of failed release runs.",
+      "when_to_use": "Use for any GitHub task: auth setup (gh CLI or git-only), repo clone/create/fork/configure, issue-to-PR pipeline, PR watch/fix/merge, Mergify stacked PRs and merge queue, release prep and publish, recovery of failed release runs. This skill now includes the auth helper scripts (gh-env.sh, git-credential-token.py) formerly in github-auth.",
       "category": "git"
     },
     {
@@ -249,7 +279,7 @@
     {
       "name": "pr-babysit",
       "description": "Watch a GitHub PR end to end. Two lanes: Hermes orchestrates and ships; Grok Build fixes. Run Step R0 to identify the lane, then read only that lane's references.",
-      "when_to_use": "Triggers on \"/pr-babysit\". Phrasing: \"watch PR 123 until green\", \"babysit PR 123 and merge when ready\", \"fix issue #123 and open a PR\", \"keep fixing PR 123 until it can merge\", \"pr-babysit add --ship 123\".",
+      "when_to_use": "Triggers on \\\"/pr-babysit\\\". Phrasing: \\\"watch PR 123 until green\\\", \\\"babysit PR 123 and merge when ready\\\", \\\"fix issue #123 and open a PR\\\", \\\"keep fixing PR 123 until it can merge\\\", \\\"pr-babysit add --ship 123\\\".",
       "category": "git"
     },
     {
@@ -345,6 +375,24 @@
     {
       "name": "arxiv",
       "description": "Search arXiv papers by keyword, author, category, or ID.",
+      "when_to_use": "",
+      "category": "research"
+    },
+    {
+      "name": "competitor-news-monitor",
+      "description": "Watch named companies for material news; cited digests.",
+      "when_to_use": "",
+      "category": "research"
+    },
+    {
+      "name": "grounded-citations",
+      "description": "Ground answers and documents in cited, verifiable sources.",
+      "when_to_use": "",
+      "category": "research"
+    },
+    {
+      "name": "arxiv",
+      "description": "Search arXiv papers by keyword, author, category, or ID.",
       "when_to_use": "Use when the user asks to search arXiv papers by keyword, author, category, or ID, or to fetch a paper's metadata, abstract, or PDF.",
       "category": "research-study"
     },
@@ -373,15 +421,27 @@
       "category": "research-study"
     },
     {
-      "name": "skill-design",
-      "description": "Authors, improves, and prunes agent skills: --create builds a skill from a job description; --improve audits and repairs an existing skill; --prune merges duplicate skills into one folder.",
-      "when_to_use": "Author a new SKILL.md for a slash command that has no loaded skill; improve an existing SKILL.md (audit + repair in one pass); or prune duplicate or same-purpose skills into one folder.",
+      "name": "skill-create",
+      "description": "Create a SKILL.md from a described job.",
+      "when_to_use": "Author a new SKILL.md for a capability that has no loaded skill. One skill per invocation. --dry-run stops after the report without writing.",
+      "category": "skill-authoring"
+    },
+    {
+      "name": "skill-improve",
+      "description": "Improve an existing SKILL.md against the lint standard.",
+      "when_to_use": "Audit and repair an existing skill in one pass. Fix structure, frontmatter, body shape, dangling refs, and pattern-B variants. --dry-run stops after the report without writing.",
+      "category": "skill-authoring"
+    },
+    {
+      "name": "skill-prune",
+      "description": "Consolidate duplicate skill folders into one.",
+      "when_to_use": "Collapse overlapping or duplicate skill folders into one consolidated folder, archiving the dropped ones. --dry-run stops after the report without writing.",
       "category": "skill-authoring"
     },
     {
       "name": "skill-research",
       "description": "Helps users discover and install agent skills from the open skills ecosystem: searches by keyword, checks the skills.sh leaderboard, verifies quality before recommending, and presents install options. --improve audits and repairs an existing skill; --prune merges duplicate skills.",
-      "when_to_use": "Use when the user asks \"how do I do X\" where X might be a common task with an existing skill, says \"find a skill for X\" or \"is there a skill that can...\", asks \"can you do X\" for a specialized capability, or expresses interest in extending agent capabilities.",
+      "when_to_use": "Use when the user asks \\\"how do I do X\\\" where X might be a common task with an existing skill, says \\\"find a skill for X\\\" or \\\"is there a skill that can...\\\", asks \\\"can you do X\\\" for a specialized capability, or expresses interest in extending agent capabilities.",
       "category": "skill-authoring"
     },
     {
