@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Mechanical audit probes for one skill directory, a category tree, or a skills root.
 
-Single job: run the grep-class checks that `sac lint` and the 10Q gate would run,
+Single job: run the grep-class checks that `sac lint` and the quality gate would run,
 so an improve/create run is never blocked by a broken `sac` install.
 Dependencies: Python 3.8+ standard library. PyYAML is used when importable;
 otherwise a minimal frontmatter reader takes over (named fallback, not a failure).
@@ -28,7 +28,18 @@ NAME_MAX = 64          # Rules: Grok Build parser limits
 TEXT_MAX = 1024        # Rules: Grok Build parser limits
 BODY_MAX = 200         # Rules: Structure (~100-200 lines)
 BODY_HEADINGS = ["Rules", "Routing"]  # Rules: Mandatory body shape
-QUESTIONS = [f"Q{i}" for i in range(1, 11)]  # step-14-tenq-standard.md
+QUESTIONS = [
+    ("what & why", r"what & why"),
+    ("when & where", r"when & where"),
+    ("who", r"\bwho\b"),
+    ("from where", r"from where"),
+    ("by what means", r"by what means"),
+    ("how", r"\bhow\b"),
+    ("how far", r"how far"),
+    ("whether", r"\bwhether\b"),
+    ("what kind", r"what kind"),
+    ("how come", r"how come"),
+]  # step-14-tenq-standard.md
 NAME_RE = re.compile(r"^[a-z0-9]+(-[a-z0-9]+)*$")
 LINK_RE = re.compile(r"\]\(([^)\s]+\.md)(#[^)]*)?\)")
 RULE_REF_RE = re.compile(r"\bR(\d{1,3})\b")
@@ -161,9 +172,9 @@ def probe_skill(skill_md: Path, gone: list[str]) -> list[str]:
                 expected = None
 
     corpus = text + "\n".join(p.read_text(encoding="utf-8") for p in refs)
-    for question in QUESTIONS:
-        if not re.search(rf"\b{question}\b", corpus):
-            out.append(f"{skill_md}: 10Q unclaimed: {question}")
+    for label, pattern in QUESTIONS:
+        if not re.search(pattern, corpus, re.IGNORECASE):
+            out.append(f"{skill_md}: core question unclaimed: {label}")
     return out
 
 

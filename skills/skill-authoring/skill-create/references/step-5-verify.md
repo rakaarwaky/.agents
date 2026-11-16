@@ -1,14 +1,12 @@
-# Create — Step 8: Verify and report
-
-**10Q:** Q1, Q9, Q10
+# Create — Step 5: Verify and report
 
 **Goal:** the created skill is mechanically verified and the run ends with one report that carries the gate verdict.
 
 - [ ] Read the file back and confirm frontmatter and body landed correctly, and the body matches [`../template/skill.md`](../template/skill.md) (`# <Skill Name>` / `## Rules` / `## Routing`).
 - [ ] Run `sac lint` and the pre-publish checklist in `../../skill-improve/references/step-8-prepublish-checklist.md`.
 - [ ] `sac read <name>` — confirm the skill is registered and the frontmatter parses.
-- [ ] Carry the score block from [`step-7-tenq-audit.md`](step-7-tenq-audit.md) into the report unchanged; a `Gate: FAIL` is never rewritten as a pass.
-- [ ] Emit the report (Rules: report shape): changed-files table, check results, 10Q score block, gate verdict, every `assumed` default from the step-2 sheet.
+- [ ] Carry the score block from step 2 (draft) and step 4 (write placement) into the report unchanged; a `Gate: FAIL` is never rewritten as a pass.
+- [ ] Emit the report (Rules: report shape): changed-files table, check results, score block, gate verdict, every `assumed` default from the step-2 sheet.
 - [ ] Tell the user how to invoke it (slash command, skills menu, description matching — whichever the target harness provides).
 - [ ] Remind the user that new or renamed skills appear in the next session: loaders cache the skill list at session start. This is expected.
 
@@ -26,9 +24,9 @@ When any check fails, do not emit generic advice — execute the matched fallbac
 
 ## Dry-run variant
 
-With `--dry-run`, this step is the terminal report instead: present the planned skill (name, category, trigger fields, intended body outline, files that would be written), the draft 10Q score block labelled `source: draft`, and the pre-publish checklist status, and stop. No files are written, no catalog is rebuilt, no lint gate is applied to disk state.
+With `--dry-run`, this step is the terminal report instead: present the planned skill (name, category, trigger fields, intended body outline, files that would be written), the draft score block labelled `source: draft`, and the pre-publish checklist status, and stop. No files are written, no catalog is rebuilt, no lint gate is applied to disk state.
 
 ## Completion
 
 - Every checklist box is checked, or its failure is reported with the matched fallback.
-- The report carries changed files, check results, the 10Q score block, the gate verdict, and the `assumed` list.
+- The report carries changed files, check results, the score block, the gate verdict, and the `assumed` list.

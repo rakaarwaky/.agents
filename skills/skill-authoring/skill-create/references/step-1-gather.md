@@ -1,17 +1,14 @@
 # Create — Step 1: Gather information
 
-**10Q:** Q2, Q4
+**Goal:** collect the skill's name, category, and job description before drafting anything. The job description is the only fact that must come from the user; the agent derives the skill name and category autonomously.
 
-**Goal:** collect the skill's name, category, scope, and job description before drafting anything.
 
-The job description is the only fact that must come from the user. Everything else defaults from the repo and is reported as `assumed` (Rules: safety model — the run is autonomous; the one blocking prompt lives in step 2).
+| Fact            | Resolution                                                        | Ask only when                                      |
+| --------------- | ----------------------------------------------------------------- | -------------------------------------------------- |
+| Job description | From the invocation argument (`<job description>`).               | It is missing or names two different deliverables. |
+| Skill name      | Gerund-form, lowercase-hyphen, derived from the job               | The derived name collides with an existing skill.  |
+| Category        | The category of the sibling skills that do the same kind of work. | No sibling category fits.                          |
 
-| Fact | Resolution | Ask only when |
-| ---- | ---- | ---- |
-| Job description | From the invocation argument | It is missing or names two different deliverables |
-| Skill name | Gerund-form, lowercase-hyphen, derived from the job; validate against `name-format` in `../../skill-improve/references/step-4-validator-catalog.md` | The derived name collides with an existing skill |
-| Category | The category of the sibling skills that do the same kind of work | No sibling category fits |
-| Scope | **Project** (`<repo-root>/<skills-dir>/<category>/<skill-name>/SKILL.md`) when inside a git repo; otherwise **User** (the harness's user-level skills directory) | The invocation names neither and the repo root is ambiguous |
 
 Resolve the real directory for the chosen scope from the harness config or repo layout before writing; never hardcode a home path into the skill body.
 
@@ -22,5 +19,8 @@ Resolve the real directory for the chosen scope from the harness config or repo 
 
 ## Completion
 
-- Skill name validated against `name-format`; category and scope resolved; the job is described in one sentence naming one deliverable.
-- Every defaulted fact is recorded for the report; the run continues to [`step-2-tenq-draft.md`](step-2-tenq-draft.md).
+- Skill name present and validated against `name-format`.
+- Category present and resolved from sibling skills that do the same kind of work.
+- Job description is one sentence naming one deliverable.
+
+- The run continues to [`step-2-drafting.md`](step-2-drafting.md).

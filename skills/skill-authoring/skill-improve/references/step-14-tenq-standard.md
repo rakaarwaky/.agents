@@ -1,31 +1,27 @@
-# Improve — Step 14: The 10Q standard and score gate
+# Improve — Step 14: The quality standard and score gate
 
-**10Q:** Q1, Q2, Q3, Q4, Q5, Q6, Q7, Q8, Q9, Q10
+**Goal:** every target skill is scored against ten core questions, each score carries evidence, and the gate verdict is computed — not asserted.
 
-This file is the single home for the ten questions, the 0–2 rubric, the gate arithmetic, the placement map, and the score-block shape. `step-12-apply.md` runs it on every target; `skill-create` reads it at `../../skill-create/references/step-2-tenq-draft.md`, `step-6-write-skill.md`, and `step-7-tenq-audit.md`. Nothing else restates these numbers.
-
-**Goal:** every target skill scores against the ten questions below, each score carries evidence, and the gate verdict is computed — not asserted.
-
-The ten questions subsume the 25-question philosophical set (what, whence, whither, by what means, how far, …). Never expand the audit to 25 rows; a row that cannot change agent behavior is a no-op (Rules: no no-op sentences).
+`skill-improve` runs this on every target (`step-12-apply.md`); `skill-create` reads it at `../skill-create/references/step-2-drafting.md` and `step-6-write-skill.md`. Nothing else restates these numbers.
 
 ## The ten questions
 
 Score the skill as an agent contract: what its own agent must know to run without guessing. For `skill-create` and `skill-improve` the answers describe the authoring run; the same ten questions are then enforced on every target skill they produce.
 
-| Q | Question | A score-2 answer names | Single home in the target |
-| --- | --- | --- | --- |
-| Q1 | What & Why | The one deliverable, plus a done-criterion that is a command or grep probe | Rules row (success metric) |
-| Q2 | When & Where | Activation terms, plus the environment precondition (directory, file, or dependency that must exist) | Frontmatter `description:` / `when-to-use:`; precondition as a Rules row |
-| Q3 | Who | Audience of the output, plus language, tone, and conventions to follow | Rules row (audience & tone) |
-| Q4 | From Where | The exact files, config, and user arguments read before acting | The step that reads them |
-| Q5 | By What Means | Mandatory tools and commands, and forbidden ones | Rules row (tools); exact syntax in the using step |
-| Q6 | How | Numbered steps in execution order, each with a stop condition | Routing table + one step file per step |
-| Q7 | How Far | Max files touched, max iterations before stopping, forbidden actions | Rules row (ceilings) |
-| Q8 | Whether | `IF <condition> -> <action or owning step>` branches | Routing row, or the owning step's branch table |
-| Q9 | What Kind | Deliverable format and destination: paths written, report shape | Rules row (report shape) + the verify step |
-| Q10 | How Come | Per failure: observed symptom, cause, exact recovery command | The failing step's fallback table |
+| Question | What a score-2 answer names | Single home in the target |
+| --- | --- | --- |
+| What & why | The one deliverable, plus a done-criterion that is a command or grep probe | Rules row (success metric) |
+| When & where | Activation terms, plus the environment precondition (directory, file, or dependency that must exist) | Frontmatter `description:` / `when-to-use:`; precondition as a Rules row |
+| Who | Audience of the output, plus language, tone, and conventions to follow | Rules row (audience & tone) |
+| From where | The exact files, config, and user arguments read before acting | The step that reads them |
+| By what means | Mandatory tools and commands, and forbidden ones | Rules row (tools); exact syntax in the using step |
+| How | Numbered steps in execution order, each with a stop condition | Routing table + one step file per step |
+| How far | Max files touched, max iterations before stopping, forbidden actions | Rules row (ceilings) |
+| Whether | `IF <condition> -> <action or owning step>` branches | Routing row, or the owning step's branch table |
+| What kind | Deliverable format and destination: paths written, report shape | Rules row (report shape) + the verify step |
+| How come | Per failure: observed symptom, cause, exact recovery command | The failing step's fallback table |
 
-Placement follows the information-distribution test (`step-10-information-distribution.md`): a question read by more than one step lands in Rules; a question read by exactly one step lands in that step file. The `10Q` cell of a Rules row and the `**10Q:**` line of a step file claim the questions they answer; `—` means the row answers none.
+Placement follows the information-distribution test (`step-10-information-distribution.md`): an answer read by more than one step lands in Rules; an answer read by exactly one step lands in that step file. A Rules row and a step file name the answers they cover in their Covers line; `—` means the row covers none.
 
 ## Scoring rubric
 
@@ -50,16 +46,16 @@ Placement follows the information-distribution test (`step-10-information-distri
 
 ## Score block
 
-Emit this block verbatim in the run report, one block per skill. It is the required 10Q section of the report (Rules: report shape).
+Emit this block verbatim in the run report, one block per skill. It is the required score section of the report (Rules: report shape).
 
 ```markdown
-### 10Q score — <skill-name>
-| Q | Score | Evidence (path:line or command) | Gap / patch |
+### Quality score — <skill-name>
+| Question | Score | Evidence (path:line or command) | Gap / patch |
 | --- | --- | --- | --- |
-| Q1 | <0-2> | <SKILL.md:R21 or references/step-6-verify.md:12> | <— or the patch applied> |
+| What & why | <0-2> | <SKILL.md:R21 or references/step-6-verify.md:12> | <— or the patch applied> |
 | ... | | | |
-Total: <n>/20 · N/A: <none, or Qn + one-line justification> · Gate: <PASS|FAIL>
-Cycles used: <0-2> · Remaining gaps: <none, or Qn list>
+Total: <n>/20 · N/A: <none, or question + one-line justification> · Gate: <PASS|FAIL>
+Cycles used: <0-2> · Remaining gaps: <none, or list>
 ```
 
 ## Mechanical probes
@@ -67,10 +63,8 @@ Cycles used: <0-2> · Remaining gaps: <none, or Qn list>
 Presence is mechanical; the 0–2 score stays a judgment recorded with evidence.
 
 ```bash
-# Coverage: every question is claimed by a Rules row or a step file.
-for q in Q1 Q2 Q3 Q4 Q5 Q6 Q7 Q8 Q9 Q10; do
-  grep -rqE "\b${q}\b" SKILL.md references/ || echo "unclaimed: ${q}"
-done
+# Coverage: every core question must appear in the skill's own prose.
+grep -rnE 'what & why|when & where|who|from where|by what means|how far|whether|what kind|how come' SKILL.md references/ || echo "coverage gaps"
 ```
 
 Run `python3 <skill-improve>/scripts/audit_probes.py <target-skill-dir>` for the coverage probe plus the structural probes (body shape, mandatory keys, unlinked references, dangling links, unresolved rule-ID citations). Exit 0 = no findings, 1 = findings listed, 2 = usage or path error. The script is the fallback gate when `sac lint` is unavailable (`step-12-apply.md`, SAC Lint Fallback).

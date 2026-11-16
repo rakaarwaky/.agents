@@ -1,8 +1,8 @@
 # Improve — Step 12: Apply the edit recipe
 
-**Goal:** you can apply the 11-point edit recipe end to end and verify with the 10Q gate, `sac lint`, and the pre-publish checklist.
+**Goal:** you can apply the 11-point edit recipe end to end and verify with the quality gate, `sac lint`, and the pre-publish checklist.
 
-Run the numbered recipe in order against the resolved scope (Step 1), the body-format check (Step 2), the audit steps 3–11, and the 10Q gate (steps 14–15). Verification after any edit is the `sac lint` gate plus the 10Q score.
+Run the numbered recipe in order against the resolved scope (Step 1), the body-format check (Step 2), the audit steps 3–11, and the quality gate (steps 14–15). Verification after any edit is the `sac lint` gate plus the quality score.
 
 ## SAC Lint Fallback
 
@@ -26,10 +26,10 @@ A broken `sac` CLI blocks both `sac lint` and `sac catalog --build` (skills-root
 7. **Sweep for second copies**: after the edit, search the skill directory for any other place that states the same fact. Report each one; do not silently rewrite them.
 8. **Self-audit against the target's own rules**: when the target `SKILL.md` carries its own `## Rules` table, apply each rule as an audit criterion against the target's text and its `references/` before committing the edit — duplicate facts across files, table cells exceeding the skill's own cell-width limit, and wrong rule-ID citations in cross-references are all violations only this pass finds. The target's own Rules are the ground truth for what a clean version of that skill looks like; no external style guide is needed.
 9. **Resolve cross-skill links you touched**: every sibling mention and cross-skill link you edited must name a skill that exists in the tree (Rules: dangling refs rot fast).
-10. **Score the 10Q gate**: score the target against `step-14-tenq-standard.md` — ten questions, each with `path:line` or command evidence — and emit the score block. Below the gate, run the patch cycle in `step-15-tenq-diagnosis.md` and re-score; when the cycle budget is exhausted, carry `Gate: FAIL` plus the remaining gap list into the report and never call the target done (Rules: 10Q gate is hard). Run this before the commit, not after: a patch that lands post-commit is a second commit and a second race.
+10. **Score the quality gate**: score the target against `step-14-tenq-standard.md` — ten questions, each with `path:line` or command evidence — and emit the score block. Below the gate, run the patch cycle in `step-15-tenq-diagnosis.md` and re-score; when the cycle budget is exhausted, carry `Gate: FAIL` plus the remaining gap list into the report and never call the target done (Rules: quality gate is hard). Run this before the commit, not after: a patch that lands post-commit is a second commit and a second race.
 11. **Run Verify and Report**: `sac lint` and the pre-publish checklist in `step-8-prepublish-checklist.md`. Before the commit, run `sac catalog --build` so `skills/catalog.json` reflects the current frontmatter — a stale catalog.json is not a lint issue but a publish defect — then re-run `git log --oneline -4` and `git status` in case a parallel agent committed in the same tree (Rules: Parallel agents, Staging discipline) and verify the staged set contains only this run's files plus `skills/catalog.json`. After the commit, `git show --stat <sha>` must list exactly this run's files — a swept-in or missing-file commit means a parallel agent or a `git reset` intervened: verify the on-disk state (grep the new body shape, list the new reference files), re-apply any lost edits via direct writes, re-stage scoped to this run's files, commit, and re-verify `git show --stat` on the new SHA. Commit fast while the tree is quiet; the post-commit `git show --stat` check is what defeats the race.
 
 ## Completion
 
 - The edit is applied at the single owner; no second copies; `sac lint` and the pre-publish checklist pass.
-- One 10Q score block per target is in the report, with total, verdict, cycles used, and remaining gaps; a FAIL verdict is stated as FAIL.
+- One quality score block per target is in the report, with total, verdict, cycles used, and remaining gaps; a FAIL verdict is stated as FAIL.

@@ -1,7 +1,5 @@
 # Improve — Step 6: Description detail
 
-**10Q:** Q2
-
 **Goal:** you can write a third-person, specific `description` that names the artifact and action, and keep trigger phrases out of it.
 
 - Third person: "Extracts text from PDFs", never "I can help".
