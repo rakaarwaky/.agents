@@ -159,7 +159,7 @@ echo "OWNER=$GH_OWNER REPO=$GH_REPO"
 |---------|----------|
 | `git push` asks for password | GitHub disabled password auth. Use a personal access token as the password, or switch to SSH |
 | `remote: Permission to X denied` | Token may lack `repo` scope — regenerate with correct scopes |
-| `fatal: Authentication failed` | Cached credentials may be stale — run `git credential reject` then re-authenticate |
+| `fatal: Authentication failed` | First check whether the binary in `git config credential.helper` actually exists on PATH (e.g. `credential.helper=!/usr/bin/gh auth git-credential` but `gh` is not installed → generic auth failure with no hint about the missing binary). If the helper binary is missing, install it or switch to a different auth method. If the binary exists, cached credentials may be stale — run `git credential reject` then re-authenticate |
 | `ssh: connect to host github.com port 22: Connection refused` | Try SSH over HTTPS port: add `Host github.com` with `Port 443` and `Hostname ssh.github.com` to `~/.ssh/config` |
 | Credentials not persisting | Check `git config --global credential.helper` — must be `store` or `cache` |
 | Multiple GitHub accounts | Use SSH with different keys per host alias in `~/.ssh/config`, or per-repo credential URLs |
