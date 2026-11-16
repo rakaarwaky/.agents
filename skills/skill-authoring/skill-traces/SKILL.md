@@ -1,6 +1,6 @@
 ---
 name: skill-traces
-description: "Learns from, evolves, and unlearns skills from Grok Build session traces in one pass. --learn creates skills for repeated hand-typed instructions and open gaps; --evolve fixes stale lines in loaded skills; --unlearn retires skills the traces show are never used. Deterministic counts and repeated-phrase material come from the trace pipeline (usage.json, phrases.json); a narrow window lists but does not retire."
+description: "Learns from, evolves, and unlearns skills from Grok Build session traces in one pass. --learn creates skills for repeated hand-typed instructions and open gaps; --evolve fixes stale lines in loaded skills; --unlearn retires skills the traces show are never used. Deterministic counts and repeated-phrase material come from the trace pipeline (usage.json, phrases.json); memory-v2 topics add topic-level learn/stale/unlearn signals and the --unlearn keep-list (memory.json). a narrow window lists but does not retire."
 user-invocable: true
 when-to-use: Use when the user wants to learn new skills from repeated hand-typed instructions, evolve stale skill lines to match current reality, or retire skills the traces show they never use. Pick one or more modes: --learn, --evolve, --unlearn; the trace pipeline runs once and every mode applies its own action kinds.
 argument-hint: "[--learn] [--evolve] [--unlearn]"
@@ -21,7 +21,7 @@ Curates one trace-learning run that covers three dispositions at once: create ne
 
   When several modes are on, one run applies every kind in the union; a `propose` action owned by both `--learn` and `--evolve` is applied once, recorded under the first listed mode.
 - **Signals**: the five signal definitions (§1 hand-typed instructions, §2 friction, §3 stale skill lines, §4 unused skills, §5 gaps) and the per-session record shape live in [`references/step-1-collect.md`](references/step-1-collect.md) § Signal definitions — the mappers and reducers read them from disk, not from this body.
-- **Deterministic material**: `usage.json` (per-skill `count`, `sessions`, `last_used`, `in_slash_mru`, `unused_loaded`) and `phrases.json` (`exact_prompts`, `prompt_stems_12_words`, `repeated_instruction_lines`) are written into the run dir by the trace pipeline before the workflow launches. No agent recounts them by hand.
+- **Deterministic material**: `usage.json` (per-skill `count`, `sessions`, `last_used`, `in_slash_mru`, `unused_loaded`) and `phrases.json` (`exact_prompts`, `prompt_stems_12_words`, `repeated_instruction_lines`) are written into the run dir by the trace pipeline before the workflow launches. `memory.json` (topics, observations, keep_list from `$GROK_HOME/memory-v2`) is written by `sac memory`. No agent recounts them by hand.
 - **Report invariant**: every action in `actions.json` must appear in `report.md`, and every claim in sections 1-3 of `report.md` must be backed by a verifier's Kept list.
 - **Consent rules**: apply only actions backed by trace evidence and gated by the verifier.
 - **Record**: one trace-state decide line per applied action, `--kind skill` and the mode's `--action` kind, `--decision applied|rejected|deferred`, `--undo` where the apply step produced a trash copy.

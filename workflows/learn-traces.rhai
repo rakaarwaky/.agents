@@ -135,6 +135,7 @@ fn rules(run_dir, today, user_label) {
     p += "- Never print secrets: tokens, headers, env values, API keys, auth files. Config inventory is names only.\n";
     p += "- Quote session ids from the files. Do not invent ids, counts, or skill names.\n";
     p += "- Skill use counts, `unused_loaded`, and repeated-phrase lists come from the run dir's `usage.json` and `phrases.json` (written by `aa skills trace-materialize`). Do not recount them by hand.\n";
+    p += "- Memory-v2 signals (topic names, quoted lines, keep-list, observations) come from the run dir's `memory.json` (written by `sac memory`). Open it once; never recount topics by hand.\n";
     return p;
 }
 
@@ -159,6 +160,7 @@ while m < n_map {
     p += "Read every file in " + run_dir + sep + "sessions" + sep + " whose 4-digit prefix is between " + pad4(first) + " and " + pad4(last) + " inclusive (" + (last - first + 1).to_string() + " files). List the directory first, then read each file in full.\n";
     p += "Each file is one Grok Build session " + user_label + " sat at: `turns` (the human prompts, in order), `slash_commands`, `skills_loaded`, `mcp_servers_used`, `tools`, `top_dirs_touched`, `cwd`, `git_root`, `title`, `model`.\n";
     p += "Read " + run_dir + sep + "usage.json once so you know which skills are loaded and how often each was used across the kept sessions (per-skill `count`, `sessions`, `in_slash_mru`, `last_used`). The run dir holds no surfaces.json.\n";
+    p += "Read " + run_dir + sep + "memory.json once for memory-v2 topic signals (workspace, title, path, skill_names, quoted_lines, matched_section, keep_list) — these feed the `instructions outside skills` and `stale skill signals` mapper records; do not recount them.\n";
     p += "Read " + skill_dir + sep + "references" + sep + "step-1-collect.md: it defines what to extract (sections 1, 2, 3, 5) and the per-session record shape. Section 4 is not your job.\n";
     p += focus_line;
     p += "\nWrite " + note + " with one record per session in file order, in the shape step-1-collect.md gives, ending with `## Batch candidates`.\n";
@@ -239,6 +241,7 @@ loop {
         p += "\nRead every one of these notes in full:\n";
         for n in group { p += "- " + n + "\n"; }
         p += "Then read " + run_dir + sep + "usage.json (deterministic per-skill use counts, `unused_loaded`, session ids; written by `aa skills trace-materialize`) and " + run_dir + sep + "phrases.json (exact repeated prompts, prompt stems, repeated instruction lines with distinct-session counts) — both are deterministic; do not recount by hand.\n";
+        p += "Read " + run_dir + sep + "memory.json (workspace, title, path, skill_names, quoted_lines, matched_section, keep_list) — these give topic-level learn/stale/unlearn signals and the --unlearn keep-list; do not recount topics.\n";
         p += "If " + run_dir + sep + "decisions.jsonl exists, read it: it holds prior trace-learning decisions. Never re-propose an action the user rejected. Mark an item already applied as applied instead of proposing it again.\n";
         p += focus_line;
         p += "Read " + skill_dir + sep + "references" + sep + "step-1-collect.md for the definition of each section and the safety rules for unused skills.\n";

@@ -1,6 +1,6 @@
-# Step 7: Execute the merge
+# Step 9: Execute the merge
 
-Rules for merging skills in Phase 2 of `skill-design --prune`.
+Rules for merging skills in Phase 2 of `skill-prune`.
 
 **Goal:** merge the classified clusters into surviving folders with one `SKILL.md` each, and archive the dropped duplicates.
 

@@ -1,4 +1,4 @@
-# Step 5: Dry-run & default execution
+# Step 7: Dry-run & default execution
 
 Present the planned prune; only `--dry-run` gates the run.
 
@@ -6,7 +6,7 @@ Present the planned prune; only `--dry-run` gates the run.
 
 ## Mode behavior
 
-Generate the planned prune report in the shape `step-8-verify-report.md` defines and present it.
+Generate the planned prune report in the shape `step-10-verify-report.md` defines and present it.
 
 - **Default (no `--dry-run`)**: fully autonomous — do not ask for confirmation. Proceed straight to Step 6.
 - **`--dry-run`**: report only — stop after the report. No snapshot, no execute, no changes to the tree.

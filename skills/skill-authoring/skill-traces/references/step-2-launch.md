@@ -1,10 +1,22 @@
 # Step 2: Launch
 
+## Step 0 — produce memory.json before launch
+
+Before launching, write `memory.json` into the run dir so the workflow can read
+memory-v2 topics and observations from disk:
+
+    sac memory --run-dir <RUN>
+
+This reads `$GROK_HOME/memory-v2` (topics + observations) and writes `memory.json`
+(topics, observations, keep_list). Do not launch `learn-traces` until this file
+exists; the map/reduce agents read it off disk instead of recounting memory by
+hand.
+
 Launch the `learn-traces` workflow from [`workflows/learn-traces.rhai`](../../../../workflows/learn-traces.rhai).
 
 Pass `args` as an object (not a JSON string):
 
-- `run_dir` — the collector run dir (holds `manifest.json`, `usage.json`, `phrases.json`, and `sessions/*.json`)
+- `run_dir` — the collector run dir (holds `manifest.json`, `usage.json`, `phrases.json`, `memory.json`, and `sessions/*.json`)
 - `count` — `sessions_kept` from `manifest.json` (an integer; `0` pauses the run)
 - `skill_dir` — this skill's own directory: `skills/skill-authoring/skill-traces`
   (its `references/` dir holds `step-1-collect.md` § Signal definitions and `step-3-read-report.md` § Report and actions shapes)

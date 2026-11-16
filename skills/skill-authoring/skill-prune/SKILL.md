@@ -41,16 +41,20 @@ You collapse duplicate and same-purpose skill folders into one, archiving the dr
 | **Same `name:` in two folders**: one is stale; keep the more complete, delete the other. | Stale copy archived. |
 
 
-## Routing
+## Steps
+
+Run the steps in order. Steps 1 and 2 manage the skill lifecycle (active → stale → archived → purged). Steps 3–10 handle the consolidation workflow.
 
 | Step | File | Purpose |
 | ---- | ---- | ------- |
 | 0 | [`references/step-0-overview.md`](references/step-0-overview.md) | Prune mode overview + classification rules |
-| 1 | [`references/step-1-confirm-root.md`](references/step-1-confirm-root.md) | Resolve the audit root |
-| 2 | [`references/step-2-inventory.md`](references/step-2-inventory.md) | Catalog every skill and read frontmatter + body |
-| 3 | [`references/step-3-group.md`](references/step-3-group.md) | Cluster skills by semantic scope |
-| 4 | [`references/step-4-classify.md`](references/step-4-classify.md) | Label each cluster: duplicate, variant, shared tooling, or separate |
-| 5 | [`references/step-5-dry-run.md`](references/step-5-dry-run.md) | Present the planned prune report; `--dry-run` stops here |
-| 6 | [`references/step-6-snapshot.md`](references/step-6-snapshot.md) | Commit the rollback target |
-| 7 | [`references/step-7-execute.md`](references/step-7-execute.md) | Merge clusters and archive dropped duplicates |
-| 8 | [`references/step-8-verify-report.md`](references/step-8-verify-report.md) | Verify the merge and emit the final report |
+| 1 | [`references/step-1-run.md`](references/step-1-run.md) | Run `sac run` once to apply automatic lifecycle transitions |
+| 2 | [`references/step-2-prune.md`](references/step-2-prune.md) | Run `sac prune --apply` once to archive idle skills and purge old archives |
+| 3 | [`references/step-3-confirm-root.md`](references/step-3-confirm-root.md) | Resolve the audit root |
+| 4 | [`references/step-4-inventory.md`](references/step-4-inventory.md) | Catalog every skill and read frontmatter + body |
+| 5 | [`references/step-5-group.md`](references/step-5-group.md) | Cluster skills by semantic scope |
+| 6 | [`references/step-6-classify.md`](references/step-6-classify.md) | Label each cluster: duplicate, variant, shared tooling, or separate |
+| 7 | [`references/step-7-dry-run.md`](references/step-7-dry-run.md) | Present the planned prune report; `--dry-run` stops here |
+| 8 | [`references/step-8-snapshot.md`](references/step-8-snapshot.md) | Commit the rollback target |
+| 9 | [`references/step-9-execute.md`](references/step-9-execute.md) | Merge clusters and archive dropped duplicates |
+| 10 | [`references/step-10-verify-report.md`](references/step-10-verify-report.md) | Verify the merge and emit the final report |

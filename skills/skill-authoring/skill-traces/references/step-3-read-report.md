@@ -86,7 +86,9 @@ Bullet list: claim, reason it was dropped (which verifier, what failed). Include
 - usage source: `usage.json` (per-skill `count`, `in_slash_mru`, `unused_loaded`,
   session ids) written by `sac traces materialize`; phrase source:
   `phrases.json` (`exact_prompts`, `prompt_stems_12_words`,
-  `repeated_instruction_lines`)
+  `repeated_instruction_lines`); memory source: `memory.json` (topics,
+  observations, keep_list from `$GROK_HOME/memory-v2`) written by
+  `sac memory --run-dir <RUN>`
 - human turns read; sessions read by mappers vs total
 - map or reduce slots lost; verifier sections that failed
 - window and filters used (params from manifest.json)

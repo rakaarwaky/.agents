@@ -8,7 +8,7 @@
 
 ## Executive Summary
 
-The `skill-authoring-tools` MCP server currently exposes 20 tools (`sac_*`) wrapping the `sac` CLI, but `sac_list` and `sac_read` return uninformative exit stubs (`"list: exit 0"` and `"read: exit 0"`), while `sac_status` crashes with an unknown subcommand error across both MCP and CLI entry points.
+The `skill-authoring-tools` MCP server currently exposes 19 tools (`sac_*`) wrapping the `sac` CLI, but `sac_list` and `sac_read` return uninformative exit stubs (`"list: exit 0"` and `"read: exit 0"`), while `sac_status` crashes with an unknown subcommand error across both MCP and CLI entry points.
 
 This design document establishes the architectural fixes to:
 1. **Render Rich Payloads in `SkillsMcpAdapter`:** Inspect `result.records` (for `LIST`, `STATUS`, `USAGE`) and `result.content` (for `READ`), rendering them into clean plain-text representations that achieve 1:1 parity with CLI commands.
@@ -29,7 +29,7 @@ This design document establishes the architectural fixes to:
 1. **Surface-Level Text Rendering:** Table and content formatting is kept in the presentation layer (`modules/mcp/src/surface_mcp_command.py`) without polluting domain VOs or capability layers with pre-rendered strings.
 2. **Plain-Text Without ANSI Escapes:** MCP output strips CLI terminal escape codes (`CYAN`, `BOLD`, `RESET`) to optimize readability and LLM token efficiency.
 3. **Observability Owns Status:** Status inspection is assigned to `_OBSERVABILITY_OPS` and handled by `SkillsObservabilityAgent`, resolving both the MCP `sac_status` tool and the CLI `sac status` command simultaneously.
-4. **Parameter Schema Publication:** All 20 tools in `SkillsMcpAdapter.list_tools()` will declare typed JSON schemas passed to MCP clients by `modules/root_mcp_entry.py`.
+4. **Parameter Schema Publication:** All 19 tools in `SkillsMcpAdapter.list_tools()` will declare typed JSON schemas passed to MCP clients by `modules/root_mcp_entry.py`.
 
 ---
 

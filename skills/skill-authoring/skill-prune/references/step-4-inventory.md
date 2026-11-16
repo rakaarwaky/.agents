@@ -1,6 +1,6 @@
-# Step 2: Inventory
+# Step 4: Inventory
 
-Read every skill in the audit root so Step 3 can cluster on full knowledge.
+Read every skill in the audit root so Step 5 can cluster on full knowledge.
 
 **Goal:** list every skill folder and read each `SKILL.md` frontmatter and body.
 

@@ -8,14 +8,17 @@ Run the steps in order; each links to the next.
 
 | Step | File | What it does |
 | ---- | ---- | ------------ |
-| 1 | [`step-1-confirm-root.md`](step-1-confirm-root.md) | Resolve the audit root the prune runs on. |
-| 2 | [`step-2-inventory.md`](step-2-inventory.md) | List every skill folder and read frontmatter and body. |
-| 3 | [`step-3-group.md`](step-3-group.md) | Cluster skills by semantic scope, verified against bodies. |
-| 4 | [`step-4-classify.md`](step-4-classify.md) | Label each cluster: duplicate, variant, shared tooling, or separate jobs. |
-| 5 | [`step-5-dry-run.md`](step-5-dry-run.md) | Present the planned prune report; `--dry-run` stops here, default proceeds to Step 6 without confirmation. |
-| 6 | [`step-6-snapshot.md`](step-6-snapshot.md) | Commit the rollback target before touching the tree. |
-| 7 | [`step-7-execute.md`](step-7-execute.md) | Merge the clusters and archive dropped duplicates. |
-| 8 | [`step-8-verify-report.md`](step-8-verify-report.md) | Verify the merge and emit the final report. |
+| 0 | [`step-0-overview.md`](step-0-overview.md) | Overview and classification rules (this file). |
+| 1 | [`step-1-run.md`](step-1-run.md) | Run `sac run` once to apply automatic lifecycle transitions. |
+| 2 | [`step-2-prune.md`](step-2-prune.md) | Run `sac prune --apply` once to archive idle skills and purge old archives. |
+| 3 | [`step-3-confirm-root.md`](step-3-confirm-root.md) | Resolve the audit root the prune runs on. |
+| 4 | [`step-4-inventory.md`](step-4-inventory.md) | Build and read the catalog; read frontmatter and body. |
+| 5 | [`step-5-group.md`](step-5-group.md) | Cluster skills by semantic scope, verified against bodies. |
+| 6 | [`step-6-classify.md`](step-6-classify.md) | Label each cluster: duplicate, variant, shared tooling, or separate jobs. |
+| 7 | [`step-7-dry-run.md`](step-7-dry-run.md) | Present the planned prune report; `--dry-run` stops here, default proceeds to Step 8 without confirmation. |
+| 8 | [`step-8-snapshot.md`](step-8-snapshot.md) | Commit the rollback target before touching the tree. |
+| 9 | [`step-9-execute.md`](step-9-execute.md) | Merge the clusters and archive dropped duplicates. |
+| 10 | [`step-10-verify-report.md`](step-10-verify-report.md) | Verify the merge and emit the final report. |
 
 ## Classification rules
 

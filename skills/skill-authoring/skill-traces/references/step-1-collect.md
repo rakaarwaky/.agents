@@ -17,18 +17,40 @@ sac traces usage --run-dir <RUN>
 Then materialize the deterministic files the workflow reads:
 
     sac traces materialize --run-dir <RUN>
+    sac memory --run-dir <RUN>
 
-This writes `usage.json` (per-skill `count`, `sessions`, `in_slash_mru`, `unused_loaded`) and `phrases.json` (`exact_prompts`, `prompt_stems_12_words`, `repeated_instruction_lines`) into the run dir. Section 3 of the report is derived from `usage.json`; the phrase sections are derived from `phrases.json` — never recounted by an agent.
+This writes `usage.json` (per-skill `count`, `sessions`, `in_slash_mru`, `unused_loaded`) and `phrases.json` (`exact_prompts`, `prompt_stems_12_words`, `repeated_instruction_lines`) into the run dir. `memory.json` (topics, observations, keep_list from `$GROK_HOME/memory-v2`) is written by `sac memory`. Section 3 of the report is derived from `usage.json`; the phrase sections are derived from `phrases.json` — never recounted by an agent.
 
 ## Signal definitions the workflow agents read
 
 Skills-only: no plugins, MCP servers, workflows, or hooks. Per-skill use counts and
 the `unused_loaded` verdict come from `usage.json` in the run dir; repeated-phrase
 material (exact prompts, 12-word stems, repeated instruction lines) comes from
-`phrases.json`. Both are written by `sac traces materialize` into the run dir
-before the workflow launches, so mappers and reducers read them off disk instead of
-recounting the `sessions/*.json` records by hand. Coverage counts and window params
-come from `manifest.json`.
+`phrases.json`. Memory-v2 topics and observations come from `memory.json` (topics
+named in `workspaces/*/topics/` and `global/topics/`; `_inbox` observations). Both
+are written into the run dir before the workflow launches, so mappers and reducers
+read them off disk instead of recounting the `sessions/*.json` records by hand.
+Coverage counts and window params come from `manifest.json`.
+
+## 0. Memory-v2 topics as evidence (§0 — prepended to signal order)
+
+Memory topics can carry the same signal kinds as sessions:
+
+- **learn**: a topic that names a skill and describes how to use it, or that
+  repeats an instruction the user types by hand. Mapper extracts the quoted line
+  as an `instructions outside skills` record with `owner: NEW` unless a loaded
+  skill already states it.
+- **stale**: a topic that says a skill line/path/command is outdated or wrong.
+  Mapper extracts it as a `stale skill signal` record quoting the skill path and
+  the topic text as evidence.
+- **keep** (never-delete): a topic that names a skill as must-keep or states a
+  never-delete criterion. The reducer uses these to build the `--unlearn` keep-list
+  (replaces `/home/raka/.agents/USER.md`; `USER.md` is not read).
+- **friction / observation**: an `_inbox` observation whose frontmatter `type` is
+  `friction`, `stale`, or `learn`. Mapper extracts the quoted body as evidence.
+
+`memory.json` keeps only files newer than `learn/state.json` → `last_completed_at`
+when `--since-last` is set, so repeated reruns do not re-consume the same topics.
 
 Ordered by blast radius: an item higher on this list costs the user more per session
 than one lower down. Mappers extract these per session; reducers merge them across
@@ -69,17 +91,19 @@ current file, there is no claim.
 
 ## 4. Unused skills (candidates to retire)
 
-**Read `.agents/USER.md` first** — the user-profile criteria document at
-`/home/raka/.agents/USER.md` — before applying any retire decision. It defines Raka's
-keep list (skills never to auto-delete) and the conservative default: when in doubt,
-keep the skill and mark it `ask` instead of `delete`. No mass deletion — if deletes
-exceed ~5 in one run, stop and ask Raka first.
+The `--unlearn` keep-list comes from memory-v2 topics: a skill is keep-listed when
+a topic in `workspaces/*/topics/` or `global/topics/` names it as must-keep or
+states a never-delete criterion (see §0). `/home/raka/.agents/USER.md` is not read.
+The conservative default: when in doubt, keep the skill and mark it `ask`
+instead of `delete`. No mass deletion — if deletes exceed ~5 in one run, stop and
+ask Raka first.
 
-Never counted by an agent. Per-skill `count`, `sessions`, `last_used`, `in_slash_mru`,
-and the `unused_loaded` list are read from `usage.json` in the run dir — the
-deterministic material `sac traces materialize` writes before launch. A skill in
-`unused_loaded` (count 0 across the window, absent from slash MRU) is a retirement
-candidate. Cross-check against `.agents/USER.md` keep list before emitting a delete.
+Never counted by an agent. Per-skill `count`, `sessions`, `last_used`,
+`in_slash_mru`, and the `unused_loaded` list are read from `usage.json` in the
+run dir — the deterministic material `sac traces materialize` writes before
+launch. A skill in `unused_loaded` (count 0 across the window, absent from slash
+MRU) is a retirement candidate. Cross-check against the memory-v2 keep-list before
+emitting a delete.
 The safety argument is what still does the job: another loaded copy or a
 sibling skill that covers the same job. If nothing else does the job, the action is
 `ask`, not `delete`. A skill that other loaded skills reference is an `ask` that
