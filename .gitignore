@@ -105,7 +105,7 @@ tools/config/*.providers.json
 /skills/.curator_state
 /skills/.bundled_manifest
 /skills/skills-lock.json
-skills/.export/
+/skills/.export/
 
 # A harness run with HOME pointed inside a skill dir leaves `<skill>/.hermes/skills`
 # behind — a link back to this same pack, so the loader sees recursive phantom skills.
