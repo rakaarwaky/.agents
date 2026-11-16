@@ -279,7 +279,7 @@
     {
       "name": "pr-babysit",
       "description": "Watch a GitHub PR end to end. Two lanes: Hermes orchestrates and ships; Grok Build fixes. Run Step R0 to identify the lane, then read only that lane's references.",
-      "when_to_use": "Triggers on \\\"/pr-babysit\\\". Phrasing: \\\"watch PR 123 until green\\\", \\\"babysit PR 123 and merge when ready\\\", \\\"fix issue #123 and open a PR\\\", \\\"keep fixing PR 123 until it can merge\\\", \\\"pr-babysit add --ship 123\\\".",
+      "when_to_use": "Triggers on \"/pr-babysit\". Phrasing: \"watch PR 123 until green\", \"babysit PR 123 and merge when ready\", \"fix issue #123 and open a PR\", \"keep fixing PR 123 until it can merge\", \"pr-babysit add --ship 123\".",
       "category": "git"
     },
     {
@@ -422,14 +422,14 @@
     },
     {
       "name": "skill-create",
-      "description": "Create a SKILL.md from a described job.",
-      "when_to_use": "Author a new SKILL.md for a capability that has no loaded skill. One skill per invocation. --dry-run stops after the report without writing.",
+      "description": "Authors a SKILL.md from a job description.",
+      "when_to_use": "Author a new SKILL.md for a capability that has no loaded skill: answer the ten core questions, draft, write, score, verify. Trigger terms: create skill, new skill, author skill. One skill per invocation; repairing an existing skill belongs to the sibling skill-improve. --dry-run stops after the report without writing.",
       "category": "skill-authoring"
     },
     {
       "name": "skill-improve",
-      "description": "Improve an existing SKILL.md against the lint standard.",
-      "when_to_use": "Audit and repair an existing skill in one pass. Fix structure, frontmatter, body shape, dangling refs, and pattern-B variants. --dry-run stops after the report without writing.",
+      "description": "Audits and repairs a SKILL.md against lint and quality gates.",
+      "when_to_use": "Audit and repair an existing skill in one pass: structure, frontmatter, body shape, dangling refs, pattern-B variants, and the quality score gate (ten core questions). Trigger terms: improve skill, audit skill. Accepts one skill, a category tree, the skills root, or an explicit list. Authoring a brand-new skill belongs to the sibling skill-create. --dry-run stops after the report without writing.",
       "category": "skill-authoring"
     },
     {
@@ -441,7 +441,7 @@
     {
       "name": "skill-research",
       "description": "Helps users discover and install agent skills from the open skills ecosystem: searches by keyword, checks the skills.sh leaderboard, verifies quality before recommending, and presents install options. --improve audits and repairs an existing skill; --prune merges duplicate skills.",
-      "when_to_use": "Use when the user asks \\\"how do I do X\\\" where X might be a common task with an existing skill, says \\\"find a skill for X\\\" or \\\"is there a skill that can...\\\", asks \\\"can you do X\\\" for a specialized capability, or expresses interest in extending agent capabilities.",
+      "when_to_use": "Use when the user asks \"how do I do X\" where X might be a common task with an existing skill, says \"find a skill for X\" or \"is there a skill that can...\", asks \"can you do X\" for a specialized capability, or expresses interest in extending agent capabilities.",
       "category": "skill-authoring"
     },
     {

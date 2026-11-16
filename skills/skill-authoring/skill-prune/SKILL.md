@@ -47,7 +47,7 @@ You collapse duplicate and same-purpose skill folders into one, archiving the dr
 | ---- | ---- | ------- |
 | 0 | [`references/step-0-overview.md`](references/step-0-overview.md) | Prune mode overview + classification rules |
 | 1 | [`references/step-1-confirm-root.md`](references/step-1-confirm-root.md) | Resolve the audit root |
-| 2 | [`references/step-2-inventory.md`](references/step-2-inventory.md) | List every skill folder and read frontmatter + body |
+| 2 | [`references/step-2-inventory.md`](references/step-2-inventory.md) | Catalog every skill and read frontmatter + body |
 | 3 | [`references/step-3-group.md`](references/step-3-group.md) | Cluster skills by semantic scope |
 | 4 | [`references/step-4-classify.md`](references/step-4-classify.md) | Label each cluster: duplicate, variant, shared tooling, or separate |
 | 5 | [`references/step-5-dry-run.md`](references/step-5-dry-run.md) | Present the planned prune report; `--dry-run` stops here |

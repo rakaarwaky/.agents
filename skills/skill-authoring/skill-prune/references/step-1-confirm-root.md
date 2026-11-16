@@ -11,8 +11,8 @@ Default to the repo's `skills` root, a specific category, or the user's path. Re
 ## Commands
 
 ```bash
-# List the skill tree to confirm the root is a valid directory
-sac list
+# Build and read the catalog to confirm the root is a valid directory
+sac catalog --build && sac catalog --read
 ```
 
 ## Completion
