@@ -8,18 +8,18 @@ The questions, the 0–2 rubric, and the gate live in `../../skill-improve/refer
 
 The agent answers each one autonomously from the job description and the repo. The user is not asked unless a forcing condition below applies.
 
-| # | Question | Asks | Represents | Derived from |
-|---|----------|------|------------|--------------|
-| Q1 | WHAT & WHY | Esensi skill + tujuan + success metric (kapan tugas dianggap selesai) | What, What kind, Why, For what purpose | Job description + one existing example of the artifact |
-| Q2 | WHEN & WHERE | Trigger aktivasi + lingkungan operasi | When, What time, Where | Job description + repo layout |
-| Q3 | WHO | Aktor, audiens output, gaya bahasa/tone | Who, Whom, Whose, With whom | Repo conventions |
-| Q4 | FROM WHERE | Sumber data/bahan baku yang harus dibaca | From where | Project config + one existing example of the artifact |
-| Q5 | BY WHAT MEANS | Tools/library/command yang WAJIB dan DILARANG | By what means, Which | Tools the repo already uses; new dependencies forbidden |
-| Q6 | HOW | SOP bernomor, berurutan, deterministik | How, In what way, About what | Existing pattern → write → register → check → report |
-| Q7 | HOW FAR | Scope, jumlah maksimal, timeout, batas iterasi | How far, How many/much, How long, How old, How often | Job description; otherwise the agent sets explicit limits |
-| Q8 | WHETHER | Keputusan agent saat menemui kondisi berbeda | Whether | Job description; otherwise stop-and-report branches |
-| Q9 | WHAT KIND | Format deliverable + ke mana disimpan/dikirim | What kind, To where | Deliverable format + destination path |
-| Q10 | HOW COME | Cara agent mendiagnosis kegagalan + rencana pemulihan (self-healing) | How come | Job description; otherwise stop-and-report on failure |
+| #   | Question      | Asks                                                                     | Derived from                                              |
+| --- | ------------- | ------------------------------------------------------------------------ | --------------------------------------------------------- |
+| Q1  | WHAT & WHY    | Skill essence + goal + success metric (when the task is considered done) | Job description + one existing example of the artifact    |
+| Q2  | WHEN & WHERE  | Activation trigger + operating environment                               | Job description + repo layout                             |
+| Q3  | WHO           | Actor, output audience, language/tone                                    | Repo conventions                                          |
+| Q4  | FROM WHERE    | Source data/raw material that must be read                               | Project config + one existing example of the artifact     |
+| Q5  | BY WHAT MEANS | Mandatory and forbidden tools/library/command                            | Tools the repo already uses; new dependencies forbidden   |
+| Q6  | HOW           | Numbered SOP, sequential, deterministic                                  | Existing pattern → write → register → check → report      |
+| Q7  | HOW FAR       | Scope, maximum count, timeout, iteration ceiling                         | Job description; otherwise the agent sets explicit limits |
+| Q8  | WHETHER       | Agent decision when encountering different conditions                    | Job description; otherwise stop-and-report branches       |
+| Q9  | WHAT KIND     | Deliverable format + where it is saved/sent                              | Deliverable format + destination path                     |
+| Q10 | HOW COME      | How the agent diagnoses failure + recovery plan (self-healing)           | Job description; otherwise stop-and-report on failure     |
 
 ## Forcing conditions — ask the user only when
 

@@ -39,7 +39,7 @@ QUESTIONS = [
     ("whether", r"\bwhether\b"),
     ("what kind", r"what kind"),
     ("how come", r"how come"),
-]  # step-14-tenq-standard.md
+]  # step-5-verify.md
 NAME_RE = re.compile(r"^[a-z0-9]+(-[a-z0-9]+)*$")
 LINK_RE = re.compile(r"\]\(([^)\s]+\.md)(#[^)]*)?\)")
 RULE_REF_RE = re.compile(r"\bR(\d{1,3})\b")

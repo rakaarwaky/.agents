@@ -1,4 +1,4 @@
-# Improve — Step 0: Overview
+# Improve — Step 0: Overview + Resolve scope
 
 Full audit + improve recipe for a target `SKILL.md` — runs before publishing or on demand. Verification after any edit is the `sac lint` gate.
 
@@ -7,24 +7,47 @@ Full audit + improve recipe for a target `SKILL.md` — runs before publishing o
 Run the steps in order.
 
 | Step | File | What it does |
-| ---- | ---- | ------------ |
-| 1 | [`step-1-scope.md`](step-1-scope.md) | Resolve the target skill set from the path. |
-| 2 | [`step-2-body-format.md`](step-2-body-format.md) | Enforce the `# Title` / `## Rules` / `## Routing` body shape. |
-| 3 | [`step-3-frontmatter-keys.md`](step-3-frontmatter-keys.md) | Full frontmatter key reference (mandatory + optional). |
-| 4 | [`step-4-validator-catalog.md`](step-4-validator-catalog.md) | What `sac lint` enforces, rule by rule. |
-| 5 | [`step-5-naming-detail.md`](step-5-naming-detail.md) | Naming conventions and rename mechanics. |
-| 6 | [`step-6-description-detail.md`](step-6-description-detail.md) | Description writing rules. |
-| 7 | [`step-7-content-detail.md`](step-7-content-detail.md) | Body content rules. |
-| 8 | [`step-8-prepublish-checklist.md`](step-8-prepublish-checklist.md) | Pre-publish checklist. |
-| 9 | [`step-9-category-placement.md`](step-9-category-placement.md) | Category-placement audit (move/create category). |
-| 10 | [`step-10-information-distribution.md`](step-10-information-distribution.md) | The information-distribution test + rules. |
-| 11 | [`step-11-reference-pattern.md`](step-11-reference-pattern.md) | The reference-pattern decision (Patterns A/B/C). |
-| 12 | [`step-12-apply.md`](step-12-apply.md) | Apply the 11-point edit recipe; quality gate, then lint + pre-publish checklist. |
-| 13 | [`step-13-pattern-b-variants.md`](step-13-pattern-b-variants.md) | Restructure a skill's `references/` into `step-<N>[a\|b\|c]` variants: split per-language monoliths at phase boundaries, rename flat files to step numbers, sync safety-model semantics, verify final shape. |
-| 14 | [`step-14-tenq-standard.md`](step-14-tenq-standard.md) | Score the target against the ten core questions: rubric, gate arithmetic, placement map, score block. |
-| 15 | [`step-15-tenq-diagnosis.md`](step-15-tenq-diagnosis.md) | Map a symptom or a failed question to its owning home, patch, regress, re-score. |
+|------|------|--------------|
+| 0 | [`step-0-overview.md`](step-0-overview.md) | Improve mode overview + resolve target scope |
+| 1 | [`step-1-format.md`](step-1-format.md) | Body shape, frontmatter keys, and lint rule catalog |
+| 2 | [`step-2-detail.md`](step-2-detail.md) | Naming, description, and content detail rules |
+| 3 | [`step-3-publish.md`](step-3-publish.md) | Pre-publish checklist, category placement, information distribution, reference pattern |
+| 4 | [`step-4-apply.md`](step-4-apply.md) | Apply recipe, Pattern B variants |
+| 5 | [`step-5-verify.md`](step-5-verify.md) | TenQ standard, quality gate, verify and report |
+
+## Resolve scope
+
+The `<skill path>` argument names the target. Resolve it before editing:
+
+- **Skill directory** — the path names `<category>/<skill>/` containing a `SKILL.md`. Improve that one skill.
+- **Category directory** — the path names a category folder without its own `SKILL.md`. Default to improving every `SKILL.md` in that tree. Do not ask the user to pick one skill; the request targets the whole category.
+- **Skills root** — the path is the `skills/` folder itself. Improve every skill in the tree.
+- **Explicit skill list** — the user names two or more skill directories (by relative or absolute path) in one invocation. Improve every named skill, running the full audit-then-improve recipe on each in order; verify the whole set after all named skills are done, not one at a time. Naming several skills is not ambiguity — act on all of them without asking.
+
+Do not prompt the user to disambiguate unless two or more distinct skills in the tree match the request equally well and acting on both would waste significant effort; in that case, name the two candidates and proceed with the more specific match. A category with exactly one skill is not ambiguity — improve that skill without asking.
+
+## Embedded-catalog guard
+
+Some skill trees are embedded into a compiled artifact (for example a Rust `include_str!` catalog constant counting on-disk skill files, guarded by a test that compares the constant to the disk state). Check for that guard before editing: read the constant and its test to learn exactly what is counted (skill folders vs individual files, which subtree), state the resulting count in the plan up front, and keep the constant and the tree consistent in the same change — a guard failure on its own blocks the whole run even when every skill edit is correct.
+
+## Commands
+
+- `sac read <name>` — read the target `SKILL.md` before editing so the edit preserves its intent.
+- `sac lint --category <name>` — preview the target's lint issues scoped to its category before the edit; the lint gate runs again after.
+
+**Absolute path as argument**: when the user passes a full filesystem path (e.g. `/repo/skills/web-design`), resolve its last segment as the category name and scope `sac lint --category <name>` accordingly. The `sac` CLI does not accept a bare path — only the category name. Verify the path is a directory containing `SKILL.md` files (a category directory) before proceeding; a path pointing at a single skill's directory scopes the run to that one skill.
+
+## Dry-run before `--apply` on mutation verbs
+
+`sac move`, `sac archive`, and `sac create` are dry-run by default and write only with `--apply`. Before running one against the live repo skills tree:
+
+1. Run the verb without `--apply` and read the `[DRY-RUN]` plan to confirm the source exists and the destination is where it should be.
+2. `--apply` against the live tree moves real files under `skills/` and rebuilds `catalog.json`. After any exploratory or wrong `--apply` on the live tree, restore: `git restore -- skills/<moved-path>`, `rm -rf skills/<destination-dir>`, then `git restore skills/catalog.json`.
+3. For behavior verification, prefer the in-process test harness over the live tree: `run_surface(crafted_tree(tmpdir), 'move', 'drafts/doc-drafts', 'notes')` from `modules/skills_design/tests/fixture_skills.py` drives `cmd_skills` against a `tmp_path` crafted pack — the live tree stays untouched.
+
+Never `--apply` against the live repo to "test" a mutation verb unless the user explicitly asked for the mutation; test on fixtures, apply only on request.
 
 ## Completion
 
-- Every step in the table ran against the resolved scope, or its blocker is named in the report.
+- The target skill set is resolved (one skill, a category tree, or the whole tree).
 - `--dry-run` produced the report without writing.

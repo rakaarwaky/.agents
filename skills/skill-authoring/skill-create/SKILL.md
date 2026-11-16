@@ -2,7 +2,7 @@
 name: skill-create
 description: "Authors a SKILL.md from a job description."
 user-invocable: true
-when-to-use: "Author a new SKILL.md for a capability that has no loaded skill: answer the ten core questions, draft, write, score, verify. Trigger terms: create skill, new skill, author skill, buat skill, bikin skill. One skill per invocation; repairing an existing skill belongs to the sibling skill-improve. --dry-run stops after the report without writing."
+when-to-use: "Author a new SKILL.md for a capability that has no loaded skill: answer the ten core questions, draft, write, score, verify. Trigger terms: create skill, new skill, author skill. One skill per invocation; repairing an existing skill belongs to the sibling skill-improve. --dry-run stops after the report without writing."
 argument-hint: "<job description> [--dry-run]"
 ---
 
