@@ -9,7 +9,12 @@
 
 ```bash
 sac read <new-name>
-sac catalog
+sac catalog --build
 ```
 
-`sac read` confirms the directory and frontmatter match; `sac catalog` refreshes the `## Skills` rows that carry the old path. If `sac lint` reports `name-mismatch`, the frontmatter `name:` was not updated to match the new directory name — fix the frontmatter, not the directory.
+`sac read` confirms the directory and frontmatter match; `sac catalog --build` refreshes the `## Skills` rows that carry the old path. If `sac lint` reports `name-mismatch`, the frontmatter `name:` was not updated to match the new directory name — fix the frontmatter, not the directory.
+
+## Completion
+
+- Directory name, frontmatter `name:`, and catalog agree; `sac read <name>` resolves.
+- A grep for every old filename and old path returns zero hits.

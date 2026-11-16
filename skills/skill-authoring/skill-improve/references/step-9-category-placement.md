@@ -16,9 +16,9 @@ sac lint
 sac catalog --read
 ```
 
-3. The catalog's `## Categories` table already carries each category's description, so it is enough to judge placement (step 4). Open `DESCRIPTION.md` directly only when you will **create or edit** a category's description (steps 6/7) or when `sac lint` flags `missing-category-description` / `empty-category-description` — the catalog row is a stale snapshot until `sac catalog` is rebuilt.
+3. The catalog's `## Categories` table already carries each category's description, so it is enough to judge placement (step 4). Open `DESCRIPTION.md` directly only when you will **create or edit** a category's description (steps 6/7) or when `sac lint` flags `missing-category-description` / `empty-category-description` — the catalog row is a stale snapshot until `sac catalog --build` is rebuilt.
 4. Identify skills whose name or description conflicts with their current category.
-5. If duplicate or obsolete skills need pruning, route to `skill-design --prune` — this mode only decides category placement.
+5. If duplicate or obsolete skills need pruning, route to the pack's pruning skill (`skill-design --prune`) — this skill only decides category placement. If that skill is not in the tree, list the duplicates in the report instead of deleting them (Rules: dangling refs rot fast).
 
 6. If no category fits, create one:
 
@@ -35,7 +35,7 @@ sac move CATEGORY/SKILL TARGET_CATEGORY --apply
 8. Rebuild the catalog:
 
 ```bash
-sac catalog
+sac catalog --build
 ```
 
 9. Verify the moved skills appear under the correct category.
@@ -48,16 +48,16 @@ sac catalog
 | `sac catalog --read` | Read the catalog's `## Categories` table without opening the file. |
 | `sac create category CATEGORY_NAME --description "CATEGORY_DESCRIPTION" --apply` | Create a new category when no existing one fits. |
 | `sac move CATEGORY/SKILL TARGET_CATEGORY --apply` | Move a misplaced skill to the correct category. |
-| `sac catalog` | Rebuild the catalog after moves or category changes. |
+| `sac catalog --build` | Rebuild the catalog after moves or category changes. |
 
 ### Pitfalls
 
 - **Empty source category**: moving the last skill out of a category leaves it empty, and `sac lint` flags `empty-category`. Delete the empty `DESCRIPTION.md` and category directory, or retire the category row in `catalog.json`.
 - **Dangling paths**: after a move, grep the pack for the old `category/skill-name` path and update any hardcoded references.
 
-### Completion
+## Completion
 
 - Every misplaced skill identified in steps 4–7 has been moved.
-- Duplicates and obsolete skills have been routed to `skill-design --prune`.
+- Duplicates and obsolete skills were routed to the pruning skill, or listed in the report when it is absent.
 - The catalog was rebuilt after moves.
 - `sac lint` reports no placement issues.

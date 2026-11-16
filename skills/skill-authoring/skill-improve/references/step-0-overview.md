@@ -2,7 +2,7 @@
 
 Full audit + improve recipe for a target `SKILL.md` — runs before publishing or on demand. Verification after any edit is the `sac lint` gate.
 
-**Goal:** make the target skill(s) follow the body shape, pass `sac lint`, and satisfy the pre-publish checklist — without losing the skill's intent.
+**Goal:** make the target skill(s) follow the body shape, pass `sac lint`, clear the 10Q gate, and satisfy the pre-publish checklist — without losing the skill's intent.
 
 Run the steps in order.
 
@@ -19,5 +19,12 @@ Run the steps in order.
 | 9 | [`step-9-category-placement.md`](step-9-category-placement.md) | Category-placement audit (move/create category). |
 | 10 | [`step-10-information-distribution.md`](step-10-information-distribution.md) | The information-distribution test + rules. |
 | 11 | [`step-11-reference-pattern.md`](step-11-reference-pattern.md) | The reference-pattern decision (Patterns A/B/C). |
-| 12 | [`step-12-apply.md`](step-12-apply.md) | Apply the 9-point edit recipe; verify with lint + pre-publish checklist. |
-| 13 | [`step-13-pattern-b-variants.md`](step-13-pattern-b-variants.md) | Restructure a skill's `references/` into `step-<N>[a|b|c]` variants: split per-language monoliths at phase boundaries, rename flat files to step numbers, sync safety-model semantics, verify final shape. |
+| 12 | [`step-12-apply.md`](step-12-apply.md) | Apply the 11-point edit recipe; 10Q gate, then lint + pre-publish checklist. |
+| 13 | [`step-13-pattern-b-variants.md`](step-13-pattern-b-variants.md) | Restructure a skill's `references/` into `step-<N>[a\|b\|c]` variants: split per-language monoliths at phase boundaries, rename flat files to step numbers, sync safety-model semantics, verify final shape. |
+| 14 | [`step-14-tenq-standard.md`](step-14-tenq-standard.md) | Score the target against Q1–Q10: rubric, gate arithmetic, placement map, score block. |
+| 15 | [`step-15-tenq-diagnosis.md`](step-15-tenq-diagnosis.md) | Map a symptom or a failed question to its owning home, patch, regress, re-score. |
+
+## Completion
+
+- Every step in the table ran against the resolved scope, or its blocker is named in the report.
+- `--dry-run` produced the report without writing.

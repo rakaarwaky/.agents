@@ -1,23 +1,26 @@
 # Create — Step 1: Gather information
 
-**Goal:** collect the skill's name, category, scope, and job description before writing anything.
+**10Q:** Q2, Q4
 
-Ask the user one at a time, as normal conversation (not option prompts):
+**Goal:** collect the skill's name, category, scope, and job description before drafting anything.
 
-1. **Skill name** — must satisfy the `name-format` rule (see the validator catalog in `../../skill-improve/references/step-4-validator-catalog.md`). Validate before continuing.
-2. **Category** — the category folder the skill belongs under: `<skills-dir>/<category>/<skill-name>/`. Default to the category of its sibling skills.
-3. **Scope** — present two options:
-   - **Project** (recommended): `<repo-root>/<skills-dir>/<category>/<skill-name>/SKILL.md` — lives in this repo, shareable with teammates. Default when inside a git repo.
-   - **User**: the harness's user-level skills directory — available in all projects.
-4. **What it should do** — the workflow to automate, a repeated example prompt, or the task description.
+The job description is the only fact that must come from the user. Everything else defaults from the repo and is reported as `assumed` (Rules: safety model — the run is autonomous; the one blocking prompt lives in step 2).
+
+| Fact | Resolution | Ask only when |
+| ---- | ---- | ---- |
+| Job description | From the invocation argument | It is missing or names two different deliverables |
+| Skill name | Gerund-form, lowercase-hyphen, derived from the job; validate against `name-format` in `../../skill-improve/references/step-4-validator-catalog.md` | The derived name collides with an existing skill |
+| Category | The category of the sibling skills that do the same kind of work | No sibling category fits |
+| Scope | **Project** (`<repo-root>/<skills-dir>/<category>/<skill-name>/SKILL.md`) when inside a git repo; otherwise **User** (the harness's user-level skills directory) | The invocation names neither and the repo root is ambiguous |
 
 Resolve the real directory for the chosen scope from the harness config or repo layout before writing; never hardcode a home path into the skill body.
 
 ## Commands
 
 - `sac list` — check the existing pack before naming; a new skill must not collide with an existing name or duplicate a description.
-- `sac discover <query>` — find skills that already cover the requested job; if a close match exists, route to `--improve` instead of `--create`.
+- `sac discover <query>` — find skills that already cover the requested job; if a close match exists, route to `skill-improve` instead of creating a second skill.
 
 ## Completion
 
-- Skill name validated against `name-format`; category and scope chosen; the job is described.
+- Skill name validated against `name-format`; category and scope resolved; the job is described in one sentence naming one deliverable.
+- Every defaulted fact is recorded for the report; the run continues to [`step-2-tenq-draft.md`](step-2-tenq-draft.md).

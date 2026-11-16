@@ -100,3 +100,8 @@ A renumber is not done when the files are renamed — the shape only reads "sequ
 - Never mix patterns arbitrarily within one skill: if one mode moves to Pattern C, keep the other modes as Pattern A single files until they also need splitting.
 - Never renumber existing step files for the sake of consistency — the pattern follows the skill's shape. (Renumbering into a coherent `step-0…N` sequence is different and always required when a Pattern B skill gains new step files; that is completing the sequence, not "consistency".)
 - Renaming a reference file that other files link to requires a grep sweep of the whole pack for the old name (Rules: dangling refs rot fast).
+
+## Completion
+
+- The pattern was chosen from the Routing table before inspecting the tree.
+- Filenames, `# Title` lines, Routing rows, and cross-links all match the chosen pattern; a grep for old names returns zero hits.
