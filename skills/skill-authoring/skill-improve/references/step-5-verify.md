@@ -4,7 +4,7 @@
 
 ## SAC lint fallback
 
-When `sac lint` is unavailable (missing `modules/` → `ModuleNotFoundError: No module named 'cli'`, skills-root path error, or broken install), fall back to `python3 scripts/audit_probes.py <target-path>` (from this skill's directory). It runs grep-based mechanical checks: body shape (`grep -n '^#' <SKILL.md>`), frontmatter scan for four mandatory keys, description/when-to-use char-count against 1,024, unlinked-refs probe, dangling-ref sweep. Report the fallback explicitly — a broken lint gate is an infra defect, not a blocker.
+When `sac lint` is unavailable (missing `modules/` → `ModuleNotFoundError: No module named 'cli'`, skills-root path error, or broken install), do not block the improve run. Run the equivalent grep-class checks directly: body shape (`grep -n '^#' <SKILL.md>`), frontmatter scan for four mandatory keys, description/when-to-use char-count against 1,024, unlinked-refs probe (`ls references/ | while read f; do grep -q "$f" SKILL.md || echo "unlinked: $f"; done`), and dangling-ref sweep (`grep -r "old-name"`). Report the fallback explicitly — a broken lint gate is an infra defect, not a blocker.
 
 A broken `sac` CLI blocks both `sac lint` and `sac catalog --build`; the catalog rebuild falls back to `git add skills/catalog.json && git commit` if stale — state the missing rebuild in the report; do not block the run.
 
@@ -57,7 +57,6 @@ Cycles used: <0-2> · Remaining gaps: <none or list>
 **Mechanical probes:**
 ```bash
 grep -rnE 'what & why|when & where|who|from where|by what means|how far|whether|what kind|how come' SKILL.md references/ || echo "coverage gaps"
-python3 scripts/audit_probes.py <target>
 ```
 
 ## TenQ diagnosis and patch cycle
