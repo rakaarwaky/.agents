@@ -12,6 +12,7 @@ Every template in `template/` has one row here. The table is the complete list; 
 | ---------- | -------- | --------------- |
 | A `SKILL.md` body | [`skill.md`](skill.md) | Frontmatter (4 mandatory keys) + `# <Skill Name>` / `## Rules` / `## Routing`. |
 | A `references/<file>.md` | [`reference.md`](reference.md) | Title, goal, sections with exact syntax, checkable `## Completion`; plus the 3 reference patterns (A/B/C). |
+| A 10Q draft answer sheet | [`tenq-answers.md`](tenq-answers.md) | Ten answered questions with home + source per row, draft score footer; filled before any file is written. |
 | (add one row per template kind you create; name the file after the artifact) | | |
 
 ## Making a template for any artifact

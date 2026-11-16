@@ -18,3 +18,8 @@ For each fact, ask one question: **how many steps read this fact during a single
 - A Rules bullet that fully defines a signal, action type, or invariant is the home for it; a step file that repeats that definition in full is the second copy. Point at the bullet, do not restate it.
 - A step file may reference the Rules bullet by name; it does not restate the bullet's content.
 - The shared-reference case (third rule above) is the only situation where a non-step `references/<name>.md` is legitimate in a Pattern B pipeline; name it in the `SKILL.md` Routing table and link it from the step that consumes it.
+
+## Completion
+
+- Every fact the edit touches has exactly one home, named before the edit.
+- An inlined shared definition names the file it absorbed, and that file is deleted in the same edit.
