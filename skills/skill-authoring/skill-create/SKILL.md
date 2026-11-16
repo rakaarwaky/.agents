@@ -69,6 +69,6 @@ Each row names the answer it covers; the question set, rubric, and gate live in 
 | 0 | [`references/step-0-overview.md`](references/step-0-overview.md) | Create mode overview |
 | 1 | [`references/step-1-gather.md`](references/step-1-gather.md) | Gather name, category, scope, and job description |
 | 2 | [`references/step-2-drafting.md`](references/step-2-drafting.md) | Answer and score the ten core questions before writing; split a two-WHAT job |
-| 3 | [`references/step-3-review.md`](references/step-3-review.md) | Reviewer loop on the tmp/ draft; write to real skills directory on 0 issues |
+| 3 | [`references/step-3-review.md`](references/step-3-review.md) | Reviewer loop on the `$DRAFT_DIR` draft; write to real skills directory on 0 issues |
 | 4 | [`references/step-4-write.md`](references/step-4-write.md) | Create the directory, pick the writer path, write SKILL.md and supporting files |
 | 5 | [`references/step-5-verify.md`](references/step-5-verify.md) | Score the artifact, run probes, enforce the gate, and verify/report. |

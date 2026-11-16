@@ -1,15 +1,15 @@
 # Create — Step 3: Review the draft
 
-**Goal:** a subagent reviewer checks the tmp/ draft against all ten core questions. If any issue is open, send it back to step 2 (drafting) for the drafter to fix via `resume_from`, then re-review. Loop until the reviewer reports 0 issues. Only then write to the real skills directory.
+**Goal:** a subagent reviewer checks the draft under `$DRAFT_DIR` (the system temp directory resolved in step-2) against all ten core questions. If any issue is open, send it back to step 2 (drafting) for the drafter to fix via `resume_from`, then re-review. Loop until the reviewer reports 0 issues. Only then write to the real skills directory.
 
 ## Spawn reviewer subagent
 
-Spawn a reviewer subagent with `spawn_subagent`. The reviewer reads the tmp/ draft produced by step 2.
+Spawn a reviewer subagent with `spawn_subagent`. The reviewer reads the draft under `$DRAFT_DIR` produced by step 2.
 
 Reviewer prompt:
 
 ```
-You are a reviewer for a draft skill under tmp/draft-<skill-name>/.
+You are a reviewer for a draft skill under <DRAFT_DIR>/ (the system temp directory).
 
 Read the draft SKILL.md and every file under references/ and templates/ (if present).
 
@@ -51,18 +51,19 @@ There is no iteration cap — the loop runs until 0 issues.
 
 Only after the reviewer reports 0 issues **and** the run is **not** `--dry-run`:
 
-1. Copy the tmp/ draft (SKILL.md + references/ + templates/ if present) to the real skill directory under `skills/<category>/<skill-name>/`.
+1. Copy the draft under `$DRAFT_DIR` (SKILL.md + references/ + templates/ if present) to the real skill directory under `skills/<category>/<skill-name>/`.
 2. Run `sac lint` (or `sac lint --category <category>`) to verify frontmatter, naming, placement, and reference linking.
 3. Run `sac catalog --build` to register the skill.
+4. Remove the draft: `rm -rf "$DRAFT_DIR"`.
 
-If `sac lint` fails, fix in the same tmp/ draft, re-run this reviewer step, then copy to the real directory.
+If `sac lint` fails, fix in the same draft, re-run this reviewer step, then copy to the real directory.
 
 With `--dry-run`, stop after the reviewer reports 0 issues. Do not copy anything to the skills directory, do not run `sac lint` against disk state, and do not rebuild the catalog. Proceed directly to step 5 (`step-5-verify.md`) for the terminal report.
 
 ## Completion
 
 - The reviewer reported 0 issues of any severity.
-- The tmp/ draft was copied to the real skills directory, `sac lint` passed, and the catalog was rebuilt.
+- The draft was copied to the real skills directory, `sac lint` passed, the catalog was rebuilt, and `$DRAFT_DIR` was removed.
 - Every default used is logged as `assumed` in the scratch sheet.
 - With `--dry-run`, stop here and proceed to step 5 (`step-5-verify.md`) for the terminal report.
 - Otherwise, the run continues to step 4 (`step-4-write.md`).
