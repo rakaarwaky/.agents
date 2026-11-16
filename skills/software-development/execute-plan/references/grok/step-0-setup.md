@@ -30,7 +30,7 @@ Terminal state: all `pr-<n>:merge-ready` ids `completed`. Only then write the fi
 This skill uses the `implementer` and `reviewer` personas.
 Resolve each persona name in this order:
 
-1. `~/.grok/personas/<name>.toml`
+1. `~/.agents/personas/<name>.toml`
 2. `<skill_dir>/../../../../personas/<name>.toml`
 
 Extract the `instructions` value under the `[subagents.personas.<name>]` table in each file (e.g. `python3 -c "import tomllib,sys; print(tomllib.load(open(sys.argv[1],'rb'))['subagents']['personas']['implementer']['instructions'])" <path>`; ignore the `[[subagents.personas.<name>.inputs]]` and `[[subagents.personas.<name>.outputs]]` arrays) and store as:
@@ -46,7 +46,7 @@ Host commands run in bash on Linux. Use `run_terminal_command`.
 Resolve `HOST_PY` as `<dirname of this SKILL.md>/scripts/host.py`.
 Run `python3 <HOST_PY> setup` and parse the JSON stdout. Store `python` as `PYTHON`, `scratch_dir` as `SCRATCH_DIR`, and `run_id` as `PLAN_ID`.
 
-`SCRATCH_DIR` is `~/.grok/develop/<repo-slug>/execute/`. State, summaries, and reviews live here.
+`SCRATCH_DIR` is `~/.agents/develop/<repo-slug>/execute/`. State, summaries, and reviews live here.
 **Validate** that `PLAN_ID` is 8 hex characters.
 **Inline the resolved absolute `SCRATCH_DIR` and `PYTHON`** into every later command.
 

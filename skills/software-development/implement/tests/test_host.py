@@ -28,6 +28,10 @@ def _completed_git_toplevel(root: str) -> subprocess.CompletedProcess:
     return subprocess.CompletedProcess([], 0, stdout=root + "\n", stderr="")
 
 
+def _completed_git_remote(url: str) -> subprocess.CompletedProcess:
+    return subprocess.CompletedProcess([], 0, stdout=url + "\n", stderr="")
+
+
 def _completed_git_fail() -> subprocess.CompletedProcess:
     return subprocess.CompletedProcess([], 1, stdout="", stderr="not a git repository")
 
@@ -60,11 +64,23 @@ class TestResolvePython(unittest.TestCase):
 
 
 class TestRepoSlug(unittest.TestCase):
-    def test_slugifies_repo_name(self):
-        with mock.patch.object(
-            host.subprocess, "run", return_value=_completed_git_toplevel("/home/raka/.agents")
-        ):
-            self.assertEqual(host._repo_slug(), "agents-arwaky")
+    def test_prefers_git_remote_origin_repo_name(self):
+        def fake_run(cmd, **_kwargs):
+            if cmd[:3] == ["git", "remote", "get-url"]:
+                return _completed_git_remote("git@github.com:raka/my-cool-repo.git")
+            return _completed_git_toplevel("/home/raka/some-local-folder")
+
+        with mock.patch.object(host.subprocess, "run", side_effect=fake_run):
+            self.assertEqual(host._repo_slug(), "my-cool-repo")
+
+    def test_falls_back_to_folder_name_when_no_remote(self):
+        def fake_run(cmd, **_kwargs):
+            if cmd[:3] == ["git", "remote", "get-url"]:
+                return _completed_git_fail()
+            return _completed_git_toplevel("/home/raka/local-only-repo")
+
+        with mock.patch.object(host.subprocess, "run", side_effect=fake_run):
+            self.assertEqual(host._repo_slug(), "local-only-repo")
 
     def test_not_inside_git_repository(self):
         with mock.patch.object(host.subprocess, "run", return_value=_completed_git_fail()):
@@ -73,26 +89,29 @@ class TestRepoSlug(unittest.TestCase):
         self.assertIn("not inside a git repository", str(ctx.exception))
 
     def test_slug_must_not_be_empty(self):
-        with mock.patch.object(
-            host.subprocess, "run", return_value=_completed_git_toplevel("/home/raka/--")
-        ):
+        def fake_run(cmd, **_kwargs):
+            if cmd[:3] == ["git", "remote", "get-url"]:
+                return _completed_git_fail()
+            return _completed_git_toplevel("/home/raka/--")
+
+        with mock.patch.object(host.subprocess, "run", side_effect=fake_run):
             with self.assertRaises(SystemExit) as ctx:
                 host._repo_slug()
         self.assertIn("could not derive project repo name", str(ctx.exception))
 
 
 class TestScratchDir(unittest.TestCase):
-    def test_under_grok_plans_with_repo_slug(self):
+    def test_under_agents_develop_with_repo_slug(self):
         with mock.patch.object(host, "_repo_slug", return_value="agents-arwaky"):
             path = host.scratch_dir()
-        self.assertEqual(path, Path.home() / ".grok" / "plans" / "agents-arwaky")
+        self.assertEqual(path, Path.home() / ".agents" / "develop" / "agents-arwaky" / "implement")
         self.assertTrue(path.is_dir())
 
 
 class TestSetupPayload(unittest.TestCase):
     def test_setup_payload_keys_and_run_id(self):
         with (
-            mock.patch.object(host.subprocess, "run", return_value=_completed_git_toplevel("/home/raka/.agents")),
+            mock.patch.object(host, "_repo_slug", return_value="agents-arwaky"),
             mock.patch.object(host.sys, "executable", "/usr/bin/python3"),
         ):
             buf = io.StringIO()
@@ -104,7 +123,7 @@ class TestSetupPayload(unittest.TestCase):
         self.assertEqual(len(payload["run_id"]), 8)
         self.assertEqual(
             Path(payload["scratch_dir"]),
-            Path.home() / ".grok" / "plans" / "agents-arwaky",
+            Path.home() / ".agents" / "develop" / "agents-arwaky" / "implement",
         )
 
 

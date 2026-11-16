@@ -10,7 +10,7 @@ When you talk to the user about these `.rhai` files, call them "workflows," not 
 1. **Gather intent**, conversationally: what should it do, what fans out in parallel, what gets verified, what's the final artifact (a report? a structured result?), and roughly how many agents the user is comfortable spawning per run.
 2. **Pick a name and scope** (same convention as skills):
    - Project: `<repo-root>/.grok/workflows/<name>.rhai` — this repo, shareable with teammates (the default inside a git repo).
-   - User: `~/.grok/workflows/<name>.rhai` — all projects.
+   - User: `~/.agents/workflows/<name>.rhai` — all projects.
    - Name it with lowercase letters, digits, and hyphens (e.g. `review-changes`).
 3. **Author the script.** Start from the example below and follow the reference sections that make up the rest of this file. The shape is: `let meta` header (pure literal) → schemas as constants → one section per phase. Keep agent prompts imperative and self-contained (see Pitfalls).
 4. **Smoke-check one path.** Call the `workflow` tool with `{ script: "<rhai>", validate_only: true }` and representative `args`, and iterate until metadata, compilation, and that canned-host path all pass. This does not cover every branch or live dependency — see Iterating.
@@ -163,7 +163,7 @@ Keep structured run IDs internal in anything user-facing. Users identify a run b
 
 Every launch persists an editable script projection and returns `script_path`. To change a script, edit that copy, smoke-check it with `validate_only: true`, and launch the `script_path` as a new run. Resume always uses the original immutable script and args captured for that run, and the tool rejects a resume combined with `name`, `script`, or `script_path`.
 
-`validate_only` checks metadata, compiles the full script, and executes the single path selected by your args and canned host results (`success: true`, with a small fixed output object). It catches errors reached on that path, but it doesn't enumerate branches, exercise live tools, prove schema handling for every agent output, or validate external side effects. So use representative args, guard every optional agent result, and offer a real run once the smoke check passes. Save reusable workflows to `.grok/workflows/<name>.rhai` and they become invocable by name. Remember `/workflows` lists live and retained runs after launch, not saved definitions.
+`validate_only` checks metadata, compiles the full script, and executes the single path selected by your args and canned host results (`success: true`, with a small fixed output object). It catches errors reached on that path, but it doesn't enumerate branches, exercise live tools, prove schema handling for every agent output, or validate external side effects. So use representative args, guard every optional agent result, and offer a real run once the smoke check passes. Save reusable workflows to `.agents/workflows/<name>.rhai` and they become invocable by name. Remember `/workflows` lists live and retained runs after launch, not saved definitions.
 
 ## Patterns that work
 

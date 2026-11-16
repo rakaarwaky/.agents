@@ -8,7 +8,7 @@ Poll with `orca terminal read --terminal <handle> --cursor <cursor> --limit 1000
 
 ## When Grok Is Done
 
-Grok writes artifacts to its scratch dir (`~/.grok/develop/<repo-slug>/execute/`):
+Grok writes artifacts to its scratch dir (`~/.agents/develop/<repo-slug>/execute/`):
 
 - **State file**: `exec-plan-<PLAN_ID>.json` — the full DAG state: per-PR status, `commit_sha`, `review_rounds`, `final_branch`, `final_review_passed`, `pr_urls`, `deferred_issues`.
 - **Per-PR summaries**: `exec-summary-<PLAN_ID>-<pr-id>.md`.

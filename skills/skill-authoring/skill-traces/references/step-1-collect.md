@@ -69,8 +69,8 @@ current file, there is no claim.
 
 ## 4. Unused skills (candidates to retire)
 
-**Read `.grok/USER.md` first** — the user-profile criteria document at
-`/home/raka/.grok/USER.md` — before applying any retire decision. It defines Raka's
+**Read `.agents/USER.md` first** — the user-profile criteria document at
+`/home/raka/.agents/USER.md` — before applying any retire decision. It defines Raka's
 keep list (skills never to auto-delete) and the conservative default: when in doubt,
 keep the skill and mark it `ask` instead of `delete`. No mass deletion — if deletes
 exceed ~5 in one run, stop and ask Raka first.
@@ -79,7 +79,7 @@ Never counted by an agent. Per-skill `count`, `sessions`, `last_used`, `in_slash
 and the `unused_loaded` list are read from `usage.json` in the run dir — the
 deterministic material `sac traces materialize` writes before launch. A skill in
 `unused_loaded` (count 0 across the window, absent from slash MRU) is a retirement
-candidate. Cross-check against `.grok/USER.md` keep list before emitting a delete.
+candidate. Cross-check against `.agents/USER.md` keep list before emitting a delete.
 The safety argument is what still does the job: another loaded copy or a
 sibling skill that covers the same job. If nothing else does the job, the action is
 `ask`, not `delete`. A skill that other loaded skills reference is an `ask` that

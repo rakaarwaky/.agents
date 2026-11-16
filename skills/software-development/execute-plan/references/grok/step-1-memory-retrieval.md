@@ -12,7 +12,7 @@ The memory helper lives in the implement skill's directory. Derive the path from
 memory_helper_path = dirname(<path-to-implement-SKILL.md>) + "/scripts/memory.py"
 ```
 
-For example, if the implement skill's SKILL.md is at `/root/.grok/worktrees/xai/repo/.grok/skills/implement/SKILL.md`, then `memory_helper_path` is `/root/.grok/worktrees/xai/repo/.grok/skills/implement/scripts/memory.py`.
+For example, if the implement skill's SKILL.md is at `/root/.agents/worktrees/xai/repo/.grok/skills/implement/SKILL.md`, then `memory_helper_path` is `/root/.agents/worktrees/xai/repo/.grok/skills/implement/scripts/memory.py`.
 
 **Substitute this absolute path directly** into every helper invocation -- do not rely on a shell environment variable surviving across `run_terminal_command` calls. All examples below show `${MEMORY_HELPER}` for readability; in practice, inline the absolute path.
 
@@ -44,4 +44,3 @@ If `existing_patterns_snapshot` is non-empty:
 2. Sort by `count` descending.
 3. Take the top 10 entries.
 4. Format into `past_issues_briefing`:
-

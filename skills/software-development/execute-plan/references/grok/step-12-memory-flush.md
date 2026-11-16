@@ -2,7 +2,7 @@
 
 ## Step 12: Memory Flush
 
-After cleanup, update the workspace memory file with patterns from this run. The orchestrator performs this directly using its own tools -- no subagent is needed. This step follows the same protocol as the `/implement` skill's Step 6 (see `.grok/skills/implement/SKILL.md` for full helper documentation, exit codes, and file format details).
+After cleanup, update the workspace memory file with patterns from this run. The orchestrator performs this directly using its own tools -- no subagent is needed. This step follows the same protocol as the `/implement` skill's Step 6 (see `.agents/skills/implement/SKILL.md` for full helper documentation, exit codes, and file format details).
 
 ### Step 12a: Collect & Categorize This Run's Patterns
 

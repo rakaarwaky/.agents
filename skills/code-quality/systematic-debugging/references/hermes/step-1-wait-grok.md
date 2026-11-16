@@ -8,7 +8,7 @@ Poll with `orca terminal read --terminal <handle> --cursor <cursor> --limit 1000
 
 ## When Grok Is Done
 
-Grok writes its artifacts to its scratch dir (`~/.grok/develop/<repo-slug>/`) and makes one local commit in the worktree (regression test + minimal fix + refactor, per the brief):
+Grok writes its artifacts to its scratch dir (`~/.agents/develop/<repo-slug>/`) and makes one local commit in the worktree (regression test + minimal fix + refactor, per the brief):
 
 - **Debug summary** — the run's final report: symptom, root cause found, the hypothesis that held, `fix_attempts` count, the regression test that now passes.
 - **Guardrails check** — confirmation the red-flag list was checked and no rationalization was accepted.

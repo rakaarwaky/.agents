@@ -11,7 +11,7 @@ Configure the optional Grok Build status-line row: pick built-in items, point it
 
 ## Global Rules
 
-- **Write only the user config file.** `[ui.status_line]` belongs in the resolved user `config.toml`; repo-level `.grok/config.toml` cannot set the row. See `config-location.md` for the resolution rule.
+- **Write only the user config file.** `[ui.status_line]` belongs in the resolved user `config.toml`; repo-level `.agents/config.toml` cannot set the row. See `config-location.md` for the resolution rule.
 - **Ask before writing when the user has not named the row.** The row is optional and off by default; a write without a request is a defect.
 - **The table change takes effect at startup; the script change on the next run.** Tell the user which one applies.
 

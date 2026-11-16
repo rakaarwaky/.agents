@@ -20,7 +20,7 @@ In-memory only (single invocation):
 - `fix_count` — per-cycle counter, observational only; does not gate or skip fixes
 - `PROCESSED_THREAD_IDS`, `REPLIED_UNRESOLVED_THREAD_IDS`, `REPLY_FAILED_THREAD_IDS`, `FIX_FAILED_THREAD_IDS` — thread lifecycle lists
 
-Persist `last_status` and `fix_count` to `~/.grok/plugin-data/pr-babysit/watched-prs-<INSTANCE_ID>.json` when the cycle ends.
+Persist `last_status` and `fix_count` to `~/.agents/plugin-data/pr-babysit/watched-prs-<INSTANCE_ID>.json` when the cycle ends.
 
 ## Worktree initialization
 

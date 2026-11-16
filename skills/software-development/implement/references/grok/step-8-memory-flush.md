@@ -7,7 +7,7 @@ Runs once per run, after every unit has reached 0 open issues. This file is the 
 Update the workspace memory file with patterns from this run, using the `issue_patterns` list accumulated during Step 5. The orchestrator performs this directly using its own tools — no subagent is needed for this step.
 
 The write goes through `"${PYTHON}" "${MEMORY_HELPER}" update --file <spec>` so that:
-- The path resolves to the **shared workspace-scoped file** (`$HOME/.grok/implement-memory/<workspace-id>.md`), not a per-worktree file.
+- The path resolves to the **shared workspace-scoped file** (`$HOME/.agents/implement-memory/<workspace-id>.md`), not a per-worktree file.
 - An exclusive lock (`fcntl.flock` on POSIX, `msvcrt.locking` on Windows; no `flock(1)` shell binary required) is held during the read-merge-write, so a /implement run in another worktree of the same repo can't clobber this update.
 - Dedup against existing entries is enforced **deterministically** (case- and whitespace-insensitive match within each category).
 - Compaction is enforced: each category is capped at 25 entries (lowest-count entries dropped first); Recent Runs is capped at 20 entries (oldest dropped).

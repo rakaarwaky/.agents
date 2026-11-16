@@ -12,7 +12,7 @@ assume a layout.
 2. Is a feature `BACKLOG.md`, `FRD.md`, or `DESIGN.md` listed by the root spec docs, or sits under a feature directory (`modules/`, `packages/`, `crates/`) and has either a row table whose headers include `ID` (or `Feature` / `Branch`) and `State`, or a `## Backlog Status` section of aes-docs entry tables (`### FR/DS/DT-...: title` + `| Aspect | Detail |`).
 
 **Out of scope** — any path whose first segment after the repo root starts with a dot
-(`.git/`, `.agents/`, `.grok/`, `.venv/`, `.tox/`, `.pytest_cache/`, `.mypy_cache/`,
+(`.git/`, `.agents/`, `.agents/`, `.venv/`, `.tox/`, `.pytest_cache/`, `.mypy_cache/`,
 `.ruff_cache/`, `.idea/`, `.vscode/`, and any other dot-prefixed directory) —
 dot-prefixed directories are always scratch, session, or tooling, never spec docs.
 Also exclude build and template paths matching `node_modules|target|dist|__pycache__|htmlcov|coverage|junit|vendor|skills|references|workspaces-bad|workspaces-good`.

@@ -8,7 +8,7 @@ Poll with `orca terminal read --terminal <handle> --cursor <cursor> --limit 1000
 
 ## When Grok Is Done
 
-Grok writes artifacts to its scratch dir (`~/.grok/develop/<repo-slug>/`):
+Grok writes artifacts to its scratch dir (`~/.agents/develop/<repo-slug>/`):
 
 - **Per-persona review files**: `grok-review-<REVIEW_ID>-<persona>.md` for every auto-selected persona (1–3).
 - **Summary file**: the aggregated review summary with per-persona issue counts by severity.

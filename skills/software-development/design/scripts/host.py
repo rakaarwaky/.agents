@@ -3,7 +3,11 @@
 
 This module is the single source of truth for the artifact root:
 
-    ~/.grok/develop/<projectreponame>/plan/
+    ~/.agents/develop/<reponame>/plan/
+
+where <reponame> is the repository name from ``git remote get-url origin``
+(not the local folder name). Falls back to the folder name when no remote
+is configured.
 
 The `setup` command creates the per-repo directory and returns it as
 `scratch_dir`; the skill's step files derive every artifact path from that
@@ -47,7 +51,7 @@ def resolve_python() -> str:
 
 
 def _develop_root() -> Path:
-    return Path.home() / ".grok" / "develop"
+    return Path.home() / ".agents" / "develop"
 
 
 def _slugify(name: str) -> str:
@@ -55,10 +59,41 @@ def _slugify(name: str) -> str:
     return re.sub(r"-{2,}", "-", slug)
 
 
-def _repo_slug() -> str:
-    """Return the git repository name only. No fallback."""
+def _repo_name_from_remote() -> str | None:
+    """Extract the repository name from ``git remote get-url origin``.
+
+    Strips ``.git`` suffix and path components so
+    ``https://github.com/user/my-repo.git`` → ``my-repo``.
+    Returns ``None`` when no origin remote is configured.
+    """
     try:
         result = subprocess.run(
+            ["git", "remote", "get-url", "origin"],
+            capture_output=True,
+            text=True,
+            timeout=5,
+        )
+    except (OSError, subprocess.SubprocessError):
+        return None
+    if result.returncode != 0 or not result.stdout.strip():
+        return None
+    url = result.stdout.strip().rstrip("/")
+    while url.endswith(".git"):
+        url = url[:-4]
+    if ":" in url and "//" not in url:
+        url = url.rsplit(":", 1)[-1]
+    name = url.rsplit("/", 1)[-1]
+    return name if name else None
+
+
+def _repo_slug() -> str:
+    """Return the git repository name from the remote origin URL.
+
+    Falls back to the folder name of git --show-toplevel when no
+    origin remote is configured.
+    """
+    try:
+        toplevel_result = subprocess.run(
             ["git", "rev-parse", "--show-toplevel"],
             capture_output=True,
             text=True,
@@ -67,10 +102,16 @@ def _repo_slug() -> str:
     except (OSError, subprocess.SubprocessError):
         raise SystemExit("host.py: git command failed")
 
-    if result.returncode != 0 or not result.stdout.strip():
+    if toplevel_result.returncode != 0 or not toplevel_result.stdout.strip():
         raise SystemExit("host.py: not inside a git repository")
 
-    name = Path(result.stdout.strip()).name
+    remote_name = _repo_name_from_remote()
+    if remote_name:
+        slug = _slugify(remote_name)
+        if slug:
+            return slug
+
+    name = Path(toplevel_result.stdout.strip()).name
     slug = _slugify(name)
 
     if not slug:
@@ -80,7 +121,7 @@ def _repo_slug() -> str:
 
 
 def scratch_dir() -> Path:
-    """Per-repo, per-skill artifact root: ``~/.grok/develop/<projectreponame>/plan/``."""
+    """Per-repo, per-skill artifact root: ``~/.agents/develop/<reponame>/plan/``."""
     path = _develop_root() / _repo_slug() / "plan"
     path.mkdir(parents=True, exist_ok=True)
 

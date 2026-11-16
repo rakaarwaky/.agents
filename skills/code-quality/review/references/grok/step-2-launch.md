@@ -17,7 +17,7 @@ Argument parsing and the persona auto-selection rules live in [step-0-argument-p
 
 For each selected persona (1–3, chosen by the orchestrator in Step 0 based on the target's content):
 
-1. Pick the first path that exists: `~/.grok/personas/<name>.toml`, then the repo fallback `<dirname of SKILL.md>/../../../personas/<name>.toml`.
+1. Pick the first path that exists: `~/.agents/personas/<name>.toml`, then the repo fallback `<dirname of SKILL.md>/../../../personas/<name>.toml`.
 2. Read the file with `read_file`.
 3. Parse with `python3 -c "import tomllib,sys; print(tomllib.load(open(sys.argv[1],'rb'))['subagents']['personas']['<name>']['instructions'])" <path>` and take the `instructions` value under the `[subagents.personas.<name>]` table (ignore the `[[subagents.personas.<name>.inputs]]` and `[[...outputs]]` arrays).
 4. Store that body as `<name>_persona_instructions`.

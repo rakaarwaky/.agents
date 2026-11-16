@@ -8,7 +8,7 @@ Run `lint-arwaky-cli report .` from the owning repo or worktree (absolute path: 
 
 ## Host Setup
 
-Resolve `HOST_PY` as `<dirname of this SKILL.md>/scripts/host.py`. Run `<python> <HOST_PY> setup` via `run_terminal_command` and parse the JSON stdout. Store `python` as `PYTHON`, `scratch_dir` as `scratch_dir`, and `run_id` as `IMPL_ID`. `scratch_dir` is `~/.grok/develop/<repo-slug>/implement/` (per-repo, created by `host.py`); every artifact path in later steps is derived from it.
+Resolve `HOST_PY` as `<dirname of this SKILL.md>/scripts/host.py`. Run `<python> <HOST_PY> setup` via `run_terminal_command` and parse the JSON stdout. Store `python` as `PYTHON`, `scratch_dir` as `scratch_dir`, and `run_id` as `IMPL_ID`. `scratch_dir` is `~/.agents/develop/<repo-slug>/implement/` (per-repo, created by `host.py`); every artifact path in later steps is derived from it.
 
 The helper is Linux-only and requires the current directory to be inside a git repository — it exits with a clear error on either condition. If it exits non-zero, report the error and stop.
 

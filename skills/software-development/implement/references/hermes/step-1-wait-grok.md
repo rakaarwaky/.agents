@@ -10,7 +10,7 @@ Poll with `orca terminal read --terminal <handle> --cursor <cursor> --limit 1000
 
 ## When Grok Is Done
 
-Grok writes two artifacts to its scratch dir (`~/.grok/develop/<repo-slug>/implement/`):
+Grok writes two artifacts to its scratch dir (`~/.agents/develop/<repo-slug>/implement/`):
 
 - **Implementation summary**: `impl-summary-<run_id>.md` — files changed, design decisions.
 - **Review**: `review-<run_id>.md` — the final merged review, 0 open issues when the loop exits.

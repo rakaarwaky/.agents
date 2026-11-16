@@ -8,7 +8,7 @@ Poll with `orca terminal read --terminal <handle> --cursor <cursor> --limit 1000
 
 ## When Grok Is Done
 
-Grok writes its artifacts to its scratch dir (`~/.grok/develop/<repo-slug>/`):
+Grok writes its artifacts to its scratch dir (`~/.agents/develop/<repo-slug>/`):
 
 - **Report**: the step 7 report (final report section shape per `grok/step-7-report-format.md`) — findings with Verdict + Reason, the "Bugs found" section, RISKY-tier items for manual review, counts removed / files merged / structural changes.
 - **Commit**: one local commit in the worktree itemising the cleanup.

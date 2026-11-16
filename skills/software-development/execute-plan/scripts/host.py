@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Linux-only host helpers for bundled orchestrator skills.
-Output root: ~/.grok/develop/<projectreponame>/execute/
+Output root: ~/.agents/develop/<reponame>/execute/
 """
 
 from __future__ import annotations
@@ -15,21 +15,43 @@ def resolve_python() -> str:
     raise SystemExit("host.py: no Python 3 interpreter found")
 
 def _develop_root() -> Path:
-    return Path.home() / ".grok" / "develop"
+    return Path.home() / ".agents" / "develop"
 
 def _slugify(name: str) -> str:
     slug = re.sub(r"[^a-z0-9-]+", "-", name.lower()).strip("-")
     return re.sub(r"-{2,}", "-", slug)
 
+def _repo_name_from_remote() -> str | None:
+    try:
+        result = subprocess.run(["git", "remote", "get-url", "origin"], capture_output=True, text=True, timeout=5)
+        if result.returncode == 0 and result.stdout.strip():
+            url = result.stdout.strip().rstrip("/")
+            while url.endswith(".git"):
+                url = url[:-4]
+            if ":" in url and "//" not in url:
+                url = url.rsplit(":", 1)[-1]
+            name = url.rsplit("/", 1)[-1]
+            return name if name else None
+    except (OSError, subprocess.SubprocessError):
+        pass
+    return None
+
 def _repo_slug() -> str:
     try:
         result = subprocess.run(["git", "rev-parse", "--show-toplevel"], capture_output=True, text=True, timeout=5)
-        if result.returncode == 0 and result.stdout.strip():
-            name = Path(result.stdout.strip()).name
-            slug = _slugify(name)
-            if slug: return slug
+        if result.returncode != 0 or not result.stdout.strip():
+            raise SystemExit("host.py: not inside a git repository")
     except (OSError, subprocess.SubprocessError):
         raise SystemExit("host.py: git command failed")
+
+    remote_name = _repo_name_from_remote()
+    if remote_name:
+        slug = _slugify(remote_name)
+        if slug: return slug
+
+    name = Path(result.stdout.strip()).name
+    slug = _slugify(name)
+    if slug: return slug
     raise SystemExit("host.py: not inside a git repository")
 
 def scratch_dir() -> Path:

@@ -40,7 +40,7 @@ After the final report (memory was flushed in Step 8), clean up the temporary ar
 
 | Item | Why |
 |------|-----|
-| Workspace memory file under `$HOME/.grok/implement-memory/` | Persists across runs as the shared memory file for this workspace |
+| Workspace memory file under `$HOME/.agents/implement-memory/` | Persists across runs as the shared memory file for this workspace |
 | The worktree | Retired by a human or CI after the PR merges to `main` (post-merge action listed in the final report above) |
 
 After cleanup completes, report to the user: "Cleanup complete."

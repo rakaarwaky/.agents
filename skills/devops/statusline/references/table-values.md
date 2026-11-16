@@ -26,7 +26,7 @@ show:
 ```toml
 [ui.status_line]
 type = "command"
-command = "~/.grok/statusline.sh"
+command = "~/.agents/statusline.sh"
 ```
 
 Save the script under the same home as the config file, then `chmod +x`

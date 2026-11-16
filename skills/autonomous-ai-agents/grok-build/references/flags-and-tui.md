@@ -2,7 +2,7 @@
 
 Companion to the grok-build SKILL.md. Open it before composing long, multi-turn, or
 interactive invocations. Sources: the Grok user guide
-(`~/.grok/docs/user-guide/`), headless-mode, sessions, agent-mode, subagents,
+(`~/.agents/docs/user-guide/`), headless-mode, sessions, agent-mode, subagents,
 permissions, plan-mode, dashboard, and keyboard-shortcuts guides.
 
 ## Headless Flags (complete)
@@ -37,7 +37,7 @@ permissions, plan-mode, dashboard, and keyboard-shortcuts guides.
   directory that already has an active session in it will silently resume *that*
   session instead of starting fresh — even though the UUID you passed never
   existed. Launch headless one-shots from a dedicated working directory (a git
-  worktree under `~/.grok/worktrees/` or `~/orca/workspaces/`, or `mktemp -d &&
+  worktree under `~/.agents/worktrees/` or `~/orca/workspaces/`, or `mktemp -d &&
   git init` for scratch work) that no other active session is using. Reuse the
   cwd + `-s <UUID>` continuation pattern below only for that cwd's own session.
 
@@ -125,7 +125,7 @@ instead of polling many tmux sessions when running a fleet of Grok agents.
   prompt.
 - Hooks gate behavior at lifecycle events (`PreToolUse` can deny, `Stop` can keep
   the agent working, `PostToolUse` can redact the model-visible output). Hooks load
-  from `~/.grok/hooks/*.json`, project `.grok/hooks/*.json` (requires folder trust),
+  from `~/.agents/hooks/*.json`, project `.agents/hooks/*.json` (requires folder trust),
   `config.toml`, and Claude/Cursor compat files. Manage with `/hooks`.
 
 ## Background Tasks

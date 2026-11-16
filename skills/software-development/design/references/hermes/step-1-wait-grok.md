@@ -8,7 +8,7 @@ Poll with `orca terminal read --terminal <handle> --cursor <cursor> --limit 1000
 
 ## When Grok Is Done
 
-Grok writes three artifacts to its scratch dir (`~/.grok/develop/<repo-slug>/plan/`):
+Grok writes three artifacts to its scratch dir (`~/.agents/develop/<repo-slug>/plan/`):
 
 - **Design document**: `design-doc-<DESIGN_ID>.md` — the polished doc including the `## PR Plan` section.
 - **Summary**: `design-summary-<DESIGN_ID>.md` — key decisions, open questions, PR plan.

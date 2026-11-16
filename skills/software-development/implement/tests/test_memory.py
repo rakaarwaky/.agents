@@ -667,8 +667,8 @@ class TestCLI(CLIBase):
         nogit.mkdir()
         rc, out, err = _run_helper(nogit, "path", env=self.env)
         self.assertEqual(rc, 0, msg=err)
-        # Path should still be under $HOME/.grok/implement-memory/
-        self.assertTrue(out.strip().startswith(str(self.home / ".grok" / "implement-memory")))
+        # Path should still be under $HOME/.agents/implement-memory/
+        self.assertTrue(out.strip().startswith(str(self.home / ".agents" / "implement-memory")))
 
     def test_lock_file_mode_under_restrictive_umask(self):
         # Round 2 [General #70 / General-2 #2]: both files must end up at
@@ -739,7 +739,7 @@ class TestCLI(CLIBase):
         # First create the directory by running update once.
         spec = json.dumps({"patterns": [{"category": "C", "description": "x"}]})
         _run_helper(self.repo_a, "update", stdin=spec, env=self.env)
-        memory_dir = self.home / ".grok" / "implement-memory"
+        memory_dir = self.home / ".agents" / "implement-memory"
         # Remove write/execute so a new os.open(O_CREAT) fails.
         # NOTE: the lock file already exists from the previous update, so
         # os.open with O_CREAT against an existing file in a 0o555 dir would
@@ -768,7 +768,7 @@ class TestCLI(CLIBase):
         # the generic Exception catch-all is in place.
         spec = json.dumps({"patterns": [{"category": "C", "description": "x"}]})
         _run_helper(self.repo_a, "update", stdin=spec, env=self.env)
-        memory_dir = self.home / ".grok" / "implement-memory"
+        memory_dir = self.home / ".agents" / "implement-memory"
         # Find the memory file we just created and overwrite with garbage.
         mem_files = [p for p in memory_dir.iterdir() if p.suffix == ".md"]
         self.assertEqual(len(mem_files), 1)
@@ -838,7 +838,7 @@ class TestDocsConsistency(unittest.TestCase):
         # different from what the helper actually writes. This test parses
         # the file, locates the marker, extracts the next fenced block, and
         # asserts the first len(DEFAULT_HEADER) lines match exactly.
-        ref_md = _HERE.parent / "references" / "step-8-memory-flush.md"
+        ref_md = _HERE.parent / "references" / "grok" / "step-8-memory-flush.md"
         text = ref_md.read_text(encoding="utf-8")
 
         marker = "<!-- mirror-of: scripts/memory.py DEFAULT_HEADER -->"

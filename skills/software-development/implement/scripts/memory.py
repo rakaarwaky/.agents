@@ -6,7 +6,7 @@ memory file so future runs can warn the implementer/reviewers up front. This
 helper centralises:
 
   * **Workspace-scoped path resolution.** The file lives under
-    ``$HOME/.grok/implement-memory/<workspace-id>.md``. The workspace id is
+    ``$HOME/.agents/implement-memory/<workspace-id>.md``. The workspace id is
     derived from a canonicalised git remote URL (or, as fallbacks, the absolute
     path of the main ``.git`` directory or the absolute cwd). Canonicalisation
     collapses SSH/HTTPS, with/without ``.git`` suffix, and trailing-slash
@@ -324,7 +324,7 @@ def memory_paths(*, create_dir: bool = False) -> dict[str, Path]:
         raise WorkspaceIdError(
             "could not determine the user's home directory ($HOME unset and pwd lookup failed)"
         )
-    base = home / ".grok" / MEMORY_DIR_NAME
+    base = home / ".agents" / MEMORY_DIR_NAME
     if create_dir:
         try:
             base.mkdir(parents=True, exist_ok=True)

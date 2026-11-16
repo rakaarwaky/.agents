@@ -82,7 +82,7 @@ class GrokBuildAdapter:
 
     def home(self) -> Path:
         """Resolve the Grok Build harness home directory."""
-        return Path(os.environ.get("GROK_HOME", Path.home() / ".grok"))
+        return Path(os.environ.get("GROK_HOME", Path.home() / ".agents"))
 
     def config_files(self) -> tuple[Path, ...]:
         """Return the config files used by the Grok Build harness."""

@@ -23,7 +23,7 @@ gh repo view --json nameWithOwner --jq '.nameWithOwner'
 
 ## 0c: Persist the Watchlist Entry
 
-State file (per session): `~/.grok/plugin-data/pr-babysit/watched-prs-<INSTANCE_ID>.json`. `INSTANCE_ID` is a UUID generated on first `add` (resolve `HOST_PY` as `<dirname of this SKILL.md>/scripts/host.py`, run `<python> <HOST_PY> uuid --full`); dedupe by `number` + repo; update `ship` if the PR is already watched and `--ship` was passed.
+State file (per session): `~/.agents/plugin-data/pr-babysit/watched-prs-<INSTANCE_ID>.json`. `INSTANCE_ID` is a UUID generated on first `add` (resolve `HOST_PY` as `<dirname of this SKILL.md>/scripts/host.py`, run `<python> <HOST_PY> uuid --full`); dedupe by `number` + repo; update `ship` if the PR is already watched and `--ship` was passed.
 
 ```json
 {

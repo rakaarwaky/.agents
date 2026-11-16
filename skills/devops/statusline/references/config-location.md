@@ -1,11 +1,11 @@
 # Where to write
 
 Resolve the config file as `$GROK_HOME/config.toml` when `GROK_HOME` is
-set, otherwise `~/.grok/config.toml`. If that path is a symlink, edit the
+set, otherwise `~/.agents/config.toml`. If that path is a symlink, edit the
 target. Create the file if it is missing; keep every other key.
 
 Write `[ui.status_line]` only in that user file. A repository
-`.grok/config.toml` cannot set this row, and campaign or version-override
+`.agents/config.toml` cannot set this row, and campaign or version-override
 patches strip it.
 
 **Goal:** the edit lands in the one file Grok actually reads, with the

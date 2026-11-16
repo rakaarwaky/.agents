@@ -133,7 +133,7 @@ Field rules:
 - `kind` is always `skill` in this pipeline.
 - `path` is exact: the SKILL.md file for the skill the action touches, or the skill
   directory for `delete`.
-- `protected` is `bundled` for skills under `~/.grok/bundled/`, `git-tracked` for
+- `protected` is `bundled` for skills under `~/.agents/bundled/`, `git-tracked` for
   skills under a git repo, and null otherwise. A protected skill is never edited or
   deleted in place: the action is `propose`, with `requires_confirmation: true` and
   a `reason` that says where the fix belongs — a user-skill override with the same

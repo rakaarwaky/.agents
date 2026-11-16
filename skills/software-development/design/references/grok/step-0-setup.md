@@ -14,9 +14,9 @@ Parse the JSON on stdout and store:
 
 - `python` as `PYTHON`
 - `run_id` as `DESIGN_ID` (validate: exactly 8 hex characters)
-- `scratch_dir` as the artifact base directory. `host.py` is the single source of truth for this location: `~/.grok/develop/<repo-slug>/plan/`, where `<repo-slug>` is the lowercased git repository name normalized to `[a-z0-9-]`. It also creates the directory. If setup fails (e.g. not inside a git repository), stop and report.
+- `scratch_dir` as the artifact base directory. `host.py` is the single source of truth for this location: `~/.agents/develop/<repo-slug>/plan/`, where `<repo-slug>` is the lowercased git repository name normalized to `[a-z0-9-]`. It also creates the directory. If setup fails (e.g. not inside a git repository), stop and report.
 
-Always use expanded absolute paths (for example `/home/<user>/.grok/develop/<repo-slug>/plan/design-doc-<DESIGN_ID>.md`), including in subagent prompts.
+Always use expanded absolute paths (for example `/home/<user>/.agents/develop/<repo-slug>/plan/design-doc-<DESIGN_ID>.md`), including in subagent prompts.
 
 ## Shared File Paths
 
@@ -36,7 +36,7 @@ Never regenerate `DESIGN_ID` or these paths during review/revise iterations.
 
 ## Persona Injection
 
-Load the `design-doc-writer` and `design-doc-reviewer` personas from `~/.grok/personas/<name>.toml`, extracting the full `instructions` value under the `[subagents.personas.<name>]` table into:
+Load the `design-doc-writer` and `design-doc-reviewer` personas from `~/.agents/personas/<name>.toml`, extracting the full `instructions` value under the `[subagents.personas.<name>]` table into:
 
 - `writer_persona_instructions`
 - `reviewer_persona_instructions`
