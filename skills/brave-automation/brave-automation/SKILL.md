@@ -18,6 +18,9 @@ One umbrella for all Brave/Chromium browser automation through the `baa` CLI. Ev
 - **Profiles must exist first.** Rows whose profile is not registered land nowhere; no `Login Data` DB to write to. `baa profile list` shows every profile named in the CSV before import. Unregistered profiles have no database.
 - **Close Brave before import.** A running Brave locks the `Login Data` DB. No `pgrep -a brave` hits, or `baa password import` retries cleanly. File-lock errors abort the import.
 - **Safe Storage key is per-system.** The AES key encrypting `Login Data` rows can rotate after a Brave upgrade; re-import after rotation. On `DecryptionError` during import, re-run after the key stabilizes. Stale key produces unreadable rows.
+- **Never launch with `--disable-sync` for sync operations.** Including `--disable-sync` renders `brave://settings/braveSync` blank and prevents chain enrollment or joining.
+- **Safe process termination.** Never run `pkill -f brave` because it matches the current shell, python script, or directory path containing `brave`, killing the runner itself. Use `pkill -9 -x "brave"` or `pkill -9 -f "remote-debugging-port="`.
+- **No passive sleep polling.** Never poll multi-profile batch runs with `sleep 60/120`. Run profile-by-profile with explicit timeouts and capture outcomes per profile.
 
 ## Jobs (labeled subsections)
 
@@ -41,6 +44,12 @@ Move credentials between CSV files and each Brave profile's `Login Data` SQLite 
 - **Idempotent import.** Re-running with the same CSV upserts, no duplicate rows. Safe to re-run after a failed import or key rotation.
 - **Import feeds CSV into Chromium's native password stores; export pulls saved passwords back out.**
 
+### 4. Sync — profile sync chain management
+Enroll source profiles into Brave Sync and join target profiles to the same sync chain via `baa profile sync`.
+
+- **Mnemonic code extraction.** Sync code dialogs render in Shadow DOM; extract the 24/25-word mnemonic directly from `textarea.sync-code-text` rather than reading top-level widget text.
+- **On-disk seed verification.** When joined to the same sync chain, all profiles share the identical `brave_sync_v2.seed` value in their respective `Preferences` JSON. Check this field to verify sync enrollment without launching the GUI.
+
 ## References
 
 | Topic | File | Purpose |
@@ -54,3 +63,4 @@ Move credentials between CSV files and each Brave profile's `Login Data` SQLite 
 | Google logout | `references/google-logout.md` | `logout` subcommand — drop the Google session for a profile. |
 | Import | `references/import.md` | `import <path>` — import a Chromium Password Manager CSV into `Login Data` DBs. |
 | Export | `references/export.md` | `export <path>` — export saved passwords from Brave to a CSV file. |
+| Sync | `references/sync.md` | `sync` subcommand — enroll source and join targets to a Brave Sync Chain. |
