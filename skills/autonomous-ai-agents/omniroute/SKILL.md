@@ -42,3 +42,4 @@ Host-native — no Docker, no container. Installed from npm, pinned by `vendor/o
 | [`references/model-tier-list.md`](references/model-tier-list.md) | Build a model tier list / capability ranking from the catalog. |
 | [`references/omniroute-models-shape.md`](references/omniroute-models-shape.md) | `GET /v1/models` response shape and dedupe suffix list. |
 | [`references/custom-provider.md`](references/custom-provider.md) | Add a custom OpenAI-compatible provider, with management API and CLI examples. |
+| [`references/agy-profile-login.md`](references/agy-profile-login.md) | Connect Antigravity (agy) accounts from per-profile Brave sessions in bulk. |

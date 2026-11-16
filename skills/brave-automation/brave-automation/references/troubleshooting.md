@@ -41,6 +41,17 @@ even though the CSV is correct.
 - If the key is irrecoverable (Brave was reinstalled), re-provision
   credentials from `passwords.csv`.
 
+## Stale console-script shebang (`cannot execute: required file not found`)
+
+When `baa` (installed into a venv under `$XDG_DATA_HOME/baa` or the repo `.venv`)
+prints `cannot execute: required file not found`, the shebang points at a `.venv` from
+an old repo location (the tools repo has been moved on this host before). Inspect
+`head -1 <venv>/bin/baa` and `readlink` the venv's `python`.
+
+Fix: re-run `./scripts/install.sh` in the CURRENT tools repo and use
+`<repo>/.venv/bin/baa` (the script prints its own activation hint). Re-running is
+idempotent; it does not touch XDG state dirs.
+
 ## XDG path issues
 
 | Symptom | Cause | Fix |
