@@ -49,7 +49,7 @@ There is no iteration cap — the loop runs until 0 issues.
 
 ## Write to the real skills directory
 
-Only after the reviewer reports 0 issues:
+Only after the reviewer reports 0 issues **and** the run is **not** `--dry-run`:
 
 1. Copy the tmp/ draft (SKILL.md + references/ + templates/ if present) to the real skill directory under `skills/<category>/<skill-name>/`.
 2. Run `sac lint` (or `sac lint --category <category>`) to verify frontmatter, naming, placement, and reference linking.
@@ -57,9 +57,12 @@ Only after the reviewer reports 0 issues:
 
 If `sac lint` fails, fix in the same tmp/ draft, re-run this reviewer step, then copy to the real directory.
 
+With `--dry-run`, stop after the reviewer reports 0 issues. Do not copy anything to the skills directory, do not run `sac lint` against disk state, and do not rebuild the catalog. Proceed directly to step 5 (`step-5-verify.md`) for the terminal report.
+
 ## Completion
 
 - The reviewer reported 0 issues of any severity.
 - The tmp/ draft was copied to the real skills directory, `sac lint` passed, and the catalog was rebuilt.
 - Every default used is logged as `assumed` in the scratch sheet.
-- The run continues to step 4 (`step-4-write.md`).
+- With `--dry-run`, stop here and proceed to step 5 (`step-5-verify.md`) for the terminal report.
+- Otherwise, the run continues to step 4 (`step-4-write.md`).

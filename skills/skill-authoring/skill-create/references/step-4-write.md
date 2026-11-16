@@ -2,6 +2,10 @@
 
 **Goal:** create the skill directory, pick the writer path, write `SKILL.md` and supporting files from the templates, with every answer landed at its single home.
 
+## Dry-run guard
+
+With `--dry-run`, skip this step entirely. Nothing is written to the real skills directory. Proceed directly to step 5 (`step-5-verify.md`) for the terminal report.
+
 ## Part A: Create the directory
 
 ```bash
