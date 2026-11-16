@@ -44,3 +44,4 @@ Host-native — no Docker, no container. Installed from npm, pinned by `vendor/o
 | [`references/custom-provider.md`](references/custom-provider.md) | Add a custom OpenAI-compatible provider, with management API and CLI examples. |
 | [`references/agy-profile-login.md`](references/agy-profile-login.md) | Connect Antigravity (agy) accounts from per-profile Brave sessions in bulk. |
 | [`references/kilocode-profile-login.md`](references/kilocode-profile-login.md) | Connect Kilo Code accounts from per-profile Brave sessions in bulk. |
+| [`references/cline-profile-login.md`](references/cline-profile-login.md) | Connect Cline (api.cline.bot) accounts via AuthKit OAuth + callback-paste flow. |

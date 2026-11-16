@@ -20,6 +20,17 @@ Automation recipes and operational rules for connecting third-party AI providers
    - Google reCAPTCHA / "Confirm you're not a robot" and phone 2FA (`challenge/dp`) cannot and must not be solved via blind click scripts.
    - Yield execution to the user with an interactive runner (`kc_interactive.py`), announce the specific challenge clearly, and poll for DB updates.
 8. **Playwright Event Loop Conflict**: When mixing headless dashboard automation and CDP profile automation, reuse the existing `sync_playwright()` instance rather than calling `.start()` multiple times on the same thread. Ensure `playwright install chromium` has run in the environment.
+9. **Inspect before scripting**: Before writing click logic for a new provider, open the auth page in a visible Brave window and enumerate `get_by_role("link")` and `get_by_role("button")` separately. OAuth "Continue with X" elements are often `<a>` links, not buttons — a button locator matches zero elements and the loop spins without action. Confirm the element role matches the locator role before automating.
+10. **Strict mode violations**: `get_by_role` with a name regex can match multiple elements (e.g. two "Connect" buttons in a dialog). Always use `.first.click()` to avoid `strict mode violation` errors that abort the entire run.
+
+### Cline (`api.cline.bot`)
+- **Type**: OAuth redirect + callback-paste flow.
+- **AuthKit page**: Cline uses AuthKit (`authkit.cline.bot`), NOT the same UI as Kilo Code. "Continue with Google" is a `<a>` **link**, not a `<button>` — use `page.get_by_role("link", name=re.compile(r"continue with google", re.IGNORECASE))`. Clicking a button locator silently matches nothing and the script loops forever.
+- **Dashboard flow**: Dashboard Connect button → consent dialog ("I understand, continue") → dialog with auth URL input → extract URL → open in Brave → after Google login, redirect chain goes `authkit.cline.bot` → `accounts.google.com` → `api.cline.bot/api/v1/auth/callback` → `localhost:7777/callback?code=...&state=...` → capture the final callback URL → paste it back into the dashboard dialog's second input and click Connect.
+- **Callback URL capture**: Poll `page.url` for `localhost:7777/callback` or (`code=` AND `localhost`). Do not stop at `api.cline.bot` — that is an intermediate redirect, not the final callback.
+- **Google consent**: Same multilingual consent patterns as other providers (Continue/Allow/Lanjutkan/Setuju/Izinkan).
+- **Challenge handling**: Same as other providers — if Google shows reCAPTCHA/2FA/password, switch to interactive runner and wait for manual resolution.
+- **Success verification**: Query `~/.omniroute/storage.sqlite` for `SELECT email FROM provider_connections WHERE provider='cline' AND is_active=1`.
 
 ## Provider Patterns
 
