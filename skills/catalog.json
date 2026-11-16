@@ -279,7 +279,7 @@
     {
       "name": "pr-babysit",
       "description": "Watch a GitHub PR end to end. Two lanes: Hermes orchestrates and ships; Grok Build fixes. Run Step R0 to identify the lane, then read only that lane's references.",
-      "when_to_use": "Triggers on \"/pr-babysit\". Phrasing: \"watch PR 123 until green\", \"babysit PR 123 and merge when ready\", \"fix issue #123 and open a PR\", \"keep fixing PR 123 until it can merge\", \"pr-babysit add --ship 123\".",
+      "when_to_use": "Triggers on \\\"/pr-babysit\\\". Phrasing: \\\"watch PR 123 until green\\\", \\\"babysit PR 123 and merge when ready\\\", \\\"fix issue #123 and open a PR\\\", \\\"keep fixing PR 123 until it can merge\\\", \\\"pr-babysit add --ship 123\\\".",
       "category": "git"
     },
     {
@@ -421,6 +421,12 @@
       "category": "research-study"
     },
     {
+      "name": "skill-audit",
+      "description": "Repairs all sac findings across the skill library, then commits and pushes the result.",
+      "when_to_use": "Run when the user asks to clear every sac lint violation of the skills pack, make sac lint exit 0, fix all pack lint issues, or repair lint findings and push. Trigger terms: skill audit, lint the pack, fix lint violations, audit skills. Authoring one new skill belongs to skill-create; repairing one skill's body against the ten-question quality gate belongs to skill-improve; consolidating duplicate skill folders into one belongs to skill-prune. This skill audits the skills pack through to a clean lint, a rebuilt catalog, and a push.",
+      "category": "skill-authoring"
+    },
+    {
       "name": "skill-create",
       "description": "Authors a SKILL.md from a job description.",
       "when_to_use": "Author a new SKILL.md for a capability that has no loaded skill: answer the ten core questions, draft, write, score, verify. Trigger terms: create skill, new skill, author skill. One skill per invocation; repairing an existing skill belongs to the sibling skill-improve. --dry-run stops after the report without writing.",
@@ -441,12 +447,12 @@
     {
       "name": "skill-research",
       "description": "Helps users discover and install agent skills from the open skills ecosystem: searches by keyword, checks the skills.sh leaderboard, verifies quality before recommending, and presents install options. --improve audits and repairs an existing skill; --prune merges duplicate skills.",
-      "when_to_use": "Use when the user asks \"how do I do X\" where X might be a common task with an existing skill, says \"find a skill for X\" or \"is there a skill that can...\", asks \"can you do X\" for a specialized capability, or expresses interest in extending agent capabilities.",
+      "when_to_use": "Use when the user asks \\\"how do I do X\\\" where X might be a common task with an existing skill, says \\\"find a skill for X\\\" or \\\"is there a skill that can...\\\", asks \\\"can you do X\\\" for a specialized capability, or expresses interest in extending agent capabilities.",
       "category": "skill-authoring"
     },
     {
       "name": "skill-traces",
-      "description": "Learns from, evolves, and unlearns skills from Grok Build session traces in one pass. --learn creates skills for repeated hand-typed instructions and open gaps; --evolve fixes stale lines in loaded skills; --unlearn retires skills the traces show are never used. Deterministic counts and repeated-phrase material come from the trace pipeline (usage.json, phrases.json); a narrow window lists but does not retire.",
+      "description": "Learns from, evolves, and unlearns skills from Grok Build session traces in one pass. --learn creates skills for repeated hand-typed instructions and open gaps; --evolve fixes stale lines in loaded skills; --unlearn retires skills the traces show are never used. Deterministic counts and repeated-phrase material come from the trace pipeline (usage.json, phrases.json); memory-v2 topics add topic-level learn/stale/unlearn signals and the --unlearn keep-list (memory.json). a narrow window lists but does not retire.",
       "when_to_use": "Use when the user wants to learn new skills from repeated hand-typed instructions, evolve stale skill lines to match current reality, or retire skills the traces show they never use. Pick one or more modes: --learn, --evolve, --unlearn; the trace pipeline runs once and every mode applies its own action kinds.",
       "category": "skill-authoring"
     },
