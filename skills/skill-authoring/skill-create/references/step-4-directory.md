@@ -1,4 +1,6 @@
-# Create — Step 3: Create the directory
+# Create — Step 4: Create the directory
+
+**10Q:** Q2, Q9
 
 **Goal:** create the skill directory, any needed subdirs, and register a new category in the catalog.
 
@@ -18,12 +20,12 @@ mkdir -p <SKILL_DIR>
 sac create category <cat> --description "<one-line category description>" --apply
 
 # Rebuild the catalog so the new category appears
-sac catalog
+sac catalog --build
 ```
 
 Without `--apply` the `create category` command previews the plan; with it, the category folder and `DESCRIPTION.md` are written.
 
-**Catalog artifacts:** `sac catalog --build` regenerates `catalog.json` at the skills root. `catalog.json` carries each skill's `name`, `description`, `when_to_use`, and `category`. The drift check (exit 3) is available at the agent level; it is not a CLI flag on `sac catalog`.
+**Catalog artifacts:** `sac catalog --build` regenerates `catalog.json` at the skills root. `catalog.json` carries each skill's `name`, `description`, `when_to_use`, and `category`. The drift check (exit 3) is available at the agent level; it is not a CLI flag on `sac catalog --build`.
 
 ## Completion
 

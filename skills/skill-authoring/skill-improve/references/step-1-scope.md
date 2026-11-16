@@ -1,6 +1,6 @@
 # Improve — Step 1: Resolve scope
 
-The `--improve` flag takes a skills path. Resolve it before editing:
+The `<skill path>` argument names the target. Resolve it before editing:
 
 - **Skill directory** — the path names `<category>/<skill>/` containing a `SKILL.md`. Improve that one skill.
 - **Category directory** — the path names a category folder without its own `SKILL.md`. Default to improving every `SKILL.md` in that tree. Do not ask the user to pick one skill; the request targets the whole category.
