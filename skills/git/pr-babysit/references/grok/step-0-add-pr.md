@@ -27,7 +27,7 @@ If `baseRefName` is another PR branch (not the repo default branch), stop and te
 
 ## Step 0.3 — Register and persist
 
-State file (per session): `~/.agents/plugin-data/pr-babysit/watched-prs-<INSTANCE_ID>.json`. `INSTANCE_ID` is a UUID generated on first `add` (resolve `HOST_PY` as `<dirname of this SKILL.md>/scripts/host.py`, run `<python> <HOST_PY> uuid --full` with a real Python 3 interpreter, rejecting WindowsApps stubs) and held in conversation context.
+State file (per session): `~/.agents/develop/<namarepo>/pr-babysit/watched-prs-<INSTANCE_ID>.json`. `<namarepo>` is the basename of the repo containing the PR (resolve from `OWNER_REPO` via `basename`, lowercased and slugified to match the `implement` host.py convention). `INSTANCE_ID` is a UUID generated on first `add` (resolve `HOST_PY` as `<dirname of this SKILL.md>/scripts/host.py`, run `<python> <HOST_PY> uuid --full` with a real Python 3 interpreter, rejecting WindowsApps stubs) and held in conversation context.
 
 Deduplicate: skip if `number` + repo already in the watchlist. If `--ship` was passed and the PR is already watched, set `ship: true`.
 

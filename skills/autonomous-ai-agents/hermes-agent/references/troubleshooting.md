@@ -53,6 +53,11 @@ Blunt instruments: `web.cache_ttl_minutes: 1` (min) or
 2. `hermes skills config` — check platform enablement
 3. Load explicitly: `hermes -s name` (or the skill's own `/<name>` slash command)
 
+### Bundled skills sync keeps re-creating unwanted category folders
+- **Symptom:** Empty category directories (`apple/`, `creative/`, `email/`, `media/`, `note-taking/`, `social-media/`, `web/`) holding only `DESCRIPTION.md` reappear in `~/.hermes/skills/` even after `rm -rf`.
+- **Cause:** `tools/skills_sync.py` unconditionally syncs category `DESCRIPTION.md` files from bundled repo skills during `sync_skills()`. `.bundled_manifest` only tracks skill content directories, not category description files.
+- **Fix:** Place the `.no-bundled-skills` marker in `$HERMES_HOME` (`touch ~/.hermes/.no-bundled-skills`), which forces `skills_sync` to run in `essential_only` mode (seeding only `hermes-agent` and avoiding any unwanted category scaffolding). Then remove the empty category folders.
+
 ### Gateway issues
 Check logs first:
 ```bash

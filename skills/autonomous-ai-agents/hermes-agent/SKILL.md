@@ -44,6 +44,7 @@ Hermes Agent is an open-source AI agent framework by Nous Research that runs in 
 - **Never stop the gateway from inside the gateway process.** `systemctl --user stop hermes-gateway` (or any SIGTERM to the gateway) is blocked: the kill signal propagates to this very process's children, so the command dies before it completes. Restart the gateway with `hermes gateway restart` from a separate shell outside the running gateway. Desktop-app restarts follow the same rule — kill the *desktop* process, not the gateway.
 - **Two theming rules that hold even without loading the reference:** apply skins yourself (`hermes config set display.skin <name>` — every surface repaints live within ~a second; don't tell the user to run `/skin`), and to tweak one color, edit the ACTIVE skin (`hermes skin set <key> <hex>`) — never fork `default`, which drops the palette and resets the background.
 - **Spawning instances:** run additional Hermes processes as fully independent subprocesses — separate sessions, tools, and environments — never as in-process subagents.
+- **Stop unwanted bundled category folders:** Hermes seeds bundled category descriptions (`apple/`, `note-taking/`, etc.) during `sync_skills()`. To disable bundled skills sync and prevent empty category folders from regenerating, create the marker `touch ~/.hermes/.no-bundled-skills` (essential-only mode).
 
 ## Routing
 
