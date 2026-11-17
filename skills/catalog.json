@@ -116,7 +116,7 @@
     },
     {
       "name": "llm-writing",
-      "description": "Create or improve docs: minimum tokens, exact names, zero AI slop.",
+      "description": "Create or improve docs: minimum tokens, exact names, zero AI slop. Use for new docs (--create) or editing existing text (--improve).",
       "when_to_use": "Use ONLY for concise document creation (--create) or for improving existing text (--improve).",
       "category": "content-creation"
     },
