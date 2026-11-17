@@ -1,6 +1,6 @@
 # Audit — Step 5: Verify and report
 
-**Goal:** confirm the pack is clean and pushed, score the run against the ten core questions, and emit one report.
+Confirm the pack is clean and pushed, score the run against the ten core questions, emit one report.
 
 ## 5.1 Verify
 

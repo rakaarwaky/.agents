@@ -1,10 +1,10 @@
 # Audit — Step 0: Overview
 
-**Goal:** run the closed loop scan → fix → rebuild → commit → push for the whole skills pack, and end when `sac lint` exits 0 with the pack pushed.
+Run the loop scan → fix → rebuild → commit → push. Stop when `sac lint` exits 0 and the pack is pushed.
 
-**Environment precondition:** the pack root is the git repository that holds `skills/`, `skills/catalog.json`, `modules/`, and `pyproject.toml`. On this host that is `/home/raka/.agents`; resolve it with `git rev-parse --show-toplevel` and never hardcode a home path into the skill body.
+**Precondition:** the pack root is the git repo holding `skills/`, `skills/catalog.json`, `modules/`, and `pyproject.toml` — `/home/raka/.agents` on this host. Resolve with `git rev-parse --show-toplevel`; never hardcode a home path.
 
-**Root assertion:** every `sac` verb resolves its own root through `default_pack_root()` — `~/.agents/skills` — and never accepts a path argument. `git` and `git mv` act on the git root. These coincide only when the repo is at `~/.agents`. Before step-1, assert equality:
+**Root assertion:** each `sac` verb resolves its own root via `default_pack_root()` — `~/.agents/skills` — and takes no path argument. `git` and `git mv` act on the git root. Assert equality before step-1:
 
 ```bash
 test "$(git rev-parse --show-toplevel)/skills" = "$HOME/.agents/skills" && echo "root OK" || echo "ROOT MISMATCH"
@@ -12,11 +12,11 @@ test "$(git rev-parse --show-toplevel)/skills" = "$HOME/.agents/skills" && echo 
 
 On `ROOT MISMATCH`, stop and report both paths. The audit never lints one tree and commits another.
 
-**Guard:** if `git status --short` is non-empty before the run, stop. Report the pre-existing dirty files and let the user decide. The audit never commits another agent's work.
+**Guard:** if `git status --short` is non-empty, stop. Report the pre-existing dirty files; the user decides. The audit never commits another agent's work.
 
 ## Issue classes the pack emits
 
-`sac lint` names every issue in square brackets. The class is the text before the first `]`.
+`sac lint` names every issue in square brackets; the class is the text before the first `]`.
 
 | Class | Meaning | Owner |
 | --- | --- | --- |
@@ -29,13 +29,13 @@ On `ROOT MISMATCH`, stop and report both paths. The audit never lints one tree a
 | `reference-not-linked` | a file in `references/` has no link in `SKILL.md` | step-2 |
 | `empty-category` | a category holds no skills | step-2 fallback |
 | `invalid-skill-name`, `invalid-placement`, `missing-description`, `invalid-description-characters`, `description-too-long` | frontmatter/placement rule violations from the linter's rule catalog | step-2 fallback |
-| any other class | not in the list above — open the linter's rule catalog in `skill-improve/references/step-1-format.md`, fix at the owner, report the class | step-2 fallback |
+| any other class | open the linter's rule catalog in `skill-improve/references/step-1-format.md`, fix at the owner, report the class | step-2 fallback |
 
 **Read-only step.** Steps 0 and 1 write nothing; `--dry-run` skips nothing here.
 
 ## Completion
 
-- Pack root resolved with `git rev-parse --show-toplevel`.
-- Pre-run guard passed: `git status --short` is empty.
-- Issue classes are known before step-1 scans.
-- The run continues to [`step-1-scan.md`](step-1-scan.md).
+- Pack root resolved via `git rev-parse --show-toplevel`.
+- Pre-run guard passed: `git status --short` empty.
+- Issue classes known before step-1 scans.
+- Continue to [`step-1-scan.md`](step-1-scan.md).

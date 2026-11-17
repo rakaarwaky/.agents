@@ -1,6 +1,6 @@
 # Audit — Step 3: Repair loop until clean
 
-**Goal:** re-scan after each repair round and stop only when `sac lint` exits 0 with zero issue lines, or when the round ceiling is reached.
+Re-scan after each repair round. Stop when `sac lint` exits 0 with zero issue lines, or when the round ceiling is reached.
 
 Read-only step until a recipe writes: with `--dry-run`, stop after bucketing — print the issue table and the planned recipes, then go to step-5 for the report. No writes.
 
@@ -24,9 +24,9 @@ With `--dry-run`, stop after bucketing: print the issue table and the planned re
 
 A round is one `sac lint` plus the recipes it triggered. Do not re-fix a class in the same round.
 
-**Self-repair iterations** count re-runs of the audit's own process after a process failure — a failed commit, a failed push, a failed catalog build. Increment `self_repair` on each such retry (step-4.5), and when `self_repair > 2`, stop and report the process failure with its command and exit code. Process failures are separate from lint repair rounds.
+**Self-repair iterations** count re-runs of the audit's own process after a process failure — a failed commit, a failed push, a failed catalog build. Increment `self_repair` on each such retry (step-4.5); when `self_repair > 2`, stop and report the process failure with its command and exit code. Process failures are separate from lint repair rounds.
 
-Process-failure retries in pseudocode:
+Process-failure retries:
 
 ```
 on commit or push failure:
@@ -60,4 +60,4 @@ The table is the audit trail the report summarizes; it is never committed.
 
 - `sac lint` exits 0 with zero issue lines, or the round ceiling stopped the loop with a named remaining list.
 - Every applied fix names its class and owner file in the scratch table.
-- The run continues to [`step-4-commit-push.md`](step-4-commit-push.md) when clean, or to [`step-5-verify-report.md`](step-5-verify-report.md) when stopped.
+- Continue to [`step-4-commit-push.md`](step-4-commit-push.md) when clean, or [`step-5-verify-report.md`](step-5-verify-report.md) when stopped.

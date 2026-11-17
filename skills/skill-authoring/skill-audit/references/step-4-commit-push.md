@@ -1,6 +1,6 @@
 # Audit — Step 4: Rebuild catalog, commit, push
 
-**Goal:** ship the fixed pack as one commit on the pack default branch, with the remote head verified.
+Ship the fixed pack as one commit on the pack default branch, with the remote head verified.
 
 With `--dry-run`, print the commands this step would run and stop — no catalog build, no staging, no commit, no push.
 
@@ -22,7 +22,7 @@ If `sac catalog --build` is unavailable (broken CLI), stage the existing `skills
 sac lint; echo "exit=$?"
 ```
 
-Only a clean scan proceeds. A scan that regressed sends the run back to step-3.
+Only a clean scan proceeds. A regressed scan sends the run back to step-3.
 
 ## 4.3 Stage explicit paths
 
@@ -39,7 +39,7 @@ The staged set must be a subset of: touched skill directories, `skills/<cat>/DES
 
 ### 4.3a Archive residue
 
-`sac archive` writes to `~/.agents/skills/.archive/<cat>/<skill>`, which on this host is inside the repo at `skills/.archive/` and is not gitignored (`.gitignore` un-ignores `/skills/_archive/` only). An archived skill therefore leaves untracked files under `skills/.archive/` after the move.
+`sac archive` writes to `~/.agents/skills/.archive/<cat>/<skill>`, which on this host is inside the repo at `skills/.archive/` and is not gitignored (`.gitignore` un-ignores `/skills/_archive/` only). An archived skill leaves untracked files under `skills/.archive/` after the move.
 
 Check and decide:
 
@@ -47,8 +47,8 @@ Check and decide:
 git status --porcelain skills/.archive
 ```
 
-- If the audit archived a skill as a fix, the move is part of the fix: stage the deletion (`git add skills/<cat>/<skill>`) and commit the removal. Leave `skills/.archive/` untracked — it is the archive store, not pack content — and note it in the report.
-- If `skills/.archive/` is empty, remove the empty tree (`rmdir skills/.archive/<cat> skills/.archive`).
+- The audit archived a skill as a fix, so the move is part of the fix: stage the deletion (`git add skills/<cat>/<skill>`) and commit the removal. Leave `skills/.archive/` untracked — it is the archive store, not pack content — and note it in the report.
+- `skills/.archive/` is empty: remove the empty tree (`rmdir skills/.archive/<cat> skills/.archive`).
 - R14's clean-tree check applies to tracked files; an untracked archive store is reported, not committed.
 
 ## 4.4 Commit
@@ -90,4 +90,4 @@ Never `git push --force`. Never `git reset --hard` except the documented rollbac
 - `sac lint` exited 0 before staging.
 - `git diff --cached --name-only` lists only task files + `catalog.json`.
 - One commit exists on the pack default branch; local and upstream SHAs match.
-- The run continues to [`step-5-verify-report.md`](step-5-verify-report.md).
+- Continue to [`step-5-verify-report.md`](step-5-verify-report.md).

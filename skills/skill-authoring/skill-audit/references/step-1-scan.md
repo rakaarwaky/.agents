@@ -1,6 +1,6 @@
 # Audit — Step 1: Scan and bucket
 
-**Goal:** record the pre-state and turn `sac lint` output into a fix table.
+Record the pre-state, then turn `sac lint` output into a fix table.
 
 ## 1.1 Record the pre-state
 
@@ -14,7 +14,7 @@ git config user.name
 git config user.email
 ```
 
-Record the snapshot SHA and the default branch in the report. `git symbolic-ref refs/remotes/origin/HEAD` prints the pack default branch (for example `main`); the audit pushes to that branch and to no other. If `git config user.name` or `user.email` is empty, the commit will fail — report the missing identity and stop, or ask the user to set it.
+Record the snapshot SHA and default branch in the report. `git symbolic-ref refs/remotes/origin/HEAD` prints the pack default branch (for example `main`); the audit pushes to that branch and no other. Empty `git config user.name` or `user.email` fails the commit — report the missing identity and stop, or ask the user to set it.
 
 ## 1.2 Run the scan
 
@@ -30,11 +30,9 @@ Exit codes: `0` clean, `1` issues found, `2` usage error. Catalog drift is a sep
 
 Each line below the count header is one issue. Parse `[<class>] <subject>: <detail>`.
 
-When `duplicate-description` or `missing-category-description` needs the catalog index, read it with `sac catalog --read` (or open `skills/catalog.json`) to see every skill's registered description and category in one place. `sac discover` is unreliable in this pack — its renderer prints names only and currently returns no matches — so read paths from the `sac lint` issue line or `skills/catalog.json` instead.
-
-When a `duplicate-skill-name` issue appears, the two paths are in the issue line itself (`... appears in: <cat1>/<name>, <cat2>/<name>`); `sac archive` resolves a bare name to the alphabetically first match (`find_skill_dir` → `min(matches)`), so record which path that is before archiving.
-
-When a `duplicate-description` issue appears, the paths are in the issue line (`... appears in: <cat1>/<name>, <cat2>/<name>`); fix the description in the loser's `SKILL.md` or archive the loser by bare name after the alphabetical-first check.
+- `duplicate-description` / `missing-category-description` needing the catalog index: read it with `sac catalog --read` (or open `skills/catalog.json`) for every skill's registered description and category in one place. `sac discover` is unreliable in this pack — its renderer prints names only and returns no matches — so read paths from the `sac lint` issue line or `skills/catalog.json`.
+- `duplicate-skill-name`: the two paths are in the issue line (`... appears in: <cat1>/<name>, <cat2>/<name>`). `sac archive` resolves a bare name to the alphabetically first match (`find_skill_dir` → `min(matches)`); record which path that is before archiving.
+- `duplicate-description`: the paths are in the issue line. Fix the description in the loser's `SKILL.md`, or archive the loser by bare name after the alphabetical-first check.
 
 | Field | Example | Used for |
 | --- | --- | --- |
@@ -42,7 +40,7 @@ When a `duplicate-description` issue appears, the paths are in the issue line (`
 | subject | `figcraft/figure-skills/paper-figure` | the directory or skill to act on |
 | detail | `SKILL.md is nested deeper than category/skill/SKILL.md` | what is wrong |
 
-Write the table as a scratch file under `/tmp/` — class, subject, detail, planned fix. Never write it into the pack.
+Write the table to a scratch file under `/tmp/` — class, subject, detail, planned fix. Never write it into the pack.
 
 ## 1.4 Fall back when `sac` is broken
 
@@ -74,4 +72,4 @@ Report the fallback explicitly. A broken gate is an infra defect, not a blocker.
 - `sac lint` run; exit code captured.
 - Every issue line bucketed into class, subject, detail, planned fix.
 - Fallback probes run when `sac` is unavailable.
-- The run continues to [`step-2-fix.md`](step-2-fix.md).
+- Continue to [`step-2-fix.md`](step-2-fix.md).
