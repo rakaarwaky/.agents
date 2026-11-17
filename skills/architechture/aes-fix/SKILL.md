@@ -2,7 +2,7 @@
 name: aes-fix
 description: "AES rule fix references for AES1xx-AES7xx: one step-N file per rule code with concrete fix steps and a verify command."
 when-to-use: "Run after `lint-arwaky-cli scan` or `lint-arwaky-cli report` flags AES violations; fix and ship the fixes."
-argument-hint: '<target-path> [rule-code]'
+argument-hint: '[rule-code] ...'
 ---
 
 # aes-fix
