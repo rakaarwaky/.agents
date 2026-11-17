@@ -10,22 +10,6 @@ argument-hint: "[--dry-run] [--category <name>]"
 
 You audit the skills pack with `sac lint`, repair every flagged violation at its owner file, rebuild the catalog, and push the result — one closed loop from scan to pushed commit. `--dry-run` reports the plan and the issues and stops before any write.
 
-**Purpose:** the pack ships with zero lint violations, tracked in one commit whose message names the classes fixed.
-
-Every skill must answer ten core questions so an agent can run it without guessing:
-- What & why — deliverable, kind, why, purpose
-- When & where — when, time, where
-- Who — who, whom, whose, with whom
-- From where — from where
-- By what means — by what means, which
-- How — how, in what way, about what
-- How far — how far, how many/much, how long, how old, how often
-- Whether — whether
-- What kind — what kind, to where
-- How come — how come
-
-The ten-question rubric, the score block, and the gate live in [`../skill-improve/references/step-5-verify.md`](../skill-improve/references/step-5-verify.md); the apply recipe and Pattern B variants live in [`../skill-improve/references/step-4-apply.md`](../skill-improve/references/step-4-apply.md).
-
 ## Rules
 
 | ID | Rule | Covers | Check |
