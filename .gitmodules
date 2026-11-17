@@ -34,3 +34,6 @@
 [submodule "skills/automation/qwen-web/tools"]
 	path = skills/automation/qwen-web/tools
 	url = https://github.com/rakaarwaky/qwen-web-arwaky.git
+[submodule "skills/content-creation/vision-arwaky/tools"]
+	path = skills/content-creation/vision-arwaky/tools
+	url = https://github.com/rakaarwaky/vision-arwaky
