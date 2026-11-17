@@ -37,28 +37,10 @@
       "category": "automation"
     },
     {
-      "name": "computer-use",
-      "description": "Drive the user's desktop in the background without stealing focus, via the Hermes computer_use tool backed by cua-driver, including a typed browser-page rung. Use when a task needs the user's actual desktop apps rather than headless browser or shell tools.",
-      "when_to_use": "Use when driving a native desktop app (browser GUI, mail client, editor, game, Figma, OS dialogs) in the background, when the user wants mouse/keyboard automation that must not steal focus, or when an input rung must be verified or escalated through the computer_use ladder. Not for headless web automation, plain file edits, or shell commands.",
-      "category": "automation"
-    },
-    {
-      "name": "flatpak-chromium-automation",
-      "description": "Drive Flatpak Chromium CDP, install unpacked extensions, manage profiles.",
-      "when_to_use": "Use when CDP debugging of a Flatpak browser fails to bind its port, when orphan Flatpak instances hijack a debug launch, when pkill/pgrep patterns threaten the agent shell, when adding a Web Store extension that cannot be clicked through, or when a tool must see or create browser profiles deterministically, when editing Local State or Preferences with a closed browser, when probing user-data dirs under native, Flatpak, Snap, or macOS installs, or when wiring NAME|user|pass|url envs into vault items plus browser profiles. Not for driving non-Flatpak browsers.",
-      "category": "automation"
-    },
-    {
       "name": "qwen-web",
       "description": "Automate Qwen AI Web (chat.qwen.ai) with the Qwen3.8-Max intelligence model — zero API keys, persistent browser sessions — and develop the qwen-web-arwaky repo source (TUI, slots, tests). Use when an AI agent needs to send prompts, review code, or analyze attachments via CLI/MCP tools, or edit the internal/qwen-web-arwaky source.",
       "when_to_use": "Use when the user runs /qwen-web, sends a prompt to Qwen AI Web, sends prompt files or attachments for Qwen analysis or code review with role templates, sets up or resets the Qwen browser session, initializes the qwen-web workspace, or asks to develop or fix the internal/qwen-web-arwaky repo.",
       "category": "automation"
-    },
-    {
-      "name": "computer-use",
-      "description": "Drive the desktop background-first; escalate on signal.",
-      "when_to_use": "",
-      "category": "autonomous-ai-agents"
     },
     {
       "name": "grok-build",
@@ -157,12 +139,6 @@
       "category": "content-creation"
     },
     {
-      "name": "comfyui",
-      "description": "Generate images, video, and audio via ComfyUI diffusion workflows.",
-      "when_to_use": "Use when the user wants to generate images, video, or audio via ComfyUI diffusion workflows — Stable Diffusion, SDXL, Flux, SD3, AnimateDiff, Hunyuan, Wan, or ControlNet/inpainting/img2img pipelines; also to install, launch, or health-check ComfyUI.",
-      "category": "content-creation"
-    },
-    {
       "name": "llm-writing",
       "description": "Create or improve docs: minimum tokens, exact names, zero AI slop.",
       "when_to_use": "Use ONLY for concise document creation (--create) or for improving existing text (--improve).",
@@ -190,12 +166,6 @@
       "name": "statusline",
       "description": "Configure the optional Grok Build status-line row (`[ui.status_line]`). Use when the user wants built-in items (cwd, model, context), a custom command script, or the row disabled.",
       "when_to_use": "Use when the user asks to configure the status line row: built-in items, a custom script path, refresh interval, padding, or off/disabled.",
-      "category": "devops"
-    },
-    {
-      "name": "systemd-headless-service",
-      "description": "Background a TTY/tray app as a 24/7 user systemd service that survives reboot. Use when an app exits under `systemd --user` with no TTY, auto-exits because `!process.stdin.isTTY`, or must run headless with linger after PC restart.",
-      "when_to_use": "Use when an app works in a terminal but dies under systemd --user (no TTY), drops to tray/background mode, or must survive reboot via `systemctl --user enable` with `loginctl linger`.",
       "category": "devops"
     },
     {
@@ -279,7 +249,7 @@
     {
       "name": "pr-babysit",
       "description": "Watch a GitHub PR end to end. Two lanes: Hermes orchestrates and ships; Grok Build fixes. Run Step R0 to identify the lane, then read only that lane's references.",
-      "when_to_use": "Triggers on \\\"/pr-babysit\\\". Phrasing: \\\"watch PR 123 until green\\\", \\\"babysit PR 123 and merge when ready\\\", \\\"fix issue #123 and open a PR\\\", \\\"keep fixing PR 123 until it can merge\\\", \\\"pr-babysit add --ship 123\\\".",
+      "when_to_use": "Triggers on \"/pr-babysit\". Phrasing: \"watch PR 123 until green\", \"babysit PR 123 and merge when ready\", \"fix issue #123 and open a PR\", \"keep fixing PR 123 until it can merge\", \"pr-babysit add --ship 123\".",
       "category": "git"
     },
     {
@@ -298,12 +268,6 @@
       "name": "ascii-video",
       "description": "ASCII video: convert video/audio to colored ASCII MP4/GIF.",
       "when_to_use": "Use when the user wants ASCII video — video-to-ASCII conversion, audio-reactive music visualizers, generative ASCII animations, hybrid video+audio, text/lyrics overlays, or TTS narration videos (MP4, GIF, image sequence).",
-      "category": "media-content"
-    },
-    {
-      "name": "gif-search",
-      "description": "Searches and downloads GIFs from Tenor via curl + jq using the Tenor API.",
-      "when_to_use": "Use when the user wants to search or download GIFs from Tenor — reaction GIFs, visual content for chat, or GIF metadata via the Tenor API with curl + jq.",
       "category": "media-content"
     },
     {
@@ -349,44 +313,8 @@
       "category": "office"
     },
     {
-      "name": "xlsx",
-      "description": "Create, read, edit Excel .xlsx workbooks and CSVs.",
-      "when_to_use": "Use when creating, reading, editing, or recalculating Excel .xlsx workbooks and CSVs — styled multi-sheet reports, formulas, tables, charts, data validation, and CSV interop — with openpyxl.",
-      "category": "office"
-    },
-    {
-      "name": "competitor-news-monitor",
-      "description": "Watch named companies for material news; cited digests. Use when monitoring a competitor set, tracking company launches, pricing, funding, partnerships, executive moves, or incidents, scheduling a recurring competitor-intelligence digest, or running the scheduled competitor-watch tick.",
-      "when_to_use": "Use when the user asks to monitor competitors, tell them when a named company changes pricing or launches a product, create a competitor intelligence digest, track funding/partnerships/executive moves/incidents, or when a cron tick fires for an existing competitor watch. Not for one-off company research (use web_search/web_extract) or plain feed reading (blogwatcher).",
-      "category": "productivity"
-    },
-    {
-      "name": "product-price-monitor",
-      "description": "Watch product, flight, or listing prices; alert on target. Use when tracking a product/listing/flight/hotel price, setting a price or availability alert, handling currency and all-in totals across variants, or running the scheduled price-watch tick.",
-      "when_to_use": "Use when the user wants an alert when a price drops below a target, wants to watch flights, hotel rooms, tickets, or listings for a fare or availability condition, track inventory or booking windows, or when a cron tick fires for an existing price watch. Not for one-off price lookups (use web_search/web_extract).",
-      "category": "productivity"
-    },
-    {
-      "name": "weekly-review-planning",
-      "description": "Weekly reset: commitments, stalled work, next-week plan. Use when running a weekly review of completed work and commitments, finding stalled projects and waiting items, or planning next week across calendar, tasks, and notes.",
-      "when_to_use": "Use when the user asks to run their weekly review, asks what they committed to and what is slipping, wants next week planned from calendar/tasks/notes, wants stale projects and waiting items found, or when a cron tick fires for a scheduled weekly review. Not for daily briefs or single-inbox triage.",
-      "category": "productivity"
-    },
-    {
       "name": "arxiv",
       "description": "Search arXiv papers by keyword, author, category, or ID.",
-      "when_to_use": "",
-      "category": "research"
-    },
-    {
-      "name": "competitor-news-monitor",
-      "description": "Watch named companies for material news; cited digests.",
-      "when_to_use": "",
-      "category": "research"
-    },
-    {
-      "name": "grounded-citations",
-      "description": "Ground answers and documents in cited, verifiable sources.",
       "when_to_use": "",
       "category": "research"
     },
@@ -412,12 +340,6 @@
       "name": "llm-wiki",
       "description": "Karpathy's LLM Wiki: build/query interlinked markdown KB.",
       "when_to_use": "Use when the user asks to create, build, or start a wiki, ingest a source into a wiki, ask a question about an existing wiki, or lint/audit/health-check a wiki.",
-      "category": "research-study"
-    },
-    {
-      "name": "study-roadmap-builder",
-      "description": "Build folder-structured quarterly study/learning roadmaps.",
-      "when_to_use": "Use when the user wants to build a folder-structured quarterly study/learning roadmap with specific sub-fields per quarter, or to teach a section from an existing roadmap.",
       "category": "research-study"
     },
     {
@@ -447,7 +369,7 @@
     {
       "name": "skill-research",
       "description": "Helps users discover and install agent skills from the open skills ecosystem: searches by keyword, checks the skills.sh leaderboard, verifies quality before recommending, and presents install options. --improve audits and repairs an existing skill; --prune merges duplicate skills.",
-      "when_to_use": "Use when the user asks \\\"how do I do X\\\" where X might be a common task with an existing skill, says \\\"find a skill for X\\\" or \\\"is there a skill that can...\\\", asks \\\"can you do X\\\" for a specialized capability, or expresses interest in extending agent capabilities.",
+      "when_to_use": "Use when the user asks \"how do I do X\" where X might be a common task with an existing skill, says \"find a skill for X\" or \"is there a skill that can...\", asks \"can you do X\" for a specialized capability, or expresses interest in extending agent capabilities.",
       "category": "skill-authoring"
     },
     {
@@ -481,27 +403,9 @@
       "category": "software-development"
     },
     {
-      "name": "design-md",
-      "description": "Author/validate/export Google's DESIGN.md design-token spec files.",
-      "when_to_use": "Use when the user wants a DESIGN.md design-token spec file — authoring, linting, diffing, or exporting to Tailwind or W3C DTCG JSON; also for WCAG contrast validation on color palettes.",
-      "category": "web-design"
-    },
-    {
-      "name": "p5js",
-      "description": "p5.js sketches: gen art, shaders, interactive, 3D.",
-      "when_to_use": "Use when the user wants a p5.js sketch — generative art, shaders, interactive visualizations, canvas animations, 3D WebGL scenes, audio-reactive visuals, or data viz, exported as HTML/PNG/GIF/MP4/SVG.",
-      "category": "web-design"
-    },
-    {
       "name": "popular-web-designs",
       "description": "54 real design systems (Stripe, Linear, Vercel) as HTML/CSS.",
       "when_to_use": "Use when the user wants a page styled like a known site — 'build a page that looks like Stripe/Linear/Vercel', a landing page, dashboard, or UI using a real design system's tokens and components.",
-      "category": "web-design"
-    },
-    {
-      "name": "pretext",
-      "description": "Build creative browser demos with DOM-free text layout.",
-      "when_to_use": "Use when the user wants a pretext creative demo — text flowing around a moving shape, ASCII-art effects using real words, text-as-geometry games, kinetic typography, multiline shrink-wrap UI, or per-glyph physics.",
       "category": "web-design"
     }
   ]
