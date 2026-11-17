@@ -11,13 +11,13 @@ Reviewer prompt:
 ```
 You are a reviewer for a draft skill under <DRAFT_DIR>/ (the system temp directory).
 
-Read the draft SKILL.md and every file under references/ and templates/ (if present).
+Read the draft SKILL.md and every file under references/ and template/ (if present).
 
 Check each of the ten core questions (Q1–Q10):
 1. Is the answer present in the artifact?
 2. Does it name paths, commands, numbers, or steps (score 2)?
 3. Is any answer ambiguous, vague, or requiring a guess (score 0 or 1)?
-4. Is every answer placed in its assigned home per the placement map in step-14-tenq-standard.md?
+4. Is every answer placed in its assigned home — success metric, audience and tone, tools, ceilings, and report shape as Rules rows; activation and precondition in the trigger fields; read-inputs, steps, branches, and fallback in the step files that own them?
 5. Are all reference files linked from SKILL.md (no unlinked references)?
 
 Also verify:
@@ -51,7 +51,7 @@ There is no iteration cap — the loop runs until 0 issues.
 
 Only after the reviewer reports 0 issues **and** the run is **not** `--dry-run`:
 
-1. Copy the draft under `$DRAFT_DIR` (SKILL.md + references/ + templates/ if present) to the real skill directory under `skills/<category>/<skill-name>/`.
+1. Copy the draft under `$DRAFT_DIR` (SKILL.md + references/ + template/ if present) to the real skill directory under `skills/<category>/<skill-name>/`.
 2. Run `sac lint` (or `sac lint --category <category>`) to verify frontmatter, naming, placement, and reference linking.
 3. Run `sac catalog --build` to register the skill.
 4. Remove the draft: `rm -rf "$DRAFT_DIR"`.

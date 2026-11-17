@@ -16,11 +16,9 @@ You <one paragraph: what the agent does when this skill loads>.
 
 ## Rules
 
-The question set, rubric, and gate live in `<path>/skill-improve/references/step-14-tenq-standard.md`.
-
 | ID | Rule | Covers | Check |
 |----|------|--------|-------|
-| R1 | <Rule name>. <the rule, stated once — this row is its single home; detail beyond a few lines moves to a reference and the row points to it.> | <the ten-question answer this row covers, or `—` if none> | <how to check compliance: a command, a grep, or a countable condition> |
+| R1 | <Rule name>. <the rule, stated once — this row is its single home; detail beyond a few lines moves to a reference and the row points to it.> | <the ten-question answer this row covers, or `—`> | <how to check compliance: a command, a grep, or a countable condition> |
 
 ## Routing
 
@@ -31,12 +29,12 @@ The question set, rubric, and gate live in `<path>/skill-improve/references/step
 
 ## How to fill each section
 
-- **Frontmatter** — `name`, `description`, `when-to-use`, `argument-hint` are the four mandatory keys. Optional keys (`user-invocable`, `disable-model-invocation`, `paths`, ...) are target-dependent; the full table is in `../../skill-improve/references/step-3-frontmatter-keys.md`. The two trigger fields carry the when-and-where answer.
+- **Frontmatter** — `name`, `description`, `when-to-use`, `argument-hint` are the four mandatory keys. Optional keys (`user-invocable`, `disable-model-invocation`, `paths`, ...) are target-dependent; add one only when the skill's behavior needs it. The two trigger fields carry the when-and-where answer.
 - **Rules** — one named row per cross-step rule; the row is the single home for that fact. Task-conditional content belongs in a reference, not here (Rules: budget for permanent cost). The rows must cover the cross-step answers: the success metric, audience and tone, tools (mandatory and forbidden), scope and iteration ceilings, and report shape.
-- **Covers cell** — the ten-question answer the row covers, or `—`. Every question must be covered somewhere in the skill; the placement map and coverage probe are in `../../skill-improve/references/step-14-tenq-standard.md`.
+- **Covers cell** — the ten-question answer the row covers, or `—` when the row is a mechanical constraint. The set of labels is the one in the skill's own question table.
 - **Routing** — one table row per reference file the skill ships, in execution order, each linking `references/step-<N>-<name>.md`. A single-file skill with no references omits the section.
 
 ## Completion
 
 - `SKILL.md` matches this skeleton exactly: four mandatory frontmatter keys, then `# <Skill Name>` / `## Rules` / `## Routing` and nothing else in the body.
-- Every Rules row has a checkable Check; the ten core questions are answered once, at their assigned home; the artifact passes the gate in `../../skill-improve/references/step-14-tenq-standard.md`.
+- Every Rules row has a checkable Check; each ten-question answer is stated once, in the file that owns it; `grep -n '^## ' SKILL.md` returns exactly `## Rules` and `## Routing`.

@@ -12,19 +12,7 @@ You audit and repair an existing `SKILL.md` against the shared lint standard and
 
 **Purpose:** make the target skill follow the body shape, pass `sac lint`, clear the quality gate, and satisfy the pre-publish checklist — without losing the skill's intent.
 
-Every skill must answer ten core questions so an agent can run it without guessing:
-- What & why — deliverable, kind, why, purpose
-- When & where — when, time, where
-- Who — who, whom, whose, with whom
-- From where — from where
-- By what means — by what means, which
-- How — how, in what way, about what
-- How far — how far, how many/much, how long, how old, how often
-- Whether — whether
-- What kind — what kind, to where
-- How come — how come
-
-The question set, rubric, score gate, and score block live in [`references/step-4-apply.md`](references/step-4-apply.md).
+The ten-question rubric, the score block, and the gate live in [`references/step-4-apply.md`](references/step-4-apply.md); the score block template and the ten-question rubric live in [`references/step-5-verify.md`](references/step-5-verify.md).
 
 ## Rules
 
@@ -74,3 +62,4 @@ Each row names the answer it answers or enforces; the question set, rubric, and 
 | 2 | [`references/step-2-detail.md`](references/step-2-detail.md) | Naming, description, and content detail rules |
 | 3 | [`references/step-3-publish.md`](references/step-3-publish.md) | Pre-publish checklist, category placement, information distribution, reference pattern |
 | 4 | [`references/step-4-apply.md`](references/step-4-apply.md) | Apply recipe, Pattern B variants, tenQ standard and diagnosis |
+| 5 | [`references/step-5-verify.md`](references/step-5-verify.md) | TenQ standard, quality gate, verify and report |

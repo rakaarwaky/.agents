@@ -8,27 +8,15 @@ argument-hint: "<job description> [--dry-run]"
 
 # Skill Create
 
-You author a new agent skill from a job description: `SKILL.md`, `references/`, and `templates/` where relevant. One skill per invocation.
+You author a new agent skill from a job description: `SKILL.md`, `references/`, and `template/` where the skill ships a skeleton. One skill per invocation.
 
 **Purpose:** build a publishable skill that clears the quality gate, passes `sac lint`, invokes correctly, follows the shared body shape, and carries no duplicate content. Every fact lives once in a single authoritative home; flag and mode terms stay in lockstep across `SKILL.md` and its reference files.
 
-Every skill must answer ten core questions so an agent can run it without guessing:
-- What & why — deliverable, kind, why, purpose
-- When & where — when, time, where
-- Who — who, whom, whose, with whom
-- From where — from where
-- By what means — by what means, which
-- How — how, in what way, about what
-- How far — how far, how many/much, how long, how old, how often
-- Whether — whether
-- What kind — what kind, to where
-- How come — how come
-
-The question set, rubric, score gate, and score block live in [`../skill-improve/references/step-14-tenq-standard.md`](../skill-improve/references/step-14-tenq-standard.md).
+The question set, the 0–2 rubric, the score block, and the gate live in [`../skill-improve/references/step-5-verify.md`](../skill-improve/references/step-5-verify.md); the apply recipe and Pattern B variants live in [`../skill-improve/references/step-4-apply.md`](../skill-improve/references/step-4-apply.md).
 
 ## Rules
 
-Each row names the answer it covers; the question set, rubric, and gate live in [`../skill-improve/references/step-14-tenq-standard.md`](../skill-improve/references/step-14-tenq-standard.md).
+Each row names the answer it covers; the question set, rubric, and gate live in [`../skill-improve/references/step-5-verify.md`](../skill-improve/references/step-5-verify.md).
 
 | ID | Rule | Covers | Check |
 |----|------|--------|-------|
@@ -42,7 +30,7 @@ Each row names the answer it covers; the question set, rubric, and gate live in 
 | R8 | **YAML hygiene.** Quote values containing `: ` or indicator characters. Unclosed frontmatter makes the parser silently drop `description` and `when-to-use`. | When & where | Values with `: ` quoted; second `---` verified immediately before `# Title`. |
 | R9 | **Structure.** One `SKILL.md` per `<category>/<skill>/SKILL.md`. Body ~100–200 lines; detail in `references/*.md`; non-trivial logic in `scripts/<file>`. | How | Body ~100–200 lines; every reference linked from SKILL.md. |
 | R10 | **Mandatory body shape.** Exactly three sections: `# Title`, `## Rules`, `## Routing`. Stop conditions are Rules bullets, not their own heading. The rules table is always-on content and belongs in the SKILL.md body — never extract it to a separate reference file; a rules reference forces a second load to recover the governing rules, defeating the purpose of always-on body rules. | How | `grep ^## ` returns exactly `## Rules` and `## Routing`; no separate rules reference file exists. |
-| R11 | **Templates are the source of truth.** `template/skill.md` is the canonical skeleton; `template/reference.md` the canonical reference shape. | How | Create steps copy from template; no inline restatements. |
+| R11 | **Templates are the source of truth.** `template/skill.md` is the canonical `SKILL.md` skeleton; `template/reference.md` the canonical reference shape; `template/template.md` the registry that routes artifact kind → template file. Create a template for any artifact kind you draft by hand more than once. | How | Create steps copy from the registered template; no inline restatements of a shape that has a template. |
 | R12 | **Tracked catalog.** `sac catalog --build` regenerates `catalog.json`. Rebuild after any frontmatter change. | What kind | `catalog.json` rebuilt after every frontmatter change. |
 | R13 | **Safety model.** All steps run autonomously by default. `--dry-run` generates the full report and stops before any snapshot or execute. Destructive actions go to `_archive/` first. | Whether | All steps proceed without confirmation; `--dry-run` stops before write. |
 | R14 | **Staging discipline.** Use explicit top-level paths; never `git add -A`. Verify staged set with `git diff --cached --name-only` before committing. | By what means | Staged set is exactly task files before commit. |

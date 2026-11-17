@@ -29,7 +29,7 @@ On `ROOT MISMATCH`, stop and report both paths. The audit never lints one tree a
 | `reference-not-linked` | a file in `references/` has no link in `SKILL.md` | step-2 |
 | `empty-category` | a category holds no skills | step-2 fallback |
 | `invalid-skill-name`, `invalid-placement`, `missing-description`, `invalid-description-characters`, `description-too-long` | frontmatter/placement rule violations from the linter's rule catalog | step-2 fallback |
-| any other class | not in the list above — read the rule entry in `skills/skill-authoring/skill-improve/references/step-1-format.md`, fix at the owner, report the class | step-2 fallback |
+| any other class | not in the list above — open the linter's rule catalog in `skill-improve/references/step-1-format.md`, fix at the owner, report the class | step-2 fallback |
 
 **Read-only step.** Steps 0 and 1 write nothing; `--dry-run` skips nothing here.
 
