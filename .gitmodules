@@ -31,3 +31,6 @@
 	path = skills/brave-automation/tools
 	url = https://github.com/rakaarwaky/brave-automation-arwaky.git
 	ignore = dirty
+[submodule "skills/automation/qwen-web/tools"]
+	path = skills/automation/qwen-web/tools
+	url = https://github.com/rakaarwaky/qwen-web-arwaky.git
