@@ -1,0 +1,834 @@
+"""CLI root composition — wires the ``aa`` command handlers.
+
+The AES root layer is the only layer allowed to import ``capabilities_*``,
+``surface_*``, and sibling ``root_*`` modules (AES201 rule 10). This
+container holds the focused command-group builders that the thin
+``root_cli_entry`` dispatches through (AES301): each builder function
+owns one verb family (commands / lifecycle / helpers) so the entry file
+stays small.
+"""
+from __future__ import annotations
+
+import os
+import shutil
+import sys
+import textwrap
+from pathlib import Path
+
+from modules.shared.src.common.taxonomy_common_constant import TOOL_RUNNERS
+from modules.shared.src.common.taxonomy_common_vo import (
+    Tool,
+    bin_home,
+    cache_home,
+    ensure_path,
+)
+from modules.shared.src.common.utility_git_submodule import init_submodules
+from modules.shared.src.common.utility_logging_setup import (
+    BLUE,
+    BOLD,
+    CYAN,
+    DIM,
+    GREEN,
+    RED,
+    RESET,
+    YELLOW,
+    banner,
+    err,
+    info,
+    ok,
+    warn,
+)
+from modules.shared.src.common.utility_logging_setup import (
+    pad as _pad,
+)
+from modules.shared.src.common.utility_logging_setup import (
+    table_widths as _table_widths,
+)
+from modules.shared.src.common.utility_manifest_reader import find_tool, load_tools
+from modules.shared.src.common.utility_paths_resolver import repo_root
+from modules.shared.src.common.utility_process_runner import run_cmd as _run_cmd_util
+
+
+# =============================================================================
+# Helpers (shared by every command family)
+# =============================================================================
+def run_cmd(cmd: list[str]) -> int:
+    try:
+        return _run_cmd_util(cmd).returncode
+    except FileNotFoundError:
+        err(f"Command not found: {cmd[0]}")
+        return 127
+
+
+def exec_python(script: Path, args: list[str]) -> int:
+    if not script.exists():
+        err(f"Python script not found: {script}")
+        return 1
+    os.execvpe(sys.executable, [sys.executable, str(script), *args], os.environ)
+    return 1
+
+
+def is_submodule_missing(path_str: str) -> bool:
+    gitmodules = repo_root() / ".gitmodules"
+    target = repo_root() / path_str
+    if not gitmodules.exists():
+        return False
+    try:
+        text = gitmodules.read_text(encoding="utf-8", errors="replace")
+    except OSError:
+        return False
+    if f"path = {path_str}" not in text:
+        return False
+    return not target.exists() or not (target / ".git").exists()
+
+
+def remove_tool_state(tool: Tool) -> None:
+    from modules.shared.src.common.taxonomy_common_vo import config_home, data_home
+
+    (bin_home() / tool.binary).unlink(missing_ok=True)
+    shutil.rmtree(data_home() / tool.id, ignore_errors=True)
+    shutil.rmtree(config_home() / tool.id, ignore_errors=True)
+    ok(f"Removed state for {tool.id}")
+
+
+def executable_path(binary: str, category: str = "", tool_id: str = "", runner: str = "") -> Path | None:
+    """Port of tools/lib/tool_resolver.py executable_path() (shutil.which + bin_home check).
+
+    For internal tools the runner candidates come from the runner module's
+    ToolResolver (capabilities_runner), which is an exact port of the
+    tool_resolver runner-candidate logic.
+    """
+    from modules.shared.src.common.taxonomy_common_vo import ToolSpec
+
+    found = shutil.which(binary)
+    if found:
+        return Path(found)
+    local = bin_home() / binary
+    if local.exists() and os.access(local, os.X_OK):
+        return local
+    if category == "internal":
+        from modules.tools.src.root_tools_container import create_tools_feature
+
+        spec = ToolSpec(
+            id=tool_id,
+            category=category,
+            binary=binary,
+            is_mcp=False,
+            description="",
+            path="",
+            alias=None,
+            mcp_binary=None,
+            runner=runner or TOOL_RUNNERS.get(tool_id, ""),
+        )
+        from modules.shared.src.tools.taxonomy_tools_vo import ToolRequest, ToolsOp
+
+        found = create_tools_feature().execute(
+            ToolRequest(ToolsOp("executable_path"), spec=spec)
+        ).executable
+        return Path(found) if found is not None else None
+    return None
+
+
+def _spec_from_tool(tool):
+    """Build a ToolSpec for the orchestrators from a manifest Tool."""
+    from modules.shared.src.common.utility_manifest_reader import spec_from_tool
+
+    return spec_from_tool(tool)
+
+
+def _confirm(prompt: str, accepted: tuple = ("y", "yes")) -> bool:
+    """Safe TTY-aware confirmation prompt. Returns False in non-TTY without --yes."""
+    if not sys.stdin.isatty():
+        return False
+    try:
+        answer = input(prompt).strip().lower()
+    except (EOFError, KeyboardInterrupt):
+        print()
+        return False
+    return answer in accepted
+
+
+# =============================================================================
+# Lifecycle commands (install / update / uninstall / clean / submodules / reset)
+# =============================================================================
+def cmd_install(argv: list[str]) -> int:
+    ensure_path()
+    target = argv[0] if argv else "all"
+    has_yes = "--yes" in argv or "-y" in argv
+    # Confirmation for install all (Plan2 P0)
+    if target == "all" and not has_yes:
+        if not sys.stdin.isatty():
+            err("Non-interactive mode detected. Use --yes to skip confirmation.")
+            return 1
+        if not _confirm("Install ALL tools? [y/N]: "):
+            warn("Aborted.")
+            return 1
+    print(f"{BOLD()}>>> Installing {target} using per-tool Python installers...{RESET()}")
+    rc = init_submodules(repo_root(), ("vendor/", "internal/"))
+    if rc != 0:
+        err("Submodule init failed. Run 'aa submodules' manually and retry.")
+        return rc
+    tools = load_tools()
+    if target != "all":
+        tool = find_tool(target)
+        if not tool:
+            err(f"Tool '{target}' not found in manifest.")
+            return 1
+        tools = [tool]
+    from modules.tools.src.root_tools_container import create_tools_feature
+    installer = create_tools_feature()
+    failed, skipped = [], []
+    total = len(tools)
+    for idx, tool in enumerate(tools, 1):
+        spec = _spec_from_tool(tool)
+        print(f"[{idx}/{total}] Installing {tool.id}", flush=True)
+        result = installer.install(spec)
+        if not result.success:
+            failed.append(tool.id)
+            err(f"{tool.id}: {result.message}")
+        elif "skipped" in result.message.lower() or "already installed" in result.message.lower():
+            skipped.append(tool.id)
+            warn(f"{tool.id}: {result.message}")
+    if target == "all":
+        from modules.cli.src.surface_mcp_command import cmd_mcp as _mcp
+        from modules.mcp.src.root_mcp_container import create_mcp_feature
+        info("Generating MCP configuration...")
+        _mcp(["generate"], create_mcp_feature())
+    if skipped:
+        print()
+        warn(f"Skipped: {', '.join(skipped)}")
+    if failed:
+        print()
+        err(f"Failed: {', '.join(failed)}")
+        return 1
+    print()
+    ok("Install finished.")
+    return 0
+
+
+def cmd_update(argv: list[str]) -> int:
+    """Update tools: pull latest from remote + force reinstall."""
+    ensure_path()
+    target = argv[0] if argv else "all"
+    has_yes = "--yes" in argv or "-y" in argv
+    if target == "all" and not has_yes:
+        if not sys.stdin.isatty():
+            err("Non-interactive mode detected. Use --yes to skip confirmation.")
+            return 1
+        if not _confirm("Update ALL tools? [y/N]: "):
+            warn("Aborted.")
+            return 1
+    print(f"{BOLD()}>>> Updating {target} (pull + reinstall)...{RESET()}")
+    tools = load_tools()
+    if target != "all":
+        tool = find_tool(target)
+        if not tool:
+            err(f"Tool '{target}' not found in manifest.")
+            return 1
+        tools = [tool]
+    from modules.tools.src.root_tools_container import create_tools_feature
+    updater = create_tools_feature()
+    failed, skipped = [], []
+    total = len(tools)
+    for idx, tool in enumerate(tools, 1):
+        spec = _spec_from_tool(tool)
+        print(f"[{idx}/{total}] Updating {tool.id}", flush=True)
+        from modules.shared.src.tools.taxonomy_tools_vo import ToolRequest, ToolsOp
+        result = updater.execute(ToolRequest(ToolsOp("update"), spec=spec)).update
+        if not result.success:
+            failed.append(tool.id)
+            err(f"{tool.id}: {result.message}")
+        elif "skipped" in result.message.lower() or "no updater" in result.message.lower():
+            skipped.append(tool.id)
+            warn(f"{tool.id}: {result.message}")
+    if target == "all":
+        from modules.cli.src.surface_mcp_command import cmd_mcp as _mcp
+        from modules.mcp.src.root_mcp_container import create_mcp_feature
+        info("Regenerating MCP configuration...")
+        _mcp(["generate"], create_mcp_feature())
+    if skipped:
+        print()
+        warn(f"Skipped (no updater): {', '.join(skipped)}")
+    if failed:
+        print()
+        err(f"Failed: {', '.join(failed)}")
+        return 1
+    print()
+    ok("Update finished.")
+    return 0
+
+
+def uninstall_tool(tool: Tool) -> int:
+    from modules.tools.src.root_tools_container import create_tools_feature
+    uninstaller = create_tools_feature()
+    spec = _spec_from_tool(tool)
+    info(f"Uninstalling {tool.id}")
+    from modules.shared.src.tools.taxonomy_tools_vo import ToolRequest, ToolsOp
+    result = uninstaller.execute(ToolRequest(ToolsOp("uninstall"), spec=spec)).uninstall
+    if not result.success:
+        err(f"{tool.id}: {result.message}")
+        return 1
+    return 0
+
+
+def cmd_uninstall(argv: list[str]) -> int:
+    target = argv[0] if argv else "--all"
+    has_yes = "--yes" in argv or "-y" in argv
+    # Confirmation for uninstall all (Plan2 P0)
+    if target in {"--all", "all"} and not has_yes:
+        if not sys.stdin.isatty():
+            err("Non-interactive mode detected. Use --yes to skip confirmation.")
+            return 1
+        warn("WARNING: This will remove ALL installed tool binaries, data and config.")
+        if not _confirm("Type 'uninstall' to continue: ", accepted=("uninstall",)):
+            warn("Aborted.")
+            return 1
+    if target in {"--all", "all"}:
+        info("Uninstalling all tools...")
+        failed = []
+        for tool in load_tools():
+            if uninstall_tool(tool) != 0:
+                failed.append(tool.id)
+        if failed:
+            err(f"Failed: {', '.join(failed)}")
+            return 1
+        ok("All tools uninstalled.")
+        return 0
+    tool = find_tool(target)
+    if not tool:
+        err(f"Tool '{target}' not found in manifest.")
+        return 1
+    return uninstall_tool(tool)
+
+
+def cmd_run(argv: list[str]) -> int:
+    """aa tool run <tool> [args...] — run the binary via the aggregate.
+
+    Delegates entirely to the tools aggregate's execute; exit-code fidelity,
+    sentinel 126, and MCP stdio handling live in RunnerCapability.
+    """
+    if not argv:
+        err("Missing tool name.")
+        print("Usage: aa tool run <tool-name> [args...]")
+        return 1
+    tool = find_tool(argv[0])
+    if tool is None:
+        err(f"Tool '{argv[0]}' not found in manifest.")
+        print("Run 'aa tool list' to see all available tools.")
+        return 1
+    from modules.shared.src.tools.taxonomy_tools_vo import (
+        ToolArgs,
+        ToolRequest,
+        ToolsOp,
+    )
+    from modules.tools.src.root_tools_container import create_tools_feature
+    spec = _spec_from_tool(tool)
+    orch = create_tools_feature()
+    return int(orch.execute(
+        ToolRequest(ToolsOp("run"), spec=spec, args=ToolArgs(argv[1:]))
+    ).run)
+
+
+def cmd_clean(argv: list[str]) -> int:
+    info("Cleaning build artifacts and generated configs...")
+    for tool in load_tools():
+        cache_path = cache_home() / tool.id
+        if cache_path.exists():
+            shutil.rmtree(cache_path, ignore_errors=True)
+            info(f"  Removed {cache_path}")
+    # Remove generated MCP config
+    (repo_root() / "mcp_servers.generated.json").unlink(missing_ok=True)
+    ok("Build artifacts cleaned.")
+    return 0
+
+
+def cmd_submodules(argv: list[str]) -> int:
+    info("Initializing and updating all submodules...")
+    code = init_submodules(repo_root(), ("vendor/", "internal/"), recursive=True)
+    if code == 0:
+        ok("Submodules ready.")
+    return code
+
+
+def cmd_reset(argv: list[str]) -> int:
+    has_yes = "--yes" in argv or "-y" in argv
+    warn("WARNING: This will wipe installed tool state and reset the repository.")
+    warn("This action cannot be undone.")
+    if not has_yes:
+        if not sys.stdin.isatty():
+            err("Non-interactive mode detected. Use --yes to skip confirmation.")
+            return 1
+        if not _confirm("Type 'RESET' to continue: ", accepted=("reset",)):
+            warn("Aborted.")
+            return 1
+    print()
+    info("[1/4] clean")
+    cmd_clean([])
+    print()
+    info("[2/4] uninstall --all")
+    uninstall_rc = cmd_uninstall(["--all", "--yes"])
+    if uninstall_rc != 0:
+        err("Uninstall step failed during reset.")
+        return uninstall_rc
+    print()
+    info("[3/4] disconnect --all")
+    from modules.cli.src.root_cli_container import cmd_disconnect
+    cmd_disconnect(["--all"])
+    print()
+    info("Resetting submodules...")
+    run_cmd(["git", "-C", str(repo_root()), "submodule", "foreach", "--recursive", "git clean -fd && git checkout ."])
+    ok("Factory reset complete.")
+    return 0
+
+
+# =============================================================================
+# Core command handlers (status / doctor / list / help / version / mcp / ...)
+# =============================================================================
+def cmd_version(argv: list[str]) -> int:
+    """Print version (P1-D6). Reads config/version.txt if present."""
+    vfile = repo_root() / "config" / "version.txt"
+    version = "0.1.0"
+    if vfile.exists():
+        version = vfile.read_text(encoding="utf-8").strip()
+    print(f"agents-arwaky {version}")
+    return 0
+
+
+def cmd_help(argv: list[str]) -> int:
+    banner()
+    print(f"{BOLD()}USAGE:{RESET()}")
+    print("  aa <noun> <action> [arguments...]")
+    print()
+    print(f"{BOLD()}PRIMARY COMMANDS:{RESET()}")
+    print(f"  {GREEN()}status{RESET()}                         Check health, submodule and binary installation status")
+    print(f"  {GREEN()}doctor{RESET()}                         Diagnose runtime environment & toolchain")
+    print(f"  {GREEN()}tool{RESET()} <cmd> [args]             Tool management (list|run|install|update|uninstall)")
+    print(f"  {GREEN()}skills{RESET()} <cmd> [args]            Skill pack: list|read|lint|catalog|discover|move|archive|create|traces")
+    print(f"  {GREEN()}connect{RESET()} --<harness>|--all     Connect MCP, skills & env to harnesses")
+    print(f"  {GREEN()}disconnect{RESET()} --<harness>|--all  Disconnect harnesses (use --all for all)")
+    print(f"  {GREEN()}mcp{RESET()} [list|generate|show]       Manage MCP configuration")
+    print(f"  {GREEN()}completion{RESET()} [bash|zsh]          Print shell completion script")
+    print()
+    print(f"{BOLD()}SERVICES & DAEMONS:{RESET()}")
+    print(f"  {GREEN()}9router{RESET()} <cmd>                  9router daemon (start|stop|status|models|...)")
+    print(f"  {GREEN()}omniroute{RESET()} <cmd>                OmniRoute daemon (start|stop|status|models|...)")
+    print(f"  {GREEN()}service{RESET()} <cmd>                  Service manager (start|stop|restart|status|logs)")
+    print()
+    print(f"{BOLD()}DATA MANAGEMENT:{RESET()}")
+    print(f"  {GREEN()}backup{RESET()} [args]                  Create local backups of tool data")
+    print(f"  {GREEN()}restore{RESET()} [args]                 Restore tool data from archive")
+    print()
+    print(f"{BOLD()}MAINTENANCE:{RESET()}")
+    print(f"  {CYAN()}submodules{RESET()}                     Initialize/update git submodules")
+    print(f"  {CYAN()}clean{RESET()}                          Remove build artifacts & generated configs")
+    print(f"  {CYAN()}reset{RESET()}                          Full factory reset = clean + uninstall + disconnect")
+    print(f"  {CYAN()}help{RESET()}                           Show this help")
+    print()
+    print(f"{BOLD()}GLOBAL OPTIONS:{RESET()}")
+    print(f"  {CYAN()}--no-color{RESET()} / {CYAN()}--plain{RESET()}         Disable ANSI colors")
+    print(f"  {CYAN()}--force-color{RESET()}                  Force ANSI colors")
+    print(f"  {CYAN()}-v{RESET()} / {CYAN()}--verbose{RESET()}              Enable debug logging")
+    print(f"  {CYAN()}-q{RESET()} / {CYAN()}--quiet{RESET()}                Suppress info logs (warnings/errors only)")
+    print()
+    print(f"{BOLD()}EXAMPLES:{RESET()}")
+    print(f"  {CYAN()}aa tool install lint{RESET()}           Install a single tool")
+    print(f"  {CYAN()}aa tool update vision{RESET()}          Update a single tool (pull + reinstall)")
+    print(f"  {CYAN()}aa tool update all{RESET()}             Update all tools")
+    print(f"  {CYAN()}aa tool run lint check .{RESET()}       Run a tool (AES linter)")
+    print(f"  {CYAN()}aa tool list{RESET()}                   List all registered tools")
+    print(f"  {CYAN()}aa connect --all{RESET()}               Connect all harnesses")
+    print(f"  {CYAN()}aa disconnect --all{RESET()}            Disconnect all harnesses")
+    print()
+    print(f"{BOLD()}BACKWARD COMPAT:{RESET()} {DIM()}('aa install', 'aa run' etc. still work){RESET()}")
+    print()
+    return 0
+
+
+def cmd_status(argv: list[str]) -> int:
+    ensure_path()
+    if "--json" in argv:
+        import json as _json
+        out = []
+        for tool in load_tools():
+            if is_submodule_missing(tool.path):
+                state = "submodule-missing"
+            elif executable_path(tool.binary, category=tool.category, tool_id=tool.id):
+                state = "installed"
+            elif (bin_home() / tool.binary).exists():
+                state = "ready"
+            elif tool.category == "internal":
+                state = "source-ready"
+            else:
+                state = "not-installed"
+            out.append({"id": tool.id, "category": tool.category, "binary": tool.binary, "status": state})
+        print(_json.dumps(out, indent=2, ensure_ascii=False))
+        return 0
+    banner()
+    print(f"{BOLD()}System & Tool Health Status:{RESET()}")
+    # Terminal-width-aware column sizing
+    try:
+        term_w = shutil.get_terminal_size((80, 24)).columns
+    except (OSError, ValueError):
+        term_w = 80
+    available = max(60, term_w - 2)
+    w_tool, w_cat, w_bin, _w_status = _table_widths(available, [2, 1, 3, 4])
+    sep = "-" * available
+    print(sep)
+    print(f"{BOLD()}{_pad('TOOL', w_tool)} {_pad('CATEGORY', w_cat)} {_pad('TARGET BINARY', w_bin)} STATUS{RESET()}")
+    print(sep)
+    for tool in load_tools():
+        cat_color = GREEN() if tool.category == "internal" else CYAN()
+        if is_submodule_missing(tool.path):
+            status = f"{RED()}[FAIL] Submodule Missing{RESET()}"
+        elif executable_path(tool.binary, category=tool.category, tool_id=tool.id):
+            status = f"{GREEN()}[OK] Installed ({tool.binary}){RESET()}"
+        elif (bin_home() / tool.binary).exists():
+            status = f"{GREEN()}[OK] Ready ({bin_home()}){RESET()}"
+        elif tool.category == "internal":
+            status = f"{BLUE()}[OK] Source Ready (Internal){RESET()}"
+        else:
+            status = f"{YELLOW()}[WARN] Not Installed{RESET()}"
+        print(f"{_pad(tool.id, w_tool)} {_pad(cat_color + tool.category + RESET(), w_cat)} {_pad(tool.binary, w_bin)} {status}")
+    print(sep)
+    return 0
+
+
+def cmd_doctor(argv: list[str]) -> int:
+    from modules.doctor.src.root_doctor_container import create_doctor_feature
+    from modules.shared.src.common.taxonomy_common_vo import (
+        DoctorFlags,
+        DoctorOp,
+        DoctorRequest,
+    )
+    request = DoctorRequest(DoctorOp("diagnose"), flags=DoctorFlags({"json": "--json" in argv}))
+    return int(create_doctor_feature().execute(request).exit_code)
+
+
+def cmd_list(argv: list[str]) -> int:
+    if "--json" in argv:
+        import json as _json
+        tools = [
+            {"id": t.id, "category": t.category, "isMcp": t.is_mcp, "description": t.description, "binary": t.binary}
+            for t in load_tools()
+        ]
+        print(_json.dumps(tools, indent=2, ensure_ascii=False))
+        return 0
+    banner()
+    print(f"{BOLD()}Registered Tools in agents-arwaky:{RESET()}")
+    try:
+        term_w = shutil.get_terminal_size((80, 24)).columns
+    except (OSError, ValueError):
+        term_w = 80
+    available = max(60, term_w - 2)
+    w_id, w_cat, w_mcp, w_desc = _table_widths(available, [2, 1, 1, 6])
+    sep = "-" * available
+    print(sep)
+    print(f"{BOLD()}{_pad('TOOL ID', w_id)} {_pad('CATEGORY', w_cat)} {_pad('MCP?', w_mcp)} {_pad('DESCRIPTION', w_desc)}{RESET()}")
+    print(sep)
+    for tool in load_tools():
+        cat_color = GREEN() if tool.category == "internal" else CYAN()
+        mcp_label = "Yes" if tool.is_mcp else "No"
+        desc = textwrap.shorten(tool.description, width=w_desc, placeholder='...')
+        print(
+            f"{_pad(tool.id, w_id)} {_pad(cat_color + tool.category + RESET(), w_cat)} "
+            f"{_pad(mcp_label, w_mcp)} {desc}"
+        )
+    print(sep)
+    return 0
+
+
+def cmd_mcp(argv: list[str]) -> int:
+    if not argv or argv[0] in ("-h", "--help", "help"):
+        print("Usage: aa mcp <list|generate|show> [path|server_id] [--json]")
+        print()
+        print("  list                Enumerate MCP-enabled tools")
+        print("  generate [path]     Rebuild mcp_servers.generated.json")
+        print("  show [server_id]    Inspect the config, or probe one server")
+        print("  list --json         Machine-readable server list")
+        return 0
+    action = argv[0]
+    generated = repo_root() / "mcp_servers.generated.json"
+
+    def _feature():
+        from modules.mcp.src.root_mcp_container import create_mcp_feature
+        return create_mcp_feature()
+
+    def _request(op, **fields):
+        from modules.shared.src.mcp.taxonomy_mcp_vo import McpOp, McpRequest
+        return _feature().execute(McpRequest(McpOp(op), **fields))
+
+    def _generate(target: str | None = None) -> int:
+        out = repo_root() / target if target else generated
+        return int(_request("generate", output=out))
+
+    if action == "list":
+        if "--json" in argv:
+            import json as _json
+            servers = [
+                {"id": t.id, "category": t.category, "description": t.description}
+                for t in load_tools()
+                if t.is_mcp
+            ]
+            print(_json.dumps(servers, indent=2, ensure_ascii=False))
+            return 0
+        print(f"{BOLD()}MCP-Enabled Tools:{RESET()}")
+        for tool in load_tools():
+            if tool.is_mcp:
+                print(f"  - {tool.id} [{tool.category}]: {tool.description}")
+        return 0
+    if action == "generate":
+        target = argv[1] if len(argv) > 1 and not argv[1].startswith("-") else None
+        return _generate(target)
+    if action in {"show", "path"}:
+        raw = argv[1] if len(argv) > 1 and not argv[1].startswith("-") else None
+        if raw is not None:
+            from modules.shared.src.mcp.taxonomy_mcp_vo import McpServerId
+            return int(_request("show", server_id=McpServerId(raw)))
+        if not generated.exists():
+            warn("Configuration file not found. Generating now...")
+            _generate()
+        if generated.exists():
+            print(f"{BOLD()}Path:{RESET()} {generated}")
+            print()
+            print(generated.read_text(encoding="utf-8"))
+            return 0
+        err("Failed to generate MCP configuration.")
+        return 1
+    err(f"Unknown MCP action: {action}")
+    print("Valid actions: list, generate, show, alias, validate")
+    return 1
+
+
+def cmd_config(argv: list[str]) -> int:
+    from modules.cli.src.surface_config_command import cmd_config as _config_surface
+    from modules.config.src.root_config_container import create_config_feature
+    return _config_surface(list(argv), create_config_feature())
+
+
+def cmd_connect(argv: list[str]) -> int:
+    from modules.cli.src.surface_harness_command import (
+        cmd_connect as _harness_connect,
+    )
+    from modules.harness.src.root_harness_container import create_harness_feature
+    return _harness_connect(list(argv), create_harness_feature())
+
+
+def cmd_disconnect(argv: list[str]) -> int:
+    from modules.cli.src.surface_harness_command import (
+        cmd_disconnect as _harness_disconnect,
+    )
+    from modules.harness.src.root_harness_container import create_harness_feature
+    return _harness_disconnect(list(argv), create_harness_feature())
+
+
+def cmd_skills(argv: list[str]) -> int:
+    """Skill-pack discovery and authoring: aa skills <verb> [args].
+
+    Composition point for the two independent packages (AES702): the
+    design tree owns the agent + surface, the traces tree owns the
+    ``SkillsTraces`` capability. Only this orchestrator-owned entry wires
+    the two together — the design tree itself never imports
+    ``skills_traces``.
+    """
+    from cli.src.surface_skills_command import (
+        cmd_skills as _skills_surface,
+    )
+    from root_skills_container import default_aggregate
+
+    aggregate = default_aggregate()
+    return _skills_surface(list(argv), aggregate)
+
+
+def cmd_completion(argv: list[str]) -> int:
+    """Print a bash/zsh completion script for the aa CLI."""
+    from modules.shared.src.common.utility_shell_completion import (
+        bash_completion,
+        zsh_completion,
+    )
+
+    shell = argv[0] if argv else "bash"
+    if shell in ("-h", "--help", "help"):
+        print("Usage: aa completion [bash|zsh]")
+        print()
+        print("  bash    Source in ~/.bashrc:  eval \"$(aa completion bash)\"")
+        print("  zsh     Source in ~/.zshrc:   eval \"$(aa completion zsh)\"")
+        return 0
+    if shell == "bash":
+        print(bash_completion())
+        return 0
+    if shell == "zsh":
+        print(zsh_completion())
+        return 0
+    err(f"Unknown shell: {shell} (expected bash or zsh)")
+    return 1
+
+
+def cmd_tool(argv: list[str]) -> int:
+    """Tool management: aa tool <list|run|install|update|uninstall> [args]
+
+    Delegates to the module's CLI surface (surface_tools_command); this entry
+    stays a thin router (AES506). The surface owns arg parsing + aggregate
+    calls so the tool action lives in one place.
+    """
+    from modules.cli.src.surface_tools_command import cmd_tool as _tools_surface
+    return _tools_surface(argv, _tool_orch())
+
+
+def _tool_orch():
+    from modules.tools.src.root_tools_container import create_tools_feature
+    return create_tools_feature()
+
+
+def _config_feature():
+    from modules.config.src.root_config_container import config_modifier, config_writer
+    return config_writer(), config_modifier()
+
+
+def _doctor_feature():
+    """Doctor feature aggregate (reachable composition root for AES502)."""
+    from modules.doctor.src.root_doctor_container import create_doctor_feature
+    return create_doctor_feature()
+
+
+def _doctor_feature_compat():
+    """Backward-compat shim for _doctor_feature() call sites."""
+    return _doctor_feature()
+
+
+def cmd_omniroute(argv: list[str]) -> int:
+    from modules.cli.src.surface_daemon_command import (
+        cmd_omniroute as _daemon_omniroute,
+    )
+    from modules.cli.src.surface_daemon_command import (
+        register_manager_factory as _reg_dm,
+    )
+    from modules.cli.src.surface_daemon_command import (
+        register_orchestrator_factory as _reg_da,
+    )
+    from modules.daemon.src.root_daemon_container import DaemonContainer
+    _c = DaemonContainer()
+    _reg_dm("omniroute", lambda: _c.omniroute)
+    _reg_da(lambda: _c.aggregate)
+    return _daemon_omniroute(argv)
+
+
+def cmd_9router(argv: list[str]) -> int:
+    from modules.cli.src.surface_daemon_command import (
+        cmd_9router as _daemon_9router,
+    )
+    from modules.cli.src.surface_daemon_command import (
+        register_manager_factory as _reg_dm,
+    )
+    from modules.cli.src.surface_daemon_command import (
+        register_orchestrator_factory as _reg_da,
+    )
+    from modules.daemon.src.root_daemon_container import DaemonContainer
+    _c = DaemonContainer()
+    _reg_dm("9router", lambda: _c.ninerouter)
+    _reg_da(lambda: _c.aggregate)
+    return _daemon_9router(argv)
+
+
+def cmd_daemon(argv: list[str]) -> int:
+    """aa daemon <id> <action> — list|status|start|… for a managed daemon."""
+    from modules.cli.src.surface_daemon_command import (
+        register_manager_factory as _reg_dm,
+    )
+    from modules.cli.src.surface_daemon_command import (
+        register_orchestrator_factory as _reg_da,
+    )
+    from modules.daemon.src.root_daemon_container import (
+        DaemonContainer,
+        create_daemon_feature,
+    )
+    from modules.shared.src.daemon.taxonomy_daemon_vo import (
+        DaemonName,
+        DaemonOp,
+        DaemonRequest,
+    )
+
+    orch = create_daemon_feature()
+    known = {str(n) for n in orch.known}
+    if not argv or argv[0] in ("-h", "--help", "help"):
+        names = ", ".join(str(n) for n in orch.known)
+        print("Usage: aa daemon <9router|omniroute> <start|stop|restart|status|logs|help>")
+        print(f"Known daemons: {names}")
+        return 0
+    daemon_id = argv[0]
+    if daemon_id not in known:
+        err(f"Unknown daemon: {daemon_id}")
+        print(f"Known daemons: {', '.join(sorted(known))}")
+        return 1
+    action = argv[1] if len(argv) > 1 else "status"
+    rest = argv[2:]
+    if action in ("start", "stop", "restart", "logs", "help"):
+        # The aggregate exposes a single `execute`; the verb is the request op.
+        outcome = orch.execute(
+            DaemonRequest(op=DaemonOp(action), name=DaemonName(daemon_id))
+        )
+        return int(outcome.exit_code or 0)
+    if action == "status":
+        _c = DaemonContainer()
+        _reg_dm("omniroute", lambda: _c.omniroute)
+        _reg_da(lambda: _c.aggregate)
+        from modules.cli.src import surface_daemon_command as _dv
+
+        fn = {
+            "omniroute": _dv.cmd_omniroute,
+        }[daemon_id]
+        return fn(["status", *rest])
+    err(f"Unknown daemon action: {action}")
+    print("Valid actions: start, stop, restart, status, logs, help")
+    return 1
+
+
+def cmd_service(argv: list[str]) -> int:
+    from modules.cli.src.surface_service_command import cmd_service as _service_cmd
+    from modules.service.src.root_service_container import create_service_feature
+    return _service_cmd(argv, create_service_feature())
+
+
+def cmd_backup(argv: list[str]) -> int:
+    from modules.backup.src.root_backup_container import create_backup_feature
+    from modules.cli.src.surface_backup_command import cmd_backup as _backup_cmd
+    return _backup_cmd(["backup", *argv], create_backup_feature())
+
+
+def cmd_restore(argv: list[str]) -> int:
+    from modules.backup.src.root_backup_container import create_backup_feature
+    from modules.cli.src.surface_backup_command import cmd_restore as _restore_cmd
+    return _restore_cmd(["restore", *argv], create_backup_feature())
+
+
+__all__ = [
+    "cmd_9router",
+    "cmd_backup",
+    "cmd_clean",
+    "cmd_completion",
+    "cmd_config",
+    "cmd_connect",
+    "cmd_daemon",
+    "cmd_disconnect",
+    "cmd_doctor",
+    "cmd_help",
+    "cmd_install",
+    "cmd_list",
+    "cmd_mcp",
+    "cmd_omniroute",
+    "cmd_reset",
+    "cmd_restore",
+    "cmd_run",
+    "cmd_service",
+    "cmd_skills",
+    "cmd_status",
+    "cmd_submodules",
+    "cmd_tool",
+    "cmd_uninstall",
+    "cmd_update",
+    "cmd_version",
+    "exec_python",
+    "executable_path",
+    "is_submodule_missing",
+    "remove_tool_state",
+    "run_cmd",
+]
