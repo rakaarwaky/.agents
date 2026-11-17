@@ -38,5 +38,5 @@ Guide the phased migration of a legacy codebase into the AES layered architectur
 | [references/python-migration.md](references/python-migration.md) | Python migration playbook — phases 0–8, lint verify pipeline, fix routing, verify |
 | [references/rust-migration.md](references/rust-migration.md) | Rust migration playbook — phases 0–8, lint verify pipeline, fix routing, verify |
 | [references/typescript-migration.md](references/typescript-migration.md) | TypeScript migration playbook — phases 0–8, lint verify pipeline, fix routing, verify |
-| [references/lint-rules.md](references/lint-rules.md) | Lint Rules (Global): shared CLI surface, AES101 naming contract, fix routing, triage order |
+| [references/lint-command.md](references/lint-command.md) | Lint Rules (Global): shared CLI surface, AES101 naming contract, fix routing, triage order |
 | Related skills | aes-layer |

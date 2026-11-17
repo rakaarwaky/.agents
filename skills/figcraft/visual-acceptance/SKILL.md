@@ -1,5 +1,5 @@
 ---
-name: visual-acceptance-loop
+name: visual-acceptance
 description: Pre-delivery acceptance recipe for paper figures — live-page screenshots, tiling self-check, vision-judge dispatch templates, and evidence-driven fix discipline.
 ---
 

@@ -1,5 +1,5 @@
 ---
-name: parametric-diagram-script
+name: parametric-diagram
 description: Draw editable structure diagrams from scratch as a parametric Python script — geometry/topology/style declared in three blocks; re-run to regenerate the SVG. The script is the single source of truth.
 ---
 

@@ -1,5 +1,5 @@
 ---
-name: declarative-engine-figures
+name: declarative-engine
 description: Grid-based block diagrams, network overview figures and deployment/phase flowcharts via a declarative layout engine — config syntax with real manuscript configs, and a no-download SVG extraction path.
 ---
 

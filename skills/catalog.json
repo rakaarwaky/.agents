@@ -175,6 +175,24 @@
       "category": "devops"
     },
     {
+      "name": "codex-figure-workflow",
+      "description": "使用 Codex 从项目源码或参考图完成架构图、流程图与结构图，串联 figcraft 的参数化 SVG、浏览器导出和视觉验收，并保留可重生成的源文件与案例证据。",
+      "when_to_use": "",
+      "category": "figcraft"
+    },
+    {
+      "name": "data-figures-rerender",
+      "description": "Faithfully replicate or vectorize data figures (scatter/bar/slope charts) — re-render from the same frozen tables with encodings kept item-by-item; outputs SVG + 600 dpi PNG; full pitfall list.",
+      "when_to_use": "",
+      "category": "figcraft"
+    },
+    {
+      "name": "declarative-engine",
+      "description": "Grid-based block diagrams, network overview figures and deployment/phase flowcharts via a declarative layout engine — config syntax with real manuscript configs, and a no-download SVG extraction path.",
+      "when_to_use": "",
+      "category": "figcraft"
+    },
+    {
       "name": "figcraft",
       "description": "Coordinates end-to-end FigCraft work from one or more visual references or written requirements through native design construction, interactive prototyping, verification, review, and save. Use for any request to create, reconstruct, prototype, or audit a .figcraft interface.",
       "when_to_use": "",
@@ -223,6 +241,42 @@
       "category": "figcraft"
     },
     {
+      "name": "game-arch-diagram",
+      "description": "Software/game architecture diagrams as a parametric script — layered bands, rider-chip band titles, semantic tints with accent bars, update-order badges, white-halo edge labels, and the six real collision defects found by vision-judge rounds.",
+      "when_to_use": "",
+      "category": "figcraft"
+    },
+    {
+      "name": "hand-svg-structure",
+      "description": "Replicate a bitmap/screenshot structure diagram (block diagram, flowchart, network, schematic) as a hand-authored static SVG — programmatic geometry/color probing, live-page export, full pitfall list.",
+      "when_to_use": "",
+      "category": "figcraft"
+    },
+    {
+      "name": "paper-figure",
+      "description": "绘制或重绘论文中的结构图、流程图和科研统计图；按 65 类图型选择布局或可运行模板，保留真实数据、可编辑矢量源、打印尺寸与验收记录。适用于论文配图及参考图复刻，不用于无精确标签要求的场景插画。",
+      "when_to_use": "",
+      "category": "figcraft"
+    },
+    {
+      "name": "parametric-diagram",
+      "description": "Draw editable structure diagrams from scratch as a parametric Python script — geometry/topology/style declared in three blocks; re-run to regenerate the SVG. The script is the single source of truth.",
+      "when_to_use": "",
+      "category": "figcraft"
+    },
+    {
+      "name": "style-presets",
+      "description": "Style presets for structure figures — three token dictionaries (academic default / web / tech). Same geometry and content declaration, swap skins with zero figure-code changes. Includes a worked GPU-pipeline example that regenerates all three finishes.",
+      "when_to_use": "",
+      "category": "figcraft"
+    },
+    {
+      "name": "visual-acceptance",
+      "description": "Pre-delivery acceptance recipe for paper figures — live-page screenshots, tiling self-check, vision-judge dispatch templates, and evidence-driven fix discipline.",
+      "when_to_use": "",
+      "category": "figcraft"
+    },
+    {
       "name": "github-workflow",
       "description": "Umbrella for GitHub auth, repo management, issues, PRs, Mergify, and releases. Subsumes github-auth and repo-manager.",
       "when_to_use": "Use for any GitHub task: auth setup (gh CLI or git-only), repo clone/create/fork/configure, issue-to-PR pipeline, PR watch/fix/merge, Mergify stacked PRs and merge queue, release prep and publish, recovery of failed release runs. This skill now includes the auth helper scripts (gh-env.sh, git-credential-token.py) formerly in github-auth.",
@@ -249,7 +303,7 @@
     {
       "name": "pr-babysit",
       "description": "Watch a GitHub PR end to end. Two lanes: Hermes orchestrates and ships; Grok Build fixes. Run Step R0 to identify the lane, then read only that lane's references.",
-      "when_to_use": "Triggers on \"/pr-babysit\". Phrasing: \"watch PR 123 until green\", \"babysit PR 123 and merge when ready\", \"fix issue #123 and open a PR\", \"keep fixing PR 123 until it can merge\", \"pr-babysit add --ship 123\".",
+      "when_to_use": "Triggers on \\\"/pr-babysit\\\". Phrasing: \\\"watch PR 123 until green\\\", \\\"babysit PR 123 and merge when ready\\\", \\\"fix issue #123 and open a PR\\\", \\\"keep fixing PR 123 until it can merge\\\", \\\"pr-babysit add --ship 123\\\".",
       "category": "git"
     },
     {
@@ -271,7 +325,7 @@
       "category": "media-content"
     },
     {
-      "name": "music-downloader",
+      "name": "media-acquisition",
       "description": "Download music lists to a local MP3 library via mdl.",
       "when_to_use": "Use when the user wants to download songs to a local MP3 music library, build/replenish a music library from a named list, or acquire media assets from external sources.",
       "category": "media-content"
@@ -311,12 +365,6 @@
       "description": "Use this skill any time a .pptx file is involved in any way — as input, output, or both. This includes creating slide decks, pitch decks, or presentations; reading, parsing, or extracting text from any .pptx file (even if the extracted content will be used elsewhere, like in an email or summary); editing, modifying, or updating existing presentations; combining or splitting slide files; working with templates, layouts, speaker notes, or comments. Trigger whenever the user mentions 'deck', 'slides', 'presentation', or references a .pptx filename, regardless of what they plan to do with the content afterward. If a .pptx file needs to be opened, created, or touched, use this skill.",
       "when_to_use": "Use whenever any .pptx file is involved — creating, reading, editing, combining, splitting, or working with templates, layouts, speaker notes, or comments — triggered by 'deck', 'slides', 'presentation', or a .pptx filename. Also use for structured programmatic work on .pptx decks via python-pptx (create from JSON spec, structured read-back, targeted text/chart/image edits, template filling, slide PNG rendering) and the legacy binary .ppt — convert it with `soffice --convert-to pptx old.ppt` first.",
       "category": "office"
-    },
-    {
-      "name": "arxiv",
-      "description": "Search arXiv papers by keyword, author, category, or ID.",
-      "when_to_use": "",
-      "category": "research"
     },
     {
       "name": "arxiv",
@@ -369,7 +417,7 @@
     {
       "name": "skill-research",
       "description": "Helps users discover and install agent skills from the open skills ecosystem: searches by keyword, checks the skills.sh leaderboard, verifies quality before recommending, and presents install options. --improve audits and repairs an existing skill; --prune merges duplicate skills.",
-      "when_to_use": "Use when the user asks \"how do I do X\" where X might be a common task with an existing skill, says \"find a skill for X\" or \"is there a skill that can...\", asks \"can you do X\" for a specialized capability, or expresses interest in extending agent capabilities.",
+      "when_to_use": "Use when the user asks \\\"how do I do X\\\" where X might be a common task with an existing skill, says \\\"find a skill for X\\\" or \\\"is there a skill that can...\\\", asks \\\"can you do X\\\" for a specialized capability, or expresses interest in extending agent capabilities.",
       "category": "skill-authoring"
     },
     {

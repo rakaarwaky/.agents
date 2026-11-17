@@ -1,5 +1,5 @@
 ---
-name: hand-svg-structure-figure
+name: hand-svg-structure
 description: Replicate a bitmap/screenshot structure diagram (block diagram, flowchart, network, schematic) as a hand-authored static SVG — programmatic geometry/color probing, live-page export, full pitfall list.
 ---
 
