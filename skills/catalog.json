@@ -31,6 +31,12 @@
       "category": "automation"
     },
     {
+      "name": "brave-automation",
+      "description": "Install the baa CLI, manage Brave browser profiles and Google sessions, and import/export Chromium credentials as CSVs via the baa CLI on Linux.",
+      "when_to_use": "Use when the user wants to install or repair the baa CLI and its XDG workspace, provision or verify isolated Brave profiles from profile.csv, script Google login or logout per profile, check a saved Google session, import credentials from a CSV into Login Data DBs, export saved passwords back to a CSV, enroll profiles in a Brave Sync Chain, or automate AI provider sign-in (Kilo Code, Cline, Antigravity) across Brave profiles. Not for headless scraping without profiles, non-Chromium browsers, cloud password managers, or non-Linux hosts.",
+      "category": "automation"
+    },
+    {
       "name": "qwen-web",
       "description": "Automate Qwen AI Web (chat.qwen.ai) with the Qwen3.8-Max intelligence model — zero API keys, persistent browser sessions — and develop the qwen-web-arwaky repo source (TUI, slots, tests). Use when an AI agent needs to send prompts, review code, or analyze attachments via CLI/MCP tools, or edit the internal/qwen-web-arwaky source.",
       "when_to_use": "Use when the user runs /qwen-web, sends a prompt to Qwen AI Web, sends prompt files or attachments for Qwen analysis or code review with role templates, sets up or resets the Qwen browser session, initializes the qwen-web workspace, or asks to develop or fix the internal/qwen-web-arwaky repo.",
@@ -59,24 +65,6 @@
       "description": "Orca CLI agent environment: Orca-managed worktrees, folder contexts, terminals, repos, automations and cron jobs, embedded browser, artifacts, and skill sharing via the orca CLI; visible local app windows via orca computer; iOS and Android emulator control; Linear ticket work; per-workspace environment recipes; multi-agent orchestration with DAGs and decision gates. Use for $orca-cli, Orca worktree, child worktree, spawn codex/claude in a worktree, read/wait/send Orca terminal, handoff/handover/give this to another agent, Orca browser, orca artifacts, share skills, scheduled agent tasks or cron jobs, visible GUI windows, booted iOS Simulator or Android emulator, linked Linear issue, per-workspace environment recipe setup, multi-agent DAG coordination. Observed user phrasing: 'build the worktree in orca', 'worktree deleted from disk / recreate worktree', 'why isn't it showing in orca IDE', 'check all open PRs', 'resolve conflicts in another worktree', orca cli-commands, orca config-system.",
       "when_to_use": "Use for any Orca CLI agent-environment task. Load references/cli.md for worktrees, terminals, repos, automations, artifacts, skill sharing, and the embedded browser; references/automations.md for scheduled agent runs and cron jobs; references/computer-use.md for visible GUI windows; references/emulator.md for a booted iOS Simulator; references/emulator-android.md for an adb-connected Android emulator or phone; references/linear.md for Linear ticket work; references/per-workspace-env.md for per-workspace environment recipes; references/orchestration.md for supervised multi-agent coordination with DAGs and decision gates. Also matches observed user phrasing: 'build the worktree in orca', 'worktree deleted from disk / recreate worktree', 'why isn't it showing in orca IDE', 'check all open PRs', 'resolve conflicts in another worktree'.",
       "category": "autonomous-ai-agents"
-    },
-    {
-      "name": "account-manager",
-      "description": "Manage Brave browser profiles and Google sessions via the baa CLI: create, list, verify, and reset isolated accounts, plus scripted Google login, logout, and session checks.",
-      "when_to_use": "Use when the user wants to create or manage local Brave/Chromium accounts, provision or verify isolated browser profiles from profile.csv, script Google login or logout in a named profile, or check a saved Google session. Not for headless scraping without profiles, non-Chromium browsers, or cloud password managers. Setup, credential import/export, and troubleshooting belong to the sibling brave-setup and password-manager skills.",
-      "category": "brave-automation"
-    },
-    {
-      "name": "brave-setup",
-      "description": "Install the baa CLI, initialize its XDG workspace, verify prerequisites, and troubleshoot common Brave automation failures on Linux.",
-      "when_to_use": "Use when the user wants to install or repair the baa CLI and its prerequisites, initialize the XDG state/data workspace, resolve XDG path issues, or debug CDP connection failures, Local State locks, and Safe Storage key errors. Not for provisioning profiles (account-manager), importing credentials (password-manager), or Google session scripting.",
-      "category": "brave-automation"
-    },
-    {
-      "name": "password-manager",
-      "description": "Import and export browser credentials as Chromium Password Manager CSVs via the baa CLI: import a CSV into the Login Data DBs, or export saved passwords back to CSV.",
-      "when_to_use": "Use when the user wants to import credentials from a CSV into local Brave/Chromium Login Data databases, or export saved browser passwords back to a CSV file. Not for headless scraping without profiles, non-Chromium browsers, or cloud password managers. Profile provisioning and Google session scripting belong to the sibling account-manager skill; setup and troubleshooting belong to brave-setup.",
-      "category": "brave-automation"
     },
     {
       "name": "codegraph",

@@ -1,102 +1,51 @@
 ---
-name: brave-setup
-description: Install the baa CLI, initialize its XDG workspace, verify prerequisites, and troubleshoot common Brave automation failures on Linux.
-when-to-use: "Use when the user wants to install or repair the baa CLI and its prerequisites, initialize the XDG state/data workspace, resolve XDG path issues, or debug CDP connection failures, Local State locks, and Safe Storage key errors. Not for provisioning profiles (account-manager), importing credentials (password-manager), or Google session scripting."
-argument-hint: "<install | init | doctor> [--dir PATH]"
-created_by: curator
+name: brave-automation
+description: "Install the baa CLI, manage Brave browser profiles and Google sessions, and import/export Chromium credentials as CSVs via the baa CLI on Linux."
+when-to-use: "Use when the user wants to install or repair the baa CLI and its XDG workspace, provision or verify isolated Brave profiles from profile.csv, script Google login or logout per profile, check a saved Google session, import credentials from a CSV into Login Data DBs, export saved passwords back to a CSV, enroll profiles in a Brave Sync Chain, or automate AI provider sign-in (Kilo Code, Cline, Antigravity) across Brave profiles. Not for headless scraping without profiles, non-Chromium browsers, cloud password managers, or non-Linux hosts."
+argument-hint: "<brave-setup|password-manager|account-manager> <subcommand> [args] [--profile <name>] [--csv FILE]"
 ---
 
-# Brave Setup (`baa init`)
+# Brave Automation (`baa`)
 
-You get the `baa` CLI running on a Linux host: install the CLI from the
-`tools/` project, initialize the XDG workspace, and repair common failures.
-Profile provisioning, credential import/export, and Google session scripting
-belong to the sibling `account-manager` and `password-manager` skills.
+You get the `baa` CLI running on a Linux host and use it to provision isolated
+Brave profiles, script Google auth, manage credentials as Chromium Password
+Manager CSVs, and automate provider sign-in across profiles. The skill covers
+three capability areas through one CLI surface:
 
-## Rules
-
-| ID | Rule | Why | Check |
-|----|------|-----|-------|
-| R1 | **Linux + Chromium only.** Confirm the host before running anything. | Unsupported platforms produce opaque errors. | `uname -s` returns `Linux`; Brave (native, Flatpak, or Snap) is installed. |
-| R2 | **Never use `/tmp` for state.** Logs and sessions live under `$XDG_STATE_HOME/baa` and `$XDG_DATA_HOME/baa`; a reviewer must find output there. | XDG compliance; state survives across runs. | `baa init` output shows XDG paths; no writes to `/tmp`. |
-| R3 | **One workspace per host.** `baa init` is idempotent; re-running it re-detects install paths without clobbering existing state. | Re-detection after a Brave move or upgrade. | `baa init` exits 0 and XDG dirs exist under `$XDG_STATE_HOME/baa`. |
-| R4 | **Verify with `baa --help` and `baa profile list` after install/init.** A silent install that leaves the console script unresolvable is the main failure mode. | Catch drift between package install and CLI surface early. | Both commands print their trees; no `ModuleNotFoundError`. |
-
-## Routing
-
-| File | Purpose |
-|------|---------|
-| [`references/install.md`](references/install.md) | Install the `baa` CLI from the `tools/` project with `uv` and verify the console scripts. |
-| [`references/init.md`](references/init.md) | Initialize the XDG state/data workspace and configure `profile.csv` / `passwords.csv`. |
-| [`references/troubleshooting.md`](references/troubleshooting.md) | CDP connection failures, `Local State` locks, Safe Storage key rotation, XDG path issues. |
----
-name: password-manager
-description: "Import and export browser credentials as Chromium Password Manager CSVs via the baa CLI: import a CSV into the Login Data DBs, or export saved passwords back to CSV."
-when-to-use: "Use when the user wants to import credentials from a CSV into local Brave/Chromium Login Data databases, or export saved browser passwords back to a CSV file. Not for headless scraping without profiles, non-Chromium browsers, or cloud password managers. Profile provisioning and Google session scripting belong to the sibling account-manager skill; setup and troubleshooting belong to brave-setup."
-argument-hint: "<import | export> <path> [--profile <name>] [--csv FILE]"
-created_by: curator
----
-
-# Password Manager (`baa password`)
-
-You move credentials between CSV files and each Brave profile's `Login Data`
-SQLite database through the `baa` CLI. `import` feeds a CSV into Chromium's
-native password stores; `export` pulls saved passwords back out. Setup and
-troubleshooting belong to the sibling `brave-setup` skill; profile provisioning
-belongs to the sibling `account-manager` skill.
-
-## Rules
-
-| ID | Rule | Why | Check |
-|----|------|-----|-------|
-| R1 | **Profiles must exist first.** Rows whose profile is not registered land nowhere. | Unregistered profiles have no `Login Data` DB to write to. | `baa profile list` shows every profile named in the CSV before import. |
-| R2 | **Idempotent import.** Re-running with the same CSV upserts, no duplicate rows. | Safe to re-run after a failed import or key rotation. | `baa password import` exits 0; row count in `Login Data` matches the CSV. |
-| R3 | **Safe Storage key is per-system.** The AES key encrypting `Login Data` rows can rotate after a Brave upgrade; re-import after rotation. | Stale key produces unreadable rows. | On a `DecryptionError` during import, re-run after the key stabilizes. |
-| R4 | **Close Brave before import.** A running Brave instance locks the `Login Data` DB. | File-lock errors abort the import. | No `pgrep -a brave` hits, or `baa password import` retries cleanly. |
-
-## Routing
-
-| File | Purpose |
-|------|---------|
-| [`references/import.md`](references/import.md) | `import <path>` — import a Chromium Password Manager CSV into the `Login Data` DBs. |
-| [`references/export.md`](references/export.md) | `export <path>` — export saved passwords from Brave into a CSV file. |
-
-
-
----
-name: account-manager
-description: "Manage Brave browser profiles and Google sessions via the baa CLI: create, list, verify, and reset isolated accounts, plus scripted Google login, logout, and session checks."
-when-to-use: "Use when the user wants to create or manage local Brave/Chromium accounts, provision or verify isolated browser profiles from profile.csv, script Google login or logout in a named profile, or check a saved Google session. Not for headless scraping without profiles, non-Chromium browsers, or cloud password managers. Setup, credential import/export, and troubleshooting belong to the sibling brave-setup and password-manager skills."
-argument-hint: "<list | create | login | logout> [subcommand] [NAMES] [--profile <name>] [--email <email>] [--password <password>] [--csv FILE]"
-created_by: curator
----
-
-# Account Manager (`baa account`)
-
-You manage local Brave/Chromium accounts through the `baa` CLI: provision isolated
-profiles from `profile.csv` into Chromium's `Local State`, verify what landed, and
-script Google login, logout, and session checks per profile. Setup and
-troubleshooting belong to the sibling `brave-setup` skill; credential import/export
-belongs to the sibling `password-manager` skill.
+- **brave-setup** — install the CLI, initialize the XDG workspace, repair failures.
+- **password-manager** — import/export credentials as Chromium Password Manager CSVs.
+- **account-manager** — provision profiles, script Google login/logout, manage sync chains, automate provider auth.
 
 ## Rules
 
 | ID | Rule | Why | Check |
 |----|------|-----|-------|
 | R1 | **Linux + Chromium only.** Confirm the host before running anything; the shared taxonomy raises on other platforms. | Unsupported platforms produce opaque errors. | `uname -s` returns `Linux`; Brave (native, Flatpak, or Snap) is installed. |
-| R2 | **One profile per account.** Each account gets its own named profile; never mix sessions or credentials across profiles. | Cross-profile leakage defeats the isolation model. | Each account maps to one profile name; no shared session storage. |
-| R3 | **`profile.csv` is the source of truth.** Edit the CSV, then run the matching `baa` subcommand — never hand-edit `Local State` directly. | Manual edits are error-prone and not reproducible. | All profile changes go through `baa profile ensure` / `create`. |
-| R4 | **Verify after every write.** A silent success that leaves a profile unregistered is the main failure mode. | Catch drift between CSV and live Chromium state early. | `baa profile list` shows every expected name after create/reset. |
-| R5 | **Google login first may trigger a challenge.** A fresh profile can hit an email-link or app-password verification (`SessionChallenge`); resolve it once manually, then re-run login. | Google flags unknown profiles; re-running after resolution succeeds. | `baa google session <name>` reports a valid session after `login`. |
+| R2 | **Never use `/tmp` for state.** Logs and sessions live under `$XDG_STATE_HOME/baa` and `$XDG_DATA_HOME/baa`. | XDG compliance; state survives across runs. | `baa init` output shows XDG paths; no writes to `/tmp`. |
+| R3 | **One workspace per host.** `baa init` is idempotent; re-running re-detects install paths without clobbering state. | Re-detection after a Brave move or upgrade. | `baa init` exits 0 and XDG dirs exist under `$XDG_STATE_HOME/baa`. |
+| R4 | **`profile.csv` is the source of truth for profiles.** Edit the CSV, then run `baa profile ensure` — never hand-edit `Local State` directly. | Manual edits are error-prone and not reproducible. | All profile changes go through `baa profile ensure`. |
+| R5 | **One profile per account.** Each account gets its own named profile; never mix sessions or credentials across profiles. | Cross-profile leakage defeats the isolation model. | Each account maps to one profile name; no shared session storage. |
+| R6 | **Close Brave before import or profile writes.** A running Brave instance locks the `Login Data` and `Local State` DBs. | File-lock errors abort the import or profile ensure. | No `pgrep -a brave` hits, or the command retries cleanly. |
+| R7 | **Safe Storage key is per-system.** The AES key encrypting `Login Data` rows can rotate after a Brave upgrade; re-import after rotation. | Stale key produces unreadable rows. | On a `DecryptionError`, re-run `baa password import` after the key stabilizes. |
+| R8 | **Verify after every write.** A silent success that leaves a profile unregistered or a session stale is the main failure mode. | Catch drift between CSV and live Chromium state early. | `baa profile list` shows every expected name; `baa google session` reports expected state. |
+| R9 | **Google login on a fresh profile may trigger a challenge.** Resolve the `SessionChallenge` (email link or app password) once manually, then re-run login. | Google flags unknown profiles; re-running after resolution succeeds. | `baa google session <name>` reports a valid session after `login`. |
+| R10 | **Install verifies the CLI surface.** A silent install that leaves `baa` unresolvable is the install failure mode. | Catch drift between package install and CLI surface early. | `baa --help` and `baa profile list` print their trees; no `ModuleNotFoundError`. |
+| R11 | **Success metric.** Every invocation ends with a verified state: `baa --help` resolves, `baa profile list` matches `profile.csv`, `baa google session` reports the expected session state, or the CSV row count matches `Login Data`. | The agent stops only when the probe passes. | Run the probe named in the active reference file's `## Completion` block; stop on pass, report on fail. |
+| R12 | **Scope ceiling.** Max 12 files touched per invocation (one reference file plus the CSV it consumes). Max 3 repair iterations per failing check. Forbidden: editing files outside `skills/automation/brave-automation/`, deleting `profile.csv` or `passwords.csv` rows without archiving, running `baa` as `sudo`, modifying Brave's `Local State` outside `baa`. | Agents do not drift or loop. | `git diff --name-only` is a subset of the skill directory; iteration count ≤ 3. |
+| R13 | **Failure fallback.** On `cdp connect timeout` -> confirm Brave is installed and `baa init` has run (`references/brave-setup/troubleshooting.md`). On `database is locked` -> close Brave (`pkill -f brave`) and re-run. On `DecryptionError` -> wait for Safe Storage key to stabilize, then re-import. On `SessionChallenge` -> resolve manually, then re-run login. On `FileNotFoundError` -> confirm Brave install path, re-run `baa init`. | Each named cause has a concrete recovery path. | The agent names the cause and runs the matching recovery command; it does not retry blindly. |
 
 ## Routing
 
 | File | Purpose |
 |------|---------|
-| [`references/create.md`](references/create.md) | `create` subcommand — provision one or more accounts from `profile.csv` with `--profile`, `--email`, `--password`. |
-| [`references/list.md`](references/list.md) | `list` subcommand — show every registered profile and which `profile.csv` entries are missing. |
-| [`references/google-login.md`](references/google-login.md) | `login` subcommand — Google login in a named profile with session persistence. |
-| [`references/google-logout.md`](references/google-logout.md) | `logout` subcommand — drop the Google session for a profile. |
-| [`references/sync.md`](references/sync.md) | Sync chain management — enroll source and join targets to a Brave Sync Chain, extract mnemonic codes, verify seeds on disk. |
-| [`references/provider-auth.md`](references/provider-auth.md) | Provider auth — automate AI provider sign-in (Kilo Code, Cline, others) across Brave profiles with Google OAuth, passkey bypass, and challenge handling. |
-
+| [`references/brave-setup/install.md`](references/brave-setup/install.md) | Install the `baa` CLI from the `tools/` project with `uv` and verify the console scripts. |
+| [`references/brave-setup/init.md`](references/brave-setup/init.md) | Initialize the XDG state/data workspace and configure `profile.csv` / `passwords.csv`. |
+| [`references/brave-setup/troubleshooting.md`](references/brave-setup/troubleshooting.md) | CDP connection failures, `Local State` locks, Safe Storage key rotation, XDG path issues. |
+| [`references/password-manager/import.md`](references/password-manager/import.md) | `baa password import` — import a Chromium Password Manager CSV into the `Login Data` DBs. |
+| [`references/password-manager/export.md`](references/password-manager/export.md) | `baa password export` — export saved passwords from Brave into a CSV file. |
+| [`references/account-manager/create.md`](references/account-manager/create.md) | `baa profile ensure` — provision one or more accounts from `profile.csv`. |
+| [`references/account-manager/list.md`](references/account-manager/list.md) | `baa profile list` — show every registered profile and flag missing CSV entries. |
+| [`references/account-manager/google-login.md`](references/account-manager/google-login.md) | `baa google login` — Google login in a named profile with session persistence. |
+| [`references/account-manager/google-logout.md`](references/account-manager/google-logout.md) | `baa google logout` — drop the Google session for a profile. |
+| [`references/account-manager/sync.md`](references/account-manager/sync.md) | Sync chain management — enroll source and join targets to a Brave Sync Chain, extract mnemonic codes, verify seeds on disk. |
+| [`references/account-manager/provider-auth.md`](references/account-manager/provider-auth.md) | Provider auth — automate AI provider sign-in (Kilo Code, Cline, Antigravity) across Brave profiles with Google OAuth, passkey bypass, and challenge handling. |
