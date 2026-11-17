@@ -16,9 +16,9 @@ You <one paragraph: what the agent does when this skill loads>.
 
 ## Rules
 
-| ID | Rule | Covers | Check |
-|----|------|--------|-------|
-| R1 | <Rule name>. <the rule, stated once — this row is its single home; detail beyond a few lines moves to a reference and the row points to it.> | <the ten-question answer this row covers, or `—`> | <how to check compliance: a command, a grep, or a countable condition> |
+| ID | Rule | Check |
+|----|------|-------|
+| R1 | <Rule name>. <the rule, stated once — this row is its single home; detail beyond a few lines moves to a reference and the row points to it.> | <how to check compliance: a command, a grep, or a countable condition> |
 
 ## Routing
 
@@ -31,7 +31,6 @@ You <one paragraph: what the agent does when this skill loads>.
 
 - **Frontmatter** — `name`, `description`, `when-to-use`, `argument-hint` are the four mandatory keys. Optional keys (`user-invocable`, `disable-model-invocation`, `paths`, ...) are target-dependent; add one only when the skill's behavior needs it. The two trigger fields carry the when-and-where answer.
 - **Rules** — one named row per cross-step rule; the row is the single home for that fact. Task-conditional content belongs in a reference, not here (Rules: budget for permanent cost). The rows must cover the cross-step answers: the success metric, audience and tone, tools (mandatory and forbidden), scope and iteration ceilings, and report shape.
-- **Covers cell** — the ten-question answer the row covers, or `—` when the row is a mechanical constraint. The set of labels is the one in the skill's own question table.
 - **Routing** — one table row per reference file the skill ships, in execution order, each linking `references/step-<N>-<name>.md`. A single-file skill with no references omits the section.
 
 ## Completion

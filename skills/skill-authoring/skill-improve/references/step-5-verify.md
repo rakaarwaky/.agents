@@ -54,9 +54,9 @@ Cycles used: <0-2> · Remaining gaps: <none or list>
 - **FAIL** → run patch cycle (below), re-score. Cycle budget is 2 per skill per invocation.
 - Budget exhausted and still below gate → emit score block with `Gate: FAIL` and remaining gap list; stop. Keep edits applied, keep catalog consistent, never report skill as done/production-ready/published.
 
-**Mechanical probes:**
+**Mechanical probe (body shape):**
 ```bash
-grep -rnE 'what & why|when & where|who|from where|by what means|how far|whether|what kind|how come' SKILL.md references/ || echo "coverage gaps"
+grep -n '^#' SKILL.md   # must return exactly the title, ## Rules, and ## Routing
 ```
 
 ## TenQ diagnosis and patch cycle
@@ -85,7 +85,7 @@ Symptom → gap map:
 1. **OBSERVE** — record symptom verbatim and the invocation that produced it. No symptom, no patch.
 2. **MAP** — pick the row; write down the question and owning home before opening an editor.
 3. **PATCH** — edit only that home. Step file owner → never edit body; Rules owner → never restate in step.
-4. **REGRESS** — re-run happy path, edge case, deliberate error (missing precondition or failing check command). Re-run `sac lint` and coverage probe.
+4. **REGRESS** — re-run happy path, edge case, deliberate error (missing precondition or failing check command). Re-run `sac lint` and the body-shape probe.
 5. **RE-SCORE** — score patched questions with evidence, recompute gate. No `version:` key (parser ignores it; version record is commit message + report change list).
 
 **Stop conditions:**
