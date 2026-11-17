@@ -32,3 +32,5 @@ belongs to the sibling `password-manager` skill.
 | [`references/list.md`](references/list.md) | `list` subcommand — show every registered profile and which `profile.csv` entries are missing. |
 | [`references/google-login.md`](references/google-login.md) | `login` subcommand — Google login in a named profile with session persistence. |
 | [`references/google-logout.md`](references/google-logout.md) | `logout` subcommand — drop the Google session for a profile. |
+| [`references/sync.md`](references/sync.md) | Sync chain management — enroll source and join targets to a Brave Sync Chain, extract mnemonic codes, verify seeds on disk. |
+| [`references/provider-auth.md`](references/provider-auth.md) | Provider auth — automate AI provider sign-in (Kilo Code, Cline, others) across Brave profiles with Google OAuth, passkey bypass, and challenge handling. |

@@ -1,12 +1,6 @@
 {
   "skills": [
     {
-      "name": "aes",
-      "description": "AES docs, layers, rule fixes, and legacy migration.",
-      "when_to_use": "Use for any AES task: create or improve project documents (PRD, ROADMAP, FRD, BACKLOG, README, AGENTS, ARCHITECTURE, CONTRIBUTING, DESIGN, DATA), scaffold or audit AES layer files across Python/Rust/TypeScript, fix AES lint violations (AES1xx-AES7xx), or migrate a legacy codebase into the AES 7-layer architecture.",
-      "category": "architechture"
-    },
-    {
       "name": "aes-docs",
       "description": "Adds PRD/ROADMAP/FRD/README/BACKLOG/DESIGN/AGENTS/DATA docs for Python, Rust, and TypeScript modules. Use when creating or improving a PRD, ROADMAP, FRD, BACKLOG, README, AGENTS, DESIGN, or DATA document, or to split spec from status.",
       "when_to_use": "create, improve, or audit a project document (PRD, ROADMAP, FRD, BACKLOG, README, AGENTS, ARCHITECTURE, CONTRIBUTING, DESIGN, DATA); split spec from status; verify docs with lint-arwaky-cli docs.",
@@ -73,27 +67,9 @@
       "category": "brave-automation"
     },
     {
-      "name": "brave-automation",
-      "description": "baa CLI: Brave profiles, Google sessions, credentials.",
-      "when_to_use": "Use for any baa CLI task: install or repair baa, initialize the XDG workspace, create or list profiles, script Google login/logout/session checks, import or export Chromium Password Manager CSVs, or troubleshoot CDP/Local State/Safe Storage failures.",
-      "category": "brave-automation"
-    },
-    {
-      "name": "brave-provider-auth",
-      "description": "Use when authenticating AI providers across Brave profiles.",
-      "when_to_use": "Use when automating provider sign-in (Kilo Code, Antigravity, or other OAuth/device-auth providers) across multiple Brave browser profiles, handling passkey bypass, Google OAuth selection, and security challenge coordination.",
-      "category": "brave-automation"
-    },
-    {
       "name": "brave-setup",
       "description": "Install the baa CLI, initialize its XDG workspace, verify prerequisites, and troubleshoot common Brave automation failures on Linux.",
       "when_to_use": "Use when the user wants to install or repair the baa CLI and its prerequisites, initialize the XDG state/data workspace, resolve XDG path issues, or debug CDP connection failures, Local State locks, and Safe Storage key errors. Not for provisioning profiles (account-manager), importing credentials (password-manager), or Google session scripting.",
-      "category": "brave-automation"
-    },
-    {
-      "name": "brave-sync-management",
-      "description": "Manage Brave Sync chains and profile enrollment.",
-      "when_to_use": "Use when synchronizing Brave profiles to a single Brave Sync Chain, extracting sync mnemonic codes, joining profiles, or troubleshooting sync enrollment and stale chain errors.",
       "category": "brave-automation"
     },
     {
