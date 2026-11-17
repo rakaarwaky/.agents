@@ -163,17 +163,16 @@ def _remove_skill_provisioned(dest_base: Path, dry_run: bool) -> None:
             dest.unlink()
             log_ok(f"Unlinked skill '{name}' from {dest_base} (pack source intact)")
             removed += 1
-        elif dest.is_dir():
+        elif dest.is_dir() and _copy_matches_pack(dest, skill_md.parent):
             # Only delete when the copy matches the pack (pure snapshot or
             # provenance-carrying) — a divergent hand-written skill stays.
-            if _copy_matches_pack(dest, skill_md.parent):
-                if dry_run:
-                    log_sub(f"[DRY-RUN] Would remove skill '{name}' from {dest_base}")
-                    continue
-                import shutil
-                shutil.rmtree(dest)
-                log_ok(f"Removed skill '{name}' from {dest_base}")
-                removed += 1
+            if dry_run:
+                log_sub(f"[DRY-RUN] Would remove skill '{name}' from {dest_base}")
+                continue
+            import shutil
+            shutil.rmtree(dest)
+            log_ok(f"Removed skill '{name}' from {dest_base}")
+            removed += 1
     if removed:
         log_ok(f"{removed} skill(s) removed from {dest_base}")
 

@@ -2,7 +2,7 @@
 name: brave-automation
 description: "Install the baa CLI, manage Brave browser profiles and Google sessions, and import/export Chromium credentials as CSVs via the baa CLI on Linux."
 when-to-use: "Use when the user wants to install or repair the baa CLI and its XDG workspace, provision or verify isolated Brave profiles from profile.csv, script Google login or logout per profile, check a saved Google session, import credentials from a CSV into Login Data DBs, export saved passwords back to a CSV, enroll profiles in a Brave Sync Chain, or automate AI provider sign-in (Kilo Code, Cline, Antigravity) across Brave profiles. Not for headless scraping without profiles, non-Chromium browsers, cloud password managers, or non-Linux hosts."
-argument-hint: "<brave-setup|password-manager|account-manager> <subcommand> [args] [--profile <name>] [--csv FILE]"
+argument-hint: "<setup|password|account> <task>"
 ---
 
 # Brave Automation (`baa`)
