@@ -30,6 +30,8 @@ Marker provenance:
 
 Read only the winning lane's references. Do not read the other lane's.
 
+- **Never end the conversation turn on drop.** In the Hermes lane, after sending `/implement` to Grok Build, do not yield the turn to the user with a passive "waiting for completion" report. Hermes must stay active in the session, execute Step 1 polling in `terminal` until the Orca terminal is idle or exited, then immediately proceed to Step 2 verification and shipping.
+
 ## Lint Progress Gate
 
 Every run bookends a lint baseline with the `lint-arwaky-cli report` progress command (binary at `/home/raka/.local/bin/lint-arwaky-cli`):
