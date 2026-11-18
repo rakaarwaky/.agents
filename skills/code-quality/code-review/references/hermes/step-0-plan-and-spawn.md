@@ -52,3 +52,9 @@ Confirm `accepted: true`. **After this send, do not send any more text to Grok.*
 Do NOT end the turn after dropping the task. Hermes must stay active and proceed immediately to Step 1 in this session to wait and poll for Grok Build to finish:
 
 > Dropped /code-review into Grok Build at <worktree_path> (<mode>: <target>). Proceeding to Step 1 to wait for completion.
+
+## Completion
+
+- Orca worktree created with `--agent grok`; JSON parsed for `worktree_path` and `worktree_id`.
+- Task dropped via `orca terminal send`; `accepted: true` confirmed.
+- Proceeded directly to Step 1 without ending the turn.

@@ -30,3 +30,11 @@ Report to the user:
 > <Mode> review of <target> complete. <N>/<P> personas completed, <M> errored. <bugs> bugs, <suggestions> suggestions, <nits> nits. Top issues: ... Summary: <abs path>.
 
 Then proceed to Step 3.
+
+## Completion
+
+- Count parity verified between summary and per-persona files.
+- Source tree confirmed clean via `git status --short`.
+- Triage summary produced with total issues, top findings, cross-persona patterns, and errored personas.
+- Report emitted to user.
+- Proceed to Step 3.

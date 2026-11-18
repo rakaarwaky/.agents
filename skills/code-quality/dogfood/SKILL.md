@@ -7,6 +7,8 @@ argument-hint: "<target> [--type web|terminal|desktop|mobile] [--scope <scope>] 
 
 # Dogfood — Exploratory QA
 
+Runs one 5-phase pipeline — plan → explore → collect evidence → categorize → report — over any of four target types: `web`, `terminal`/`tui`, `desktop`, `mobile`. This file is the lane identification step; the working method lives in `references/hermes/` and `references/grok/`.
+
 ## Rules
 
 | ID | Rule | Check |

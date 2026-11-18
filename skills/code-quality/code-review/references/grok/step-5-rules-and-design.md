@@ -27,3 +27,7 @@ A single persona subagent can fail (context window overflow on a very large diff
 ## Why no GitHub posting
 
 Findings land in per-persona review files plus a single summary file on disk. If the user wants the findings posted to a PR, that is a separate workflow (a `gh api` call or a dedicated posting skill) and is out of scope for this skill.
+
+## Completion
+
+- Design decisions and constraints reviewed and understood.

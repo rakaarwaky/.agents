@@ -74,3 +74,11 @@ Review the **current content** of a file or directory, ignoring commit status.
 ## Report progress
 
 After collection, report per [step-4-in-progress-reporting.md](step-4-in-progress-reporting.md).
+
+## Completion
+
+- `scratch_dir`, `PYTHON`, and `REVIEW_ID` (8 hex chars) initialized via `host.py setup`.
+- Review target scope resolved and written to `<files_file>` (and `<diff_file>` for diff modes).
+- Short-circuited with clean message if file list is empty.
+- In-progress update reported via Step 4.
+- Proceed to Step 2.

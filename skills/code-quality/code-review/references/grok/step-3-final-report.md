@@ -64,3 +64,10 @@ Cleanup is asymmetric by outcome:
 - **Empty-path exit (Step 1 short-circuit):** remove nothing — `<files_file>` was never populated and no review files were written.
 
 For the removals, run the resolved `<PYTHON> <HOST_PY> cleanup <files_file> [diff_file]` with the absolute paths. Missing files are allowed. Do not use a shell deletion command.
+
+## Completion
+
+- `<summary_file>` written with accurate totals, per-persona table, and top issues.
+- Final report presented to user with deliverable paths and totals.
+- Temporary files `<files_file>` and `<diff_file>` cleaned up via `host.py cleanup`.
+- Per-persona review files and summary file retained in scratch dir.

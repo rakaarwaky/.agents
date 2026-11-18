@@ -65,3 +65,10 @@ Store the selected list (ordered, deduplicated, 1–3 entries) as `personas` for
 The 10 available lens personas:
 
 backend-engineer, business-analyst, devops-engineer, frontend-engineer, product-engineer, qa-engineer, security-engineer, software-architect, system-analyst, ui-ux-designer
+
+## Completion
+
+- Mode successfully mapped to one of: `commit`, `uncommit`, `pr`, `path`.
+- Target parameter validated and resolved (or halted on invalid syntax).
+- 1–3 lens personas auto-selected from the 10-persona roster.
+- Proceed to Step 1.

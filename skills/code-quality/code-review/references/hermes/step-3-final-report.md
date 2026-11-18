@@ -16,3 +16,8 @@ Report to the user:
    ```
 
 Report: "Review complete."
+
+## Completion
+
+- All report items 1–7 delivered to the user.
+- "Review complete." emitted as closing line.

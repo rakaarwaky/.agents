@@ -19,7 +19,7 @@ For each selected persona (1–3, chosen by the orchestrator in Step 0 based on 
 
 1. Pick the first path that exists: `~/.agents/personas/<name>.toml`, then the repo fallback `<dirname of SKILL.md>/../../../personas/<name>.toml`.
 2. Read the file with `read_file`.
-3. Parse with `python3 -c "import tomllib,sys; print(tomllib.load(open(sys.argv[1],'rb'))['subagents']['personas']['<name>']['instructions'])" <path>` and take the `instructions` value under the `[subagents.personas.<name>]` table (ignore the `[[subagents.personas.<name>.inputs]]` and `[[...outputs]]` arrays).
+3. Parse with `python3 -c "import tomllib,sys; print(tomllib.load(open(sys.argv[1],'rb'))['subagents']['personas']['<name>']['instructions'])\" <path>` and take the `instructions` value under the `[subagents.personas.<name>]` table (ignore the `[[subagents.personas.<name>.inputs]]` and `[[...outputs]]` arrays).
 4. Store that body as `<name>_persona_instructions`.
 
 ## Prompt template
@@ -163,3 +163,11 @@ On any hard failure, report ERROR with the exact error text.
 After all launches, call `get_command_or_subagent_output` for all task IDs and wait for every subagent. Record a failed subagent as `ERROR` for that persona and continue aggregating the rest — one failed persona does not abort the run.
 
 Report progress: "All <N> reviewers complete. Aggregating findings..."
+
+## Completion
+
+- 1–3 reviewer subagents spawned in parallel with `background: true`.
+- All reviewer subagents completed or recorded as `ERROR`.
+- Per-persona review files written to `${scratch_dir}/grok-review-<REVIEW_ID>-<persona>.md`.
+- In-progress update reported via Step 4.
+- Proceed to Step 3.

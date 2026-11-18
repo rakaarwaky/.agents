@@ -56,3 +56,10 @@ If Grok reports failure or exits non-idle with an error, report it verbatim to t
 Report to the user: "Grok Build finished the <mode> review of <target>. <N>/<P> personas completed (<M> errored). <bugs> bugs, <suggestions> suggestions, <nits> nits. Summary: <path>."
 
 Then proceed to Step 2.
+
+## Completion
+
+- Grok terminal reached `tui-idle` or `exited` status.
+- Artifacts located at `/tmp/grok-<username>/` with correct `REVIEW_ID` prefix.
+- Brief progress report emitted to user.
+- Proceed to Step 2.
