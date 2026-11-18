@@ -20,14 +20,16 @@ Needs revision. The architectural direction, passive component boundaries (AES20
 - **Suggestion**: Align the PR boundaries. Either:
   1. Have PR 1 keep passing `onPickFile={onPickFile}` and `fileMeta={fileMeta}` to `<StudioLayerPanel>` so dual dropzones function during PR 1, and add `surface_studio_landing_component.tsx` to PR 2's affected files list to disconnect them cleanly in lockstep with `StudioLayerPanelProps`; or
   2. Acknowledge that PR 1 decommissions sidebar upload immediately at the composition level, update the Rollout Plan description to remove the claim of temporary dual dropzone support, and keep `surface_studio_landing_component.tsx` in PR 1.
-- **Status**: open
+- **Status**: addressed
+- **Response**: Adopted Option B. Updated the Rollout Plan description in the plan document to remove the claim of temporary dual dropzones and clarify that PR 1 decommissions sidebar upload immediately at the composition level (`StudioLanding`), directing file ingestion exclusively to `StudioCanvas`. `surface_studio_landing_component.tsx` remains cleanly scoped to PR 1, while PR 2 removes the dead code, markup, and prop definitions from `StudioLayerPanel`.
 
 ### Issue 2: Drag-and-drop flickering on stage child elements (`onDragLeave`)
 - **Severity**: bug
 - **Section**: Section 1 (`surface_studio_canvas_component.tsx` — Canvas stage render logic)
 - **Description**: The plan attaches `onDragLeave={() => setIsDragging(false)}` directly to `.pt-studio-canvas-stage`. In HTML5 / React drag-and-drop, when a dragged file passes over any child element (e.g. `.pt-studio-canvas-frame`, preview SVG, chip, or `.pt-studio-canvas-dropzone` children like icons and text), the browser fires `dragleave` on the stage and `dragenter` on the child. Without checking whether the drag has actually left the stage boundary (e.g. using `e.currentTarget.contains(e.relatedTarget as Node)` or a drag counter ref), `isDragging` will rapidly toggle between `true` and `false`, repeatedly mounting and unmounting `.pt-studio-canvas-drag-overlay` or toggling CSS classes while dragging.
 - **Suggestion**: Specify child-boundary protection for the drag event handlers. In `handleDragLeave`, check `if (!e.currentTarget.contains(e.relatedTarget as Node)) { setIsDragging(false); }` or maintain a counter ref (`dragCounter`), and ensure child elements within the dropzone have `pointer-events: none` or boundary guards.
-- **Status**: open
+- **Status**: addressed
+- **Response**: Updated Section 1 and Section 4 in the plan document. Implemented boundary containment in `handleDragLeave` via `if (!e.currentTarget.contains(e.relatedTarget as Node)) { setIsDragging(false); }` so crossing child stage elements does not falsely clear drag state. Added `.pt-studio-canvas-dropzone * { pointer-events: none; }` in CSS to prevent spurious drag leave/enter cycles on empty-state child nodes, and noted this containment in Observability.
 
 ### Issue 3: Complete loss of document metadata display across the entire Studio surface
 - **Severity**: suggestion
@@ -85,3 +87,12 @@ Needs revision. The architectural direction, passive component boundaries (AES20
 - **Preserved re-export compatibility**: Thoughtfully preserves the `StudioFileMeta` type export chain from `surface_studio_layer_panel_component.tsx` through `surface_studio_landing_component.tsx` to prevent breaking existing consumers.
 - **Well-structured test coverage plan**: Specifies a dedicated new test file `unit_studio_canvas_upload.test.tsx` and carefully identifies which obsolete test assertions in `unit_studio_layer_panel_component.test.tsx` must be retired.
 - **Clear visual hierarchy and UX improvement**: Correctly diagnoses the UI imbalance in the Studio surface and provides a modern drag-and-drop canvas UX matching industry standards.
+
+---
+
+## Revision Summary
+
+### Batch 1 (Issue 1 & Issue 2)
+- **Issue 1 (Rollout Plan & PR 1 alignment)**: Resolved by choosing Option B. Updated the Rollout Plan in `plan-doc-14c3b92a.md` to clarify that PR 1 decommissions sidebar upload immediately at the composition root level (`StudioLanding`), routing upload exclusively to `StudioCanvas`. `surface_studio_landing_component.tsx` remains scoped to PR 1, avoiding dead prop connections or dual-zone ambiguity during the transition.
+- **Issue 2 (Drag-and-drop flickering on stage child elements)**: Resolved in `plan-doc-14c3b92a.md`. Added child-boundary containment logic to `handleDragLeave` using `e.currentTarget.contains(e.relatedTarget as Node)` so dragging over child elements does not prematurely clear `isDragging`. Added `.pt-studio-canvas-dropzone * { pointer-events: none; }` in CSS to eliminate spurious child drag events inside the dropzone card, and documented this containment in Observability.
+

@@ -573,7 +573,7 @@ No changes to database schemas, value objects (VOs), or API contracts.
   - `data-testid="studio-layer-panel"` — existing layer panel root (unchanged).
 - **Removed test IDs**:
   - `data-testid="studio-file-input"` — removed from sidebar (was in `surface_studio_layer_panel_component.tsx` line 169).
-- **User Action Feedback**: Drag-over on the stage activates `.pt-studio-canvas-dropzone-drag` (empty state) or renders `.pt-studio-canvas-drag-overlay` (loaded state), providing clear visual cues.
+- **User Action Feedback**: Drag-over on the stage activates `.pt-studio-canvas-dropzone-drag` (empty state) or renders `.pt-studio-canvas-drag-overlay` (loaded state), providing clear visual cues. Child-boundary containment in `handleDragLeave` prevents flickering as the pointer crosses child nodes.
 
 ---
 
