@@ -25,7 +25,14 @@ The document must end with these three exact sections, in this specific order:
 (Summarize important architectural choices and rationale.)
 
 ## PR Plan
-(Break the design into concrete, ordered, independently mergeable PRs. Each PR must include: title, affected files, dependencies, and description. This section must be at the absolute bottom of the document.)
+(Break the design into concrete, ordered, independently mergeable PRs. Each PR must use this exact format:
+
+### PR N: <Title>
+- **Files/components affected:** <comma-separated file paths>
+- **Dependencies:** None, or "PR <n>, PR <m>"
+- **Description:** <one-line description>
+
+Every PR must include exactly these three bullets in this order. Use sequential PR numbers starting at 1. This section must be at the absolute bottom of the document.)
 ```
 
 ## After Completion
