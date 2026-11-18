@@ -40,3 +40,21 @@ If `existing_patterns_snapshot` is non-empty:
 2. Sort by `count` descending.
 3. Take the top 10 entries.
 4. Format into `past_issues_briefing`:
+
+   ```
+   ## Past Issue Patterns
+
+   The following issue patterns have been seen in previous runs on this
+   workspace. Address them proactively in your implementation and review:
+
+   - [<category>] <description> (seen <count> times)
+   - ...
+   ```
+
+5. Store the formatted string in `past_issues_briefing`. This string is injected into every implementer and reviewer prompt in Step 6.
+
+If `existing_patterns_snapshot` is empty (or `exists` is `false`), set `past_issues_briefing` to `""` and skip the briefing block.
+
+Do NOT read or write `.agents/execute-plan-issues.md` directly — that legacy path is per-worktree and no longer used. The helper is the single source of truth for the path.
+
+Continue to Step 2 (tool detection).

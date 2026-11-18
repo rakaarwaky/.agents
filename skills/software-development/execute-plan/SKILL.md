@@ -1,8 +1,9 @@
 ---
 name: execute-plan
 description: "Executes a PR Plan DAG end-to-end: Hermes validates the plan and drops /execute-plan into Grok Build (Grok runs parallel Orca worktrees, implementers, the 3-reviewer panel, fix loops, and final assembly), then Hermes verifies the final branch and ships the PR."
-when-to-use: "Use for /execute-plan <design-doc-path>, execute plan, run the plan, implement the design, or after /design produces a PR plan."
-argument-hint: "<design-doc-path> [--resume <PLAN_ID>]"
+when-to-use: "Use for /execute-plan <design-doc-path> [--resume <PLAN_ID>], execute plan, run the plan, implement the design, or after /design produces a PR plan."
+argument-hint: "<design-doc-path> | --resume <PLAN_ID>"
+disable-model-invocation: true
 ---
 # Execute Plan Skill
 

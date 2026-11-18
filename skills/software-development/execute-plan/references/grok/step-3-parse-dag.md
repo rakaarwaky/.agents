@@ -12,9 +12,10 @@ Run the bundled validator first — it encodes the exact parsing, validation, an
 sdc validate-plan <design_doc_path>
 ```
 
-- Exit `0`: parse the JSON report. `linearized_order`, `level_assignments`, `pr_count`, and `max_parallelism` are authoritative — store `linearized_order` in the state file and skip to Step 4 (it only computes branch names from the parsed nodes; it must not re-derive the order).
-- Exit `1`: the report's `errors` list names the offending PRs (duplicate id, unresolved dependency, cycle, malformed entry). Report the first error to the user and stop — do not proceed to Step 4 or spawn any subagent.
-- Exit `2`: usage or IO error (path not found, unreadable). Report and stop.
+- Exit `0`: parse the JSON report. Require `valid == true` and `errors == []`. `linearized_order`, `level_assignments`, `nodes`, `pr_count`, and `max_parallelism` are authoritative; store `linearized_order` in the state file and skip to Step 4.
+- Exit `1`: DAG validation failed. Read the JSON on stdout and report the first error; stop.
+- Exit `2`: usage or IO error. Read stderr and report the first error; stop.
+- Exit `4`: plan parse error (missing section, no entries, malformed PR heading/dependency). Read the JSON on stderr and report the first error; stop.
 
 Only parse by hand if `sdc` is unavailable. The manual procedure below is the reference implementation the validator mirrors; both must agree on `id`, `slug`, `dependencies`, `level`, and `linearized_order`.
 

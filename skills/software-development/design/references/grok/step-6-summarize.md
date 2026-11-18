@@ -26,8 +26,9 @@ Run the plan validator to confirm the PR Plan section is well-formed and parseab
 sdc validate-plan <design_doc_file>
 ```
 
-- Exit `0`: plan is valid. Report: `PR plan validated: <N> PRs, <L> levels, max parallelism <P>`.
-- Exit `1`: plan is malformed. Show the error to the user and resume the writer to fix the PR Plan section. Do not proceed to Step 7 until the validator passes.
-- Exit `2`: IO error (file missing/unreadable). Report and stop.
+- Exit `0` with `valid == true` and `errors == []`: plan is valid. Report: `PR plan validated: <N> PRs, <L> levels, max parallelism <P>`.
+- Exit `1`: DAG validation failed. Read stdout JSON, show the error, and resume the writer to fix the PR Plan section.
+- Exit `2`: IO error (file missing/unreadable). Read stderr and stop.
+- Exit `4`: parse error (missing section, no entries, malformed heading/dependency). Read stderr JSON, show the error, and resume the writer.
 
 Then continue to Step 7.

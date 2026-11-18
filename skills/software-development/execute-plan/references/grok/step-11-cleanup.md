@@ -1,4 +1,4 @@
-# Step 11 Cleanup
+## Step 11 Cleanup
 
 ## Step 11: Cleanup
 
@@ -24,16 +24,17 @@ for each pr in dag.nodes where orca_worktree_id is not null
 
 The final Orca worktree is exempt from Step 11 — it is retired post-merge only (Step 10.5).
 
-Then delete each per-PR summary, merged review, and individual reviewer file:
+**Do NOT delete the per-PR summary, merged review, or individual reviewer files.** Hermes (Steps 1–3 of the Hermes lane) reads these files to verify the run:
 
-```
-sdc host cleanup <each ${scratch_dir}/exec-summary-<PLAN_ID>-<pr-id>.md, ${scratch_dir}/exec-review-<PLAN_ID>-<pr-id>.md, and config.review_file you created>
-```
+- `exec-summary-<PLAN_ID>-<pr-id>.md` — per-PR summaries
+- `exec-review-<PLAN_ID>-<pr-id>.md` — per-PR merged reviews
+- `<config.review_file>` — individual reviewer files
 
-**Keep the state file** -- the user may want to reference PR URLs or run history; remove manually if desired:
-```bash
-rm ${scratch_dir}/exec-plan-<PLAN_ID>.json
-```
+These files are the verification gate. Grok must not delete what Hermes consumes.
+
+**Hermes owns post-verification cleanup** — Hermes Step 3 runs `sdc host cleanup` on these files after it has read them and produced the final report.
+
+The state file (`exec-plan-<PLAN_ID>.json`) is kept for reference; Hermes Step 3 also cleans it up after verification.
 
 **After failure (resumable):** Worktrees for **completed** PRs are preserved (their commits are needed for final branch assembly in Step 10.1). Worktrees for **failed** or **crashed** PRs are cleaned up during `--resume` (Step 9) before retrying, since failed PRs are retried from scratch with new worktrees.
 

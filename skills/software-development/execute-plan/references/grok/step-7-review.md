@@ -12,7 +12,7 @@ After each PR's implementation completes successfully, the orchestrator launches
 
 The security and plan-alignment concerns are folded into the General reviewer, and the Tests and Simplicity specialists are prompt-only. There are no effort levels, no slot allocation, and no conditional selection — the composition is identical on every PR.
 
-The review-fix loop (Steps 7b/7c) runs per PR until **all** of that PR's reviewers report 0 open issues in the same round. Reviewer fan-out is per PR and is **independent of `max_concurrent`**, which caps only implementation subagents — each PR has exactly 3 reviewers running in parallel.
+The review-fix loop (Steps 7b/7c) runs per PR until **all** of that PR's reviewers report 0 open issues in the same round. The loop has a **round cap of 5** per PR: if 5 rounds pass without 0 open issues, mark the PR as `failed` with reason `"review round cap exceeded"` and proceed to the next PR. Reviewer fan-out is per PR and is **independent of `max_concurrent`**, which caps only implementation subagents — each PR has exactly 3 reviewers running in parallel.
 
 ### Step 7.0: Per-PR Reviewer Setup (Specialization Selection)
 

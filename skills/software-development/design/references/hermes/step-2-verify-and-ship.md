@@ -24,10 +24,13 @@ This is the hand-off gate for `/execute-plan`. Extract the `## PR Plan` section 
 sdc validate-plan <path to a file containing the PR Plan section>
 ```
 
-`sdc` lives at `/home/raka/.local/bin/sdc`. (If the design doc is the whole file, point the validator at it directly — the validator reads the `## PR Plan` section from the file.)
+`sdc` lives at `~/.local/bin/sdc`. (If the design doc is the whole file, point the validator at it directly — the validator reads the `## PR Plan` section from the file.)
 
-- Exit `0`: `linearized_order`, `level_assignments`, `pr_count`, and `max_parallelism` are authoritative. Record them — they are the hand-off facts for the user.
-- Exit `1` / `2`: the plan is malformed or the section is missing. Report the first error and stop — do not hand-edit the PR plan to make it parse. The design is not execute-plan-ready; tell the user to re-run `/design` with the validator's error in context, or to fix the plan by hand and re-invoke.
+- Exit `0` with `valid == true` and `errors == []`: `linearized_order`, `level_assignments`, `nodes`, `pr_count`, and `max_parallelism` are authoritative. Record them — they are the hand-off facts for the user.
+- Exit `1`: DAG validation failed. Read stdout JSON and report the first error.
+- Exit `2`: usage/IO failure. Read stderr and report the first error.
+- Exit `4`: parse failure (missing section, no entries, malformed PR/dep fields). Read stderr JSON and report the first error.
+- On any non-zero exit: stop. Do not hand-edit the PR plan to make it parse.
 
 ## 2c: Report
 
