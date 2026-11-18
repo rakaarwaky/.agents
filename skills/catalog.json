@@ -248,8 +248,8 @@
     },
     {
       "name": "issue-worker",
-      "description": "issue → PR: analyzes open GitHub issues, verifies claims at HEAD, asks user decisions via quiz, isolates work in Orca worktrees, delegates implementation to Grok Build, verifies fixes, and pushes branches to open draft PRs. Never merges.",
-      "when_to_use": "Use when analyzing open GitHub issues to create PRs (/issue-worker <issue-number>...), triaging bug reports or feature requests, verifying issue reproduction at HEAD, running isolated Orca worktrees for issue fixes, or opening draft PRs from existing issues. Never creates issues (handled by /issue-maker) and never auto-merges.",
+      "description": "issue → PR: analyzes open GitHub issues (latest or oldest N issues), verifies claims at HEAD, asks user decisions via quiz, isolates work in Orca worktrees, delegates implementation to Grok Build, verifies fixes, and pushes branches to open draft PRs. Never merges.",
+      "when_to_use": "Use when taking open GitHub issues to PRs (/issue-worker <latest|oldest> <N>), triaging the N latest or oldest open issues, verifying issue reproduction at HEAD, running isolated Orca worktrees for issue fixes, or opening draft PRs from existing issues. Never creates issues (handled by /issue-maker) and never auto-merges.",
       "category": "git"
     },
     {
