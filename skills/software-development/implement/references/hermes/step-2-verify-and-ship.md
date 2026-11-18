@@ -48,13 +48,15 @@ git -C <worktree_path> push -u origin <worktree_branch>
 
 Then open the PR with `gh pr create --base main --head <worktree_branch>`. A rejected push to `main` is not a reason to bypass CI gates — the PR lane is the supported path.
 
-## 2e: Open the PR
+## 2e: Open the PR (default — mandatory unless the user opts out)
 
-When `gh` is available and the remote is GitHub:
+Creating a PR is the default and expected outcome of every run. Open a **ready-for-review** PR (not a draft) whenever `gh` is available and the remote is GitHub:
 
 ```
-gh pr create --base main --head <worktree_branch> --fill --draft
+gh pr create --base main --head <worktree_branch> --fill
 ```
+
+Drop `--fill` and pass an explicit `--title`/`--body` if you have a richer summary to attach. Only fall back to `--draft` when the user explicitly asks for a draft in this run.
 
 No `gh` or non-GitHub remote: derive the compare URL
 
@@ -62,12 +64,12 @@ No `gh` or non-GitHub remote: derive the compare URL
 https://<host>/<owner>/<repo>/compare/main...<worktree_branch>?expand=1
 ```
 
-Strip any `user[:pass]@` from the remote URL before logging it.
+Strip any `user[:pass]@` from the remote URL before logging it. Treat a missing `gh`/non-GitHub remote as an environment limitation to report — not as permission to skip shipping the branch for review.
 
 ## 2f: Report
 
 Report to the user:
 
-> Implemented via Grok Build in <worktree_path>. PR: <url> (draft). <N issues raised by the review panel, all resolved | headless run; verified via worktree diff and gates>. Memory file updated at <path> (or "no memory update — Grok reported no new patterns").
+> Implemented via Grok Build in <worktree_path>. PR: <url>. <N issues raised by the review panel, all resolved | headless run; verified via worktree diff and gates>. Memory file updated at <path> (or "no memory update — Grok reported no new patterns").
 
 Then proceed to Step 3.
