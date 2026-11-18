@@ -47,8 +47,8 @@ Send exactly this, once, via `orca terminal send --terminal <handle> --text "<br
 
 Confirm `accepted: true`. **After this send, do not send any more text to Grok.**
 
-## Report & Stop
+## Proceed to Step 1
 
-> Dropped /code-review into Grok Build at <worktree_path> (<mode>: <target>). Waiting for completion.
+Do NOT end the turn after dropping the task. Hermes must stay active and proceed immediately to Step 1 in this session to wait and poll for Grok Build to finish:
 
-Then end the turn. When the Orca terminal becomes idle (detected when this conversation resumes), proceed to Step 1.
+> Dropped /code-review into Grok Build at <worktree_path> (<mode>: <target>). Proceeding to Step 1 to wait for completion.

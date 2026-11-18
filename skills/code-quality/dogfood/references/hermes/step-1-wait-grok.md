@@ -13,6 +13,31 @@ Worktree case: poll with `orca terminal read --terminal <handle> --cursor <curso
 - `orca terminal status --terminal <handle>` is **not** a valid subcommand (returns `invalid_argument`). Use `terminal wait --for tui-idle` to test idle and `terminal read` to drain output.
 - Do NOT send text while waiting.
 
+### Automated Polling Script (Worktree case)
+
+Execute this loop in `terminal` (set `timeout=600`):
+
+```bash
+ORCA="${ORCA_CLI_COMMAND:-/home/raka/.local/bin/orca-ide}"
+cursor=0
+while true; do
+  wait_res=$("$ORCA" terminal wait --terminal "<handle>" --for tui-idle --timeout-ms 60000 --json 2>/dev/null || true)
+  satisfied=$(echo "$wait_res" | jq -r '.result.satisfied // false' 2>/dev/null || echo "false")
+  if [[ "$satisfied" == "true" ]]; then
+    echo "Terminal reached tui-idle."
+    break
+  fi
+  read_res=$("$ORCA" terminal read --terminal "<handle>" --cursor "$cursor" --limit 100 --json 2>/dev/null || true)
+  cursor=$(echo "$read_res" | jq -r '.result.terminal.nextCursor // empty' 2>/dev/null || echo "$cursor")
+  status=$(echo "$read_res" | jq -r '.result.terminal.status // empty' 2>/dev/null || echo "")
+  if [[ "$status" == "exited" ]]; then
+    echo "Terminal process exited."
+    break
+  fi
+  sleep 5
+done
+```
+
 Headless case: the `grok -p` call (launched inside the worktree/scratch directory, never in the Hermes session directly) is foreground/blocking — it returns when Grok finishes. No polling.
 
 ## When Grok Is Done

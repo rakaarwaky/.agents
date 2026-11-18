@@ -46,10 +46,8 @@ Send exactly this, once, via `orca terminal send --terminal <handle> --text "<br
 
 `<task-description>` is the skill argument, expanded verbatim. Confirm `accepted: true` in the response. **After this send, do not send any more text to Grok.** No status checks, no course corrections, no "are you done yet".
 
-## Report & Stop
+## Proceed to Step 1
 
-Report to the user, in one line:
+Do NOT end the turn after dropping the task. Do NOT stop after sending the brief. Hermes must stay active and proceed immediately to Step 1 in this session to wait and poll for Grok Build to finish:
 
-> Dropped /implement into Grok Build at <worktree_path> (branch <worktree_branch>). Waiting for completion.
-
-Then end the turn. When the Orca terminal becomes idle (detected when this conversation resumes), proceed to Step 1.
+> Dropped /implement into Grok Build at <worktree_path> (branch <worktree_branch>). Proceeding to Step 1 to wait for completion.

@@ -51,10 +51,8 @@ Send exactly this, once, via `orca terminal send --terminal <handle> --text "<br
 
 Confirm `accepted: true` in the response. **After this send, do not send any more text to Grok.** No status checks, no course corrections, no "is PR-3 done?".
 
-## Report & Stop
+## Proceed to Step 1
 
-Report to the user in one line:
+Do NOT end the turn after dropping the task. Hermes must stay active and proceed immediately to Step 1 in this session to wait and poll for Grok Build to finish:
 
-> Dropped /execute-plan into Grok Build at <worktree_path> (<pr_count> PRs, max parallelism <max_parallelism>). Waiting for completion.
-
-Then end the turn. When the Orca terminal becomes idle (detected when this conversation resumes), proceed to Step 1.
+> Dropped /execute-plan into Grok Build at <worktree_path> (<pr_count> PRs, max parallelism <max_parallelism>). Proceeding to Step 1 to wait for completion.

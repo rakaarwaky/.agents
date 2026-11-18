@@ -38,8 +38,8 @@ Send exactly this, once, via `orca terminal send --terminal <handle> --text "<br
 
 Confirm `accepted: true`. **After this send, do not send any more text to Grok.**
 
-## Report & Stop
+## Proceed to Step 1
 
-> Dropped /deep-clean into Grok Build at <worktree_path> (target: <path>, language: <lang>, mode: <headless | dry-run>). Waiting for completion.
+Do NOT end the turn after dropping the task. Hermes must stay active and proceed immediately to Step 1 in this session to wait and poll for Grok Build to finish:
 
-Then end the turn. When the Orca terminal becomes idle (detected when this conversation resumes), proceed to Step 1.
+> Dropped /deep-clean into Grok Build at <worktree_path> (target: <path>, language: <lang>, mode: <headless | dry-run>). Proceeding to Step 1 to wait for completion.

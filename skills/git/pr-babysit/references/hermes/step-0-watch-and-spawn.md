@@ -79,8 +79,8 @@ Drop the task, once, via `orca terminal send --terminal <handle> --text "<brief>
 
 Confirm `accepted: true`. **After this send, do not send any more text to Grok.** Increment `fix_count`.
 
-## Report & Stop
+## Proceed to Step 1
 
-> Dropped /pr-babysit fix into Grok Build at <worktree_path> (PR <number>, <N> failing checks, <M> open threads). Waiting for the fix pass.
+Do NOT end the turn after dropping the task. Hermes must stay active and proceed immediately to Step 1 in this session to wait for the fix pass:
 
-Then end the turn. When the Orca terminal becomes idle (detected when this conversation resumes), proceed to Step 1.
+> Dropped /pr-babysit fix into Grok Build at <worktree_path> (PR <number>, <N> failing checks, <M> open threads). Proceeding to Step 1 to wait for completion.

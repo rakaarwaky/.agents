@@ -40,8 +40,8 @@ Send exactly this, once, via `orca terminal send --terminal <handle> --text "<br
 
 Confirm `accepted: true`. **After this send, do not send any more text to Grok.** A debugging run that needs a mid-run decision (a red-flag stop, a 3-failures architecture question) is Grok's to surface in its final report — not something you ping it about.
 
-## Report & Stop
+## Proceed to Step 1
 
-> Dropped /systematic-debugging into Grok Build at <worktree_path> (issue: <issue-or-error>, lang: <lang>). Waiting for completion.
+Do NOT end the turn after dropping the task. Hermes must stay active and proceed immediately to Step 1 in this session to wait and poll for Grok Build to finish:
 
-Then end the turn. When the Orca terminal becomes idle (detected when this conversation resumes), proceed to Step 1.
+> Dropped /systematic-debugging into Grok Build at <worktree_path> (issue: <issue-or-error>, lang: <lang>). Proceeding to Step 1 to wait for completion.
