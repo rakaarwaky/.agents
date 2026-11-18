@@ -10,7 +10,8 @@ Poll with `orca terminal read --terminal <handle> --cursor <cursor> --limit 1000
 - Subsequent reads: pass the previous `nextCursor` as `--cursor` so only new output since that read is returned. Stop paging when `nextCursor` is null or unchanged from `latestCursor`.
 - `limit` defaults to 120 for tail previews; use `--limit 1000` for long agent responses.
 - `orca terminal status --terminal <handle>` is **not** a valid subcommand (returns `invalid_argument`). Use `terminal wait --for tui-idle` to test idle and `terminal read` to drain output.
-- Do NOT send text while waiting.
+- **Silent-loop pitfall:** Grok's write→review→revise loop can run many rounds while the terminal emits no visible output for minutes at a time. Do not treat silence as failure or completion. Cross-check progress by listing `~/.agents/develop/<repo-slug>/plan/` and comparing `design-doc-*` mtimes between polls; a changing mtime means the loop is still active. Do not send text while waiting (see step-0 rule).
+- **Cleanup pitfall:** Grok's final step removes `design-review-*` and `design-summary-*` from the plan dir, leaving only `design-doc-*`. Confirm 0 open issues by reading the review file *before* it disappears; once cleanup completes, rely on the last observed review state plus the presence of the final design doc.
 
 ### Automated Polling Script
 
@@ -26,7 +27,7 @@ while true; do
     echo "Terminal reached tui-idle."
     break
   fi
-  read_res=$("$ORCA" terminal read --terminal "<handle>" --cursor "$cursor" --limit 100 --json 2>/dev/null || true)
+  read_res=$("$ORCA" terminal read --terminal "<handle>" --cursor "$cursor" --limit 1000 --json 2>/dev/null || true)
   cursor=$(echo "$read_res" | jq -r '.result.terminal.nextCursor // empty' 2>/dev/null || echo "$cursor")
   status=$(echo "$read_res" | jq -r '.result.terminal.status // empty' 2>/dev/null || echo "")
   if [[ "$status" == "exited" ]]; then
@@ -39,13 +40,13 @@ done
 
 ## When Grok Is Done
 
-Grok writes three artifacts to its scratch dir (`~/.agents/develop/<repo-slug>/plan/`):
+Grok writes artifacts to its scratch dir (`~/.agents/develop/<repo-slug>/plan/`):
 
-- **Design document**: `design-doc-<DESIGN_ID>.md` — the polished doc including the `## PR Plan` section.
+- **Design document**: `design-doc-<DESIGN_ID>.md` — the polished doc including the `## PR Plan` section (this survives Grok's cleanup).
 - **Summary**: `design-summary-<DESIGN_ID>.md` — key decisions, open questions, PR plan.
 - **Review**: `design-review-<DESIGN_ID>.md` — the final review file; must show 0 open issues when the loop exits.
 
-The run id appears in Grok's terminal output. Read the summary first, then confirm the review file shows 0 open issues. If any issue carries `Status: needs-user-input`, that is an open decision for the user — surface it before proceeding to Step 2. If Grok reports failure or exits non-idle with an error, report it verbatim to the user and stop — do not retry, do not hand-write the document yourself.
+The run id appears in Grok's terminal output. Read the summary first, then confirm the review file shows 0 open issues **before Grok's cleanup removes it**. If any issue carries `Status: needs-user-input`, that is an open decision for the user — surface it before proceeding to Step 2. If Grok reports failure or exits non-idle with an error, report it verbatim to the user and stop — do not retry, do not hand-write the document yourself.
 
 Report to the user: "Grok Build finished the design run. <N> review rounds, 0 open issues (or: <K> issues need your input). Design doc: <path>."
 

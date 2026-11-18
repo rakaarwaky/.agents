@@ -12,7 +12,7 @@ Read all three files from the scratch dir:
 
 Cross-check:
 
-- **0 open issues**: the final `review_file` must show no issue with `Status: open`. Any `needs-user-input` status is an open decision — surface it to the user and stop (do not proceed to the hand-off validation until the user decides; Grok will re-run the loop on a fresh drop if the user wants it closed).
+- **0 open issues**: the final `review_file` must show no issue with `Status: open`. Grok's cleanup removes `design-review-*` and `design-summary-*` from the plan dir at finalization, so read and record the review state *before* cleanup completes; once cleanup finishes, the presence of `design-doc-*` plus the last-observed "Approved"/"0 open issues" state is the verification evidence. Any `needs-user-input` status is an open decision — surface it to the user and stop (do not proceed to the hand-off validation until the user decides; Grok will re-run the loop on a fresh drop if the user wants it closed).
 - **wontfix discipline**: any `wontfix` status should carry a substantive technical explanation in the review file — not a bare "won't fix". If one is bare, flag it.
 - **Scope held**: the design doc and summary must not contain implementation code, source-file edits, branches, commits, or PR links — the design-only boundary (Grok lane step 1: the repo is read-only for the writer subagents). Any source-tree drift in the worktree (`git -C <worktree_path> status --short` should be clean or scratch-dir-only) means the boundary was violated; report it.
 
@@ -24,7 +24,7 @@ This is the hand-off gate for `/execute-plan`. Extract the `## PR Plan` section 
 sdc validate-plan <path to a file containing the PR Plan section>
 ```
 
-(If the design doc is the whole file, point the validator at it directly — the validator reads the `## PR Plan` section from the file.)
+`sdc` lives at `/home/raka/.local/bin/sdc`. (If the design doc is the whole file, point the validator at it directly — the validator reads the `## PR Plan` section from the file.)
 
 - Exit `0`: `linearized_order`, `level_assignments`, `pr_count`, and `max_parallelism` are authoritative. Record them — they are the hand-off facts for the user.
 - Exit `1` / `2`: the plan is malformed or the section is missing. Report the first error and stop — do not hand-edit the PR plan to make it parse. The design is not execute-plan-ready; tell the user to re-run `/design` with the validator's error in context, or to fix the plan by hand and re-invoke.

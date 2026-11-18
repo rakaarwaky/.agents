@@ -15,7 +15,7 @@ Grok has zero conversation context. Compose a brief covering:
 
 ## Create the Orca Worktree
 
-Resolve `$ORCA` (`$ORCA_CLI_COMMAND` if set, else `/home/raka/.local/bin/orca-ide` — never bare `orca`). `$ORCA` is not exported by the shell, so `${ORCA}` expands to empty and bash reports `command not found`. Always call by the absolute path unless `$ORCA_CLI_COMMAND` is set. Resolve the owning repo (same resolution as the other lanes: `git -C <parent-dir> rev-parse --show-toplevel` on a path named in the brief, else the current workspace cwd; tie-break preferring the standalone clone).
+Resolve `$ORCA` (`$ORCA_CLI_COMMAND` if set, else `/home/raka/.local/bin/orca-ide` — never bare `orca`). `$ORCA` is not exported by the shell, so `${ORCA}` expands to empty and bash reports `command not found`. The default path may not exist even when `which orca`/`which orca-ide` returns a shim elsewhere (e.g. `/home/raka/.config/orca/linux-orca-cli-shim/orca`). Probe the default first, fall back to `which orca`, and always call the resolved absolute path; `${ORCA}` alone is not reliable. Resolve the owning repo (same resolution as the other lanes: `git -C <parent-dir> rev-parse --show-toplevel` on a path named in the brief, else the current workspace cwd; tie-break preferring the standalone clone).
 
 ```
 "$ORCA" worktree create --repo path:<repo_path> --name design-<task-slug> --agent grok --no-parent --surface terminal --json
@@ -37,7 +37,7 @@ Send exactly this, once, via `orca terminal send --terminal <handle> --text "<br
 <constraints and acceptance criteria from the brief>
 ```
 
-Confirm `accepted: true`. **After this send, do not send any more text to Grok.** A `needs-user-input` status the reviewer sets is Grok's to surface in its final report — you do not ping it mid-loop.
+Confirm `accepted: true`. The response may carry a warning that the provider cannot report delivery — ignore it; `accepted: true` is the confirmation. **After this send, do not send any more text to Grok.** A `needs-user-input` status the reviewer sets is Grok's to surface in its final report — you do not ping it mid-loop.
 
 ## Proceed to Step 1
 
