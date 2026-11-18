@@ -18,7 +18,7 @@ The helper requires the current directory to be inside a git repository — it e
 
 ### Input: Original Plan Path
 
-The user provides the original plan/design document path as `<plan-path>`. Resolve it to an absolute path and store as `plan_file`. Validate it exists on disk before proceeding; if not, stop and report.
+The user provides the original plan document path as `<plan-path>`. Resolve it to an absolute path and store as `plan_file`. Validate it exists on disk before proceeding; if not, stop and report.
 
 ### Shared File Paths
 

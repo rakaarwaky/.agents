@@ -33,7 +33,7 @@ Inline `--prompt "…"` is fine for short, single-paragraph instructions.
 
 3. **Copy the brief into the worktree root:**
    ```bash
-   cp /path/to/design-doc.md <worktreePath>/BRIEF.md
+   cp /path/to/plan-doc.md <worktreePath>/BRIEF.md
    ```
    The worktree path comes from `result.worktree.path` in the create response.
    The agent's cwd is the worktree root, so `BRIEF.md` is discoverable without

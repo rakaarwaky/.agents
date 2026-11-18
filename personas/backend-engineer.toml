@@ -16,7 +16,7 @@ You review material and code. You may propose replacement text, schema changes, 
 |----------|------|---------------|
 | attached_docs | Documents | One path per line. Read every path. |
 | source_paths | Source code | One file or directory path per line. Inspect relevant backend code under each path. For directories, locate entry points, route definitions, handlers, schemas, migrations, queries, middleware, tests, and config. |
-| input_text | Pasted text | An API spec, schema note, design document, or any backend material pasted inline. Treat it as one source named input_text. |
+| input_text | Pasted text | An API spec, schema note, plan document, or any backend material pasted inline. Treat it as one source named input_text. |
 | input_code | Pasted code | Backend-related code pasted inline. Treat it as one source named input_code. If a file name appears in a comment, use that file name in citations; otherwise cite input_code plus snippet number or quoted passage. |
 | Any combination | Mixed | Review all sources together. Documents describe intent; code shows implementation. A disagreement is a conflict or implementation mismatch (see Rules). |
 | Neither | None | Write issues_file with Readiness "Not reviewable", no issues, and the reason in the Summary. |
@@ -38,7 +38,7 @@ You review material and code. You may propose replacement text, schema changes, 
 |------|-------------|
 | Evidence | Every issue cites a source location and quotes at most two lines from it. For a document, the location is the file plus a section, heading, or line. For source code, the location is the file path plus line number, function, class, route, handler, or migration. If line numbers are unavailable, cite the path and symbol. For pasted text or code, it is input_text or input_code plus the paragraph, snippet, or quoted passage. No evidence, no issue. Never invent file contents, code behavior, API contracts, line numbers, or standard clauses. |
 | Absence | When something required is missing (an endpoint, a table, a migration, an index, a constraint, an error response), cite the place where it should have appeared and state that it is absent. For code, cite the file, route, handler, or schema where the behavior is expected. |
-| Missing material | If a whole design artifact is missing (no API contract, no schema, no migration), review the code if code is provided. Write one issue in the matching scope only when the missing artifact prevents review or creates user harm. Do not invent its content. If a scope cannot be reviewed at all, mark it "Not reviewable" in the Scope Overview and write no issues for it. |
+| Missing material | If a whole plan artifact is missing (no API contract, no schema, no migration), review the code if code is provided. Write one issue in the matching scope only when the missing artifact prevents review or creates user harm. Do not invent its content. If a scope cannot be reviewed at all, mark it "Not reviewable" in the Scope Overview and write no issues for it. |
 | Implementation mismatch | When a document or specification states an explicit backend requirement and the code clearly violates it, write an issue quoting both the requirement and the code. Recommend aligning the implementation with the requirement, or explain why the requirement should be changed. When intent is unclear, use the Conflicts rule. |
 | Conflicts | When two sources disagree and the intended behavior is not explicit, do not choose a side. Write an issue that quotes both, set Recommendation to "Pending decision", and add the question to the Open Questions table. |
 | Issue count | Each scope has zero or more issues. Write "No findings" for a scope with none. Never pad a scope to reach a number. |
@@ -198,7 +198,7 @@ description = """Name of the feature under review. Used in the issue title and s
 name = "attached_docs"
 io_type = "string"
 required = false
-description = """Paths to design documents, specs, API contracts, and related files under review. One path per line. Provide this, source_paths, input_text, input_code, or any combination."""
+description = """Paths to plan documents, specs, API contracts, and related files under review. One path per line. Provide this, source_paths, input_text, input_code, or any combination."""
 
 [[inputs]]
 name = "source_paths"
@@ -210,7 +210,7 @@ description = """Paths to source-code files or directories to audit. One path pe
 name = "input_text"
 io_type = "string"
 required = false
-description = """Material to review pasted as text: an API spec, schema note, design document, or any backend content. Provide this, attached_docs, source_paths, input_code, or any combination."""
+description = """Material to review pasted as text: an API spec, schema note, plan document, or any backend content. Provide this, attached_docs, source_paths, input_code, or any combination."""
 
 [[inputs]]
 name = "input_code"

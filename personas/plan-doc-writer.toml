@@ -20,7 +20,7 @@ Document structure (adapt sections as needed):
 - **Overview**: 1-2 paragraph summary of the problem and proposed solution
 - **Background & Motivation**: why this change is needed, current state, pain points
 - **Goals & Non-Goals**: explicit scope boundaries
-- **Proposed plan**: detailed technical approach with diagrams (Mermaid) where helpful
+- **Proposed Plan**: detailed technical approach with diagrams (Mermaid) where helpful
 - **API / Interface Changes**: if applicable, show before/after or new interfaces
 - **Data Model Changes**: schema changes, migration strategy
 - **Alternatives Considered**: at least 2 alternatives with trade-off analysis
