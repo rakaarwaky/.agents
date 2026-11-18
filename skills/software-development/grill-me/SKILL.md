@@ -1,6 +1,6 @@
 ---
 name: grill-me
-description: Relentlessly interviews a plan or design until a shared understanding is reached.
+description: Relentlessly interviews a plan or design until a shared understanding is reached, and writes resolved decisions back into the original plan.
 when-to-use: "Use when asked to grill, interview, or stress-test a plan, design, or decision tree until every branch is resolved. Triggers: 'grill this plan', 'interview this design', 'stress-test my approach'."
 argument-hint: "<plan or design to grill>"
 disable-model-invocation: true
@@ -42,6 +42,11 @@ The interview uses the `sdc` host helper for per-repo artifact management:
 - `sdc host setup --subdir plan` creates `~/.agents/develop/<repo-slug>/plan/` and returns `{python, scratch_dir, run_id}`. The `run_id` (8 hex chars) is stored as `INTERVIEW_ID`.
 - All interview artifacts live under `scratch_dir`: `interview-tree-<INTERVIEW_ID>.md`, `resolved-decisions-<INTERVIEW_ID>.md`, `open-questions-<INTERVIEW_ID>.md`, `interview-summary-<INTERVIEW_ID>.md`.
 - `sdc host cleanup` removes temporary files under `scratch_dir` at the end of the interview; the durable summary is kept.
+
+## Outputs
+
+1. **Interview summary** — `<scratch_dir>/interview-summary-<INTERVIEW_ID>.md` — full record of branches walked, decisions resolved, dependency chains, and sources.
+2. **Improved original plan** — `plan_file` (the document you passed in) updated with every resolved decision, its answer, dependency chain, and source. Original content preserved; only new `grill-me` result sections are added.
 
 ## Routing
 

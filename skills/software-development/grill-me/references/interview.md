@@ -6,7 +6,7 @@ Walk down each branch of the design tree, resolving dependencies between decisio
 
 ## Lane Structure
 
-This skill follows the Hermes/Grok lane split used by the sibling skills (`implement`, `design`, `execute-plan`):
+This skill follows the Hermes/Grok lane split used by the sibling skills (`implement`, `planner`, `execute-plan`):
 
 - **Hermes lane** (`references/hermes/`) — plans the task brief, creates the Orca worktree with `--agent grok`, drops `/grill-me` into Grok Build, waits for completion, verifies, commits, and reports. Hermes never writes code.
 - **Grok lane** (`references/grok/`) — runs inside the Orca worktree: host setup, branch walk, dependency resolution, exit check, cleanup. Grok does the actual interviewing.
@@ -28,7 +28,12 @@ Lane selection is determined by the physical attribution signal (`HERMES_AGENT` 
 - Every branch of the design tree walked; dependencies between decisions resolved one-by-one.
 - Questions answerable from the codebase were answered by exploring it, not by asking the user.
 - `open_questions` is empty (or remaining questions explicitly escalated to the user).
-- Shared understanding reached; interview summary written to `interview-summary-<INTERVIEW_ID>.md` under the scratch dir; cleanup ran with exit code 0.
+- Shared understanding reached; interview summary written to `interview-summary-<INTERVIEW_ID>.md` under the scratch dir; resolved decisions written back into the original plan (`plan_file`); cleanup ran with exit code 0.
+
+## Outputs
+
+1. **Interview summary** — `<scratch_dir>/interview-summary-<INTERVIEW_ID>.md` — full record of branches walked, decisions resolved, dependency chains, and sources.
+2. **Improved original plan** — `plan_file` (the document you passed in) updated with every resolved decision, its answer, dependency chain, and source. Original content preserved; only new `grill-me` result sections are added.
 
 ## Routing
 
