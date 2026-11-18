@@ -14,7 +14,7 @@ Grok has zero conversation context. Compose a brief that covers:
 2. **Scope** — in-scope paths, and an explicit out-of-scope list (sibling trees, new top-level directories, anything the task never named). Resolve scope the same way `grok/step-0-setup.md` describes (check candidate paths on disk; if genuinely ambiguous, ask the user ONE clarifying question naming both candidates).
 3. **Constraints** — style, tests to run, things not to touch, repo conventions from AGENTS.md / CONTRIBUTING.md. Include the lint gate: `lint-arwaky-cli report .` from the worktree at the end of the run must show a non-positive Delta versus the start-turn baseline recorded in this step's Start-Turn Gate section; positive delta means the run introduced new violations and the run is not done.
 4. **Acceptance criteria** — what "done" looks like: tests passing, linter clean, specific commands that must exit 0.
-5. **Deliverable** — commit the work in the worktree with a conventional commit message; do NOT push, do NOT open a PR, do NOT merge.
+5. **Deliverable** — completed implementation with all reviews passed; leave changes uncommitted in the worktree (Hermes owns verification and git commit in Step 2); do NOT commit, do NOT push, do NOT open a PR, do NOT merge.
 
 ## Create the Orca Worktree
 

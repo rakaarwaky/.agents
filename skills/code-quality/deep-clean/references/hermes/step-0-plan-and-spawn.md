@@ -14,7 +14,7 @@ Grok has zero conversation context. Compose a brief covering:
 
 ## Create the Orca Worktree
 
-Resolve `$ORCA` (`$ORCA_CLI_COMMAND` if set, else `orca-ide` on Linux — never bare `orca`) and the owning repo (same resolution as `grok/` references: `git -C <parent-dir> rev-parse --show-toplevel` on a candidate path inside `<path>`, tie-break preferring the standalone clone).
+Resolve `$ORCA` (`$ORCA_CLI_COMMAND` if set, else `/home/raka/.local/bin/orca-ide` — never bare `orca`). `$ORCA` is not exported by the shell, so `${ORCA}` expands to empty and bash reports `command not found`. Always call by the absolute path unless `$ORCA_CLI_COMMAND` is set. Resolve the owning repo (same resolution as `grok/` references: `git -C <parent-dir> rev-parse --show-toplevel` on a candidate path inside `<path>`, tie-break preferring the standalone clone).
 
 ```
 "$ORCA" worktree create --repo path:<repo_path> --name <path-slug> --agent grok --no-parent --surface terminal --json

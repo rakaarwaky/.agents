@@ -19,7 +19,7 @@ Produce a short triage for the user (your value-add, not a re-do of the per-pers
 3. **Cross-persona patterns** — issues raised by 2+ personas on the same file/line (corroborated findings rank higher).
 4. **Errored personas** — which personas failed and why.
 
-## 2c: Report
+## 2c: Deliverable Retention
 
 The per-persona files and summary stay in the scratch dir — they are deliverables, never delete them. If the user wants them out of the scratch dir, copy the summary + the persona files they asked for; do not commit them into the module repo unless explicitly asked.
 

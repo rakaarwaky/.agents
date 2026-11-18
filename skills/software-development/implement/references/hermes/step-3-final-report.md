@@ -22,6 +22,7 @@ Report to the user:
 4. Worktree path and the post-merge retirement command:
 
    ```
+   # Resolve $ORCA (default /home/raka/.local/bin/orca-ide)
    "$ORCA" worktree rm --worktree <worktree_id> --force --json
    ```
 
