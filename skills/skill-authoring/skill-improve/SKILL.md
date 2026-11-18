@@ -61,5 +61,5 @@ Each row names the answer it answers or enforces; the question set, rubric, and 
 | 1 | [`references/step-1-format.md`](references/step-1-format.md) | Body shape, frontmatter keys, lint rule catalog |
 | 2 | [`references/step-2-detail.md`](references/step-2-detail.md) | Naming, description, and content detail rules |
 | 3 | [`references/step-3-publish.md`](references/step-3-publish.md) | Pre-publish checklist, category placement, information distribution, reference pattern |
-| 4 | [`references/step-4-apply.md`](references/step-4-apply.md) | Apply recipe, Pattern B variants, tenQ standard and diagnosis |
+| 4 | [`references/step-4-apply.md`](references/step-4-apply.md) | Apply recipe, Pattern A consolidation, Pattern B variants, tenQ standard and diagnosis |
 | 5 | [`references/step-5-verify.md`](references/step-5-verify.md) | TenQ standard, quality gate, verify and report |

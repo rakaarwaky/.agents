@@ -169,8 +169,11 @@ export interface StudioCanvasProps {
 ```tsx
 <div
   className="pt-studio-canvas-stage"
-  onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
-  onDragLeave={() => setIsDragging(false)}
+  onDragOver={(e) => {
+    e.preventDefault();
+    setIsDragging(true);
+  }}
+  onDragLeave={handleDragLeave}
   onDrop={handleDrop}
 >
   {hasDocument ? (
@@ -211,6 +214,15 @@ export interface StudioCanvasProps {
 
 **Event handlers**:
 ```ts
+const handleDragLeave = (e: DragEvent<HTMLDivElement>) => {
+  // Prevent flickering when cursor moves across stage child elements
+  // (frame, SVG icons, text, chips, or overlay). Only clear dragging
+  // when leaving the stage element itself.
+  if (!e.currentTarget.contains(e.relatedTarget as Node)) {
+    setIsDragging(false);
+  }
+};
+
 const handleDrop = (e: DragEvent<HTMLDivElement>) => {
   e.preventDefault();
   setIsDragging(false);
@@ -352,6 +364,9 @@ Key differences from current:
   text-align: center;
   cursor: pointer;
   transition: all var(--pt-duration-fast, 0.15s) var(--pt-ease, ease);
+}
+.pt-studio-canvas-dropzone * {
+  pointer-events: none;
 }
 .pt-studio-canvas-dropzone:hover,
 .pt-studio-canvas-dropzone-drag {
@@ -566,10 +581,10 @@ No changes to database schemas, value objects (VOs), or API contracts.
 
 This is a cosmetic/structural surface-layer change with no backend dependencies, feature flags, or staged rollout needed.
 
-1. **PR 1**: Implement all canvas-side changes (upload button, file input, empty state, drag-and-drop) with new CSS classes and a new canvas upload test file. `StudioLanding` is updated in the same PR to wire `onPickFile`/`onReinspect`/`hasDocument` to `StudioCanvas`. At this PR, both the sidebar and canvas accept dropped PSD files (duplicated, temporarily).
-2. **PR 2**: Strip the sidebar of upload-related DOM, remove `onPickFile`/`fileMeta` from `StudioLayerPanelProps`, and update sidebar tests. After this PR, upload lives exclusively on the canvas.
+1. **PR 1**: Implement all canvas-side changes (upload button, file input, empty state, drag-and-drop) with new CSS classes and a new canvas upload test file. `StudioLanding` is updated in the same PR to wire `onPickFile`/`onReinspect`/`hasDocument` to `StudioCanvas`. At this PR, the canvas takes over primary file ingestion while `StudioLanding` stops passing `onPickFile`/`fileMeta` to `StudioLayerPanel`, decommissioned at the composition level.
+2. **PR 2**: Strip the sidebar of dead upload-related DOM and state, remove `onPickFile`/`fileMeta` from `StudioLayerPanelProps`, and update sidebar tests. After this PR, upload lives exclusively on the canvas and dead code is removed from `StudioLayerPanel`.
 
-**Rollback**: Revert PR 2 to restore sidebar upload, then revert PR 1 to remove canvas upload.
+**Rollback**: Revert PR 2 to restore sidebar markup/props, then revert PR 1 to restore sidebar wiring in `StudioLanding` and remove canvas upload.
 
 **CI gates (per ci.yml)**:
 - `npm test -- --run` (working directory: `packages/`) — all vitest tests pass.

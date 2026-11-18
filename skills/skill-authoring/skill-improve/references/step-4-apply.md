@@ -23,6 +23,17 @@ Run in order against the resolved scope:
 8. **Self-audit against the target's own rules**: when the target `SKILL.md` carries its own `## Rules` table, apply each rule as an audit criterion against the target's text and its `references/` before committing the edit.
 9. **Resolve cross-skill links you touched**: every sibling mention and cross-skill link you edited must name a skill that exists in the tree (Rules: dangling refs rot fast).
 
+## Pattern A consolidation
+
+When asked to merge step-numbered references (`step-0-detect.md`, `step-1-*.md`, `step-2-*.md`) into a single topical file (`auth.md`):
+
+1. **Read all source files first.** Concatenation without reading produces duplicated sections and broken cross-links.
+2. **Merge order = execution order.** The merged file's sections follow the step numbers: detection → method 1 → method 2 → shared helpers → troubleshooting. Renumber as `## 1.`, `## 2.`, etc.
+3. **Decision trees become section markers.** A `step-0` decision tree ("if X → step-1, if Y → step-2") becomes a numbered list in the merged file pointing at section headings, not file links. Example: `→ **Method 2: gh CLI Authentication**` not `→ [step-1-gh-cli-auth.md](step-1-gh-cli-auth.md)`.
+4. **Collapse the Routing table.** Replace three rows (`Auth detect`, `Auth gh-cli`, `Auth git-only`) with one row: `| Auth | [references/auth.md](references/auth.md) | <combined purpose> |`.
+5. **Grep-sweep for old filenames.** `grep -r "step-[012]" SKILL.md references/` — zero hits before commit. Check Rules bullets, Routing rows, and reference-to-reference links.
+6. **Delete the source files.** `rm` the step files only after the merged file is written and the grep sweep passes.
+
 ## Pattern B restructuring
 
 When asked to restructure an existing skill's `references/` from flat/mode layout into numbered step files with per-language/per-runtime sub-variants:
@@ -37,5 +48,6 @@ When asked to restructure an existing skill's `references/` from flat/mode layou
 ## Completion
 
 - Edit applied at single owner; no second copies.
+- Pattern A consolidation (if requested): merged file has numbered sections in execution order, decision trees use section markers not file links, Routing table collapsed to one row, grep sweep returns zero old-filename hits, source files deleted.
 - Pattern B restructure (if requested): only `step-` prefixed files, zero old filename hits, mode semantics synced across Rules, `argument-hint`, and step files.
 - Commit scoped to target skill's paths only.

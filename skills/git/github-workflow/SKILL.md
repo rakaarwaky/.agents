@@ -1,7 +1,7 @@
 ---
 name: github-workflow
-description: "Umbrella for GitHub auth, repo management, issues, PRs, Mergify, and releases. Routes to sibling skills for issue-to-PR, PR babysitting, and releasing pipelines."
-when-to-use: "Use for GitHub auth setup (gh CLI or git-only), repo clone/create/fork/configure, repo settings and Actions, gitignore audit. For issue-to-PR work use issue-worker; for PR watch/fix/merge use pr-babysit; for release prep and publish use releasing. This skill owns the auth helper scripts (gh-env.sh, git-credential-token.py)."
+description: "Umbrella for GitHub auth, repo management, issues, PRs, and releases."
+when-to-use: "Use for GitHub auth setup (gh CLI or git-only), repo clone/create/fork/configure, repo settings and Actions, gitignore audit."
 argument-hint: "<auth | repo> <subcommand> [flags]"
 ---
 
@@ -18,8 +18,16 @@ argument-hint: "<auth | repo> <subcommand> [flags]"
 | R5 | **Token scopes.** `repo`, `workflow`, `read:org` (90-day expiration recommended). | `gh auth status` shows required scopes. |
 | R6 | **Git identity.** Configure `user.name` and `user.email`; required for commits. | `git config user.name` and `git config user.email` return values. |
 | R7 | **Max scope.** Auth job touches only credential/config files. Repo job touches only the target repository's remotes, settings, and Actions configuration. Max 2 retry iterations per failing check. Forbidden: modifying source code, creating commits, pushing branches. | `git diff --name-only` shows no source changes. |
+| R8 | **Audience.** Output targets skill authors and maintainers of this pack. Body and references in English, imperative mood; `description:` in third person. | No first-person pronouns in body or references. |
+| R9 | **Input gathering.** Read `scripts/gh-env.sh` first to resolve auth method, owner, and repo. Use `$GH_OWNER` and `$GH_REPO` in subsequent commands rather than hardcoding values. | `source scripts/gh-env.sh` runs before any repo operation. |
+| R10 | **Execution order.** Auth → Clone/Create/Fork → Settings/Actions → Info. Each step's completion criteria must be met before the next begins. | Reference files executed in Routing table order. |
+| R11 | **Branching.** Auth failure → follow auth.md decision tree. Missing `gh` → use git-only path. Permission denied → verify token scopes (R5). Command not found → check PATH or install. | IF-THEN branches resolved before proceeding. |
+| R12 | **Deliverable.** Every repo operation produces a verifiable state change: repo exists at URL, clone succeeds, settings reflected in `gh repo view`, workflow triggered, secret set. | Completion criteria in each reference file met. |
+| R13 | **Failure recovery.** Auth errors → auth.md §5 Troubleshooting. Repo errors → check token scopes, verify remote URL, retry once. After 2 failures, report error and stop. | Error reported with cause and recovery attempt logged. |
 
 ## Routing
+
+Execution order (R10): Auth → Clone/Create/Fork → Settings/Actions → Gitignore → Info.
 
 | Step      | File                                                 | Purpose                                                                                                                                 |
 | --------- | ---------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
