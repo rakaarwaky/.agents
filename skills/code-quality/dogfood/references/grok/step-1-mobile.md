@@ -1,7 +1,7 @@
 # Step 1 — Mobile Target
 
 QA workflow for Android apps on an AOSP emulator via `adb`.
-See the [android-emulator-linux-gps skill](../../automation/android-emulator-linux-gps/SKILL.md)
+See the [android-emulator-linux-gps skill](../../../../automation/android-emulator-linux-gps/SKILL.md)
 for AVD setup, ABI selection, and headless operation.
 
 ## Prerequisites

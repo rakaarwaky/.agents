@@ -236,8 +236,8 @@
     },
     {
       "name": "github-workflow",
-      "description": "Umbrella for GitHub auth, repo management, issues, PRs, Mergify, and releases. Routes to sibling skills for issue-to-PR, PR babysitting, and releasing pipelines.",
-      "when_to_use": "Use for GitHub auth setup (gh CLI or git-only), repo clone/create/fork/configure, repo settings and Actions, gitignore audit. For issue-to-PR work use issue-worker; for PR watch/fix/merge use pr-babysit; for release prep and publish use releasing. This skill owns the auth helper scripts (gh-env.sh, git-credential-token.py).",
+      "description": "Umbrella for GitHub auth, repo management, issues, PRs, and releases.",
+      "when_to_use": "Use for GitHub auth setup (gh CLI or git-only), repo clone/create/fork/configure, repo settings and Actions, gitignore audit.",
       "category": "git"
     },
     {
