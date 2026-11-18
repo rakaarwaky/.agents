@@ -1,0 +1,194 @@
+{
+  "plan_id": "011222b2",
+  "design_doc_path": "/home/raka/.agents/develop/psd-timelapse/plan/design-doc-2e3f3378.md",
+  "status": "completed",
+  "created_at": "2026-11-18T00:00:00Z",
+  "max_concurrent": 8,
+  "linearized_order": [
+    "pr-1",
+    "pr-2",
+    "pr-3",
+    "pr-4"
+  ],
+  "dag": {
+    "nodes": [
+      {
+        "id": "pr-1",
+        "number": "1",
+        "title": "Shared Client Contracts & Taxonomy",
+        "slug": "shared-client-contracts-taxonomy",
+        "description": "Scaffolds shared client domain in packages/shared/src/client/. Defines data models, error classes, route constants, parsing/URL utilities, protocol interfaces, aggregate contract, schema-pinning test, and CI ci.yml.",
+        "dependencies": [],
+        "level": 0,
+        "status": "completed",
+        "branch": "execute-plan/011222b2-pr-1-shared-client-contracts-taxonomy",
+        "subagent_id": null,
+        "worktree_path": "/home/raka/orca/workspaces/psd-timelapse/011222b2-pr-1",
+        "base_sha": "ad3e1f384cc95817ed8e137f96de89e5707824f8",
+        "commit_sha": "b4b747709b515081b88a2049cb1c91ec340437c1",
+        "error": null,
+        "reviewer_configs": [
+          {
+            "subagent_id": null,
+            "persona_to_inject": "reviewer",
+            "specialization": "general",
+            "review_file": "/home/raka/.agents/develop/psd-timelapse/execute/exec-review-011222b2-pr-1-general.md"
+          },
+          {
+            "subagent_id": null,
+            "persona_to_inject": null,
+            "specialization": "tests",
+            "review_file": "/home/raka/.agents/develop/psd-timelapse/execute/exec-review-011222b2-pr-1-tests.md"
+          },
+          {
+            "subagent_id": null,
+            "persona_to_inject": null,
+            "specialization": "simplicity",
+            "review_file": "/home/raka/.agents/develop/psd-timelapse/execute/exec-review-011222b2-pr-1-simplicity.md"
+          }
+        ],
+        "review_rounds": 2,
+        "started_at": "2026-11-18T00:00:00Z",
+        "completed_at": "2026-11-18T00:00:00Z",
+        "worktree_cleaned": false,
+        "orca_worktree_id": "6110b8f4-d602-4589-ac05-fc9acfee1c78::/home/raka/orca/workspaces/psd-timelapse/011222b2-pr-1"
+      },
+      {
+        "id": "pr-2",
+        "number": "2",
+        "title": "Client Capabilities Implementation",
+        "slug": "client-capabilities-implementation",
+        "description": "Implements 5 concrete capability classes under packages/client/src/ adhering to AES 3-block structure and protocol contracts. Adds FRD.md and BACKLOG.md. Unit tests with mock HTTP and SSE streams.",
+        "dependencies": [
+          "pr-1"
+        ],
+        "level": 1,
+        "status": "completed",
+        "branch": "execute-plan/011222b2-pr-2-client-capabilities-implementation",
+        "subagent_id": null,
+        "worktree_path": "/home/raka/orca/workspaces/psd-timelapse/011222b2-pr-2",
+        "base_sha": "b4b747709b515081b88a2049cb1c91ec340437c1",
+        "commit_sha": "9dc124ad52c12a4796cca2cc47577d756b5a677a",
+        "error": null,
+        "reviewer_configs": [
+          {
+            "subagent_id": null,
+            "persona_to_inject": "reviewer",
+            "specialization": "general",
+            "review_file": "/home/raka/.agents/develop/psd-timelapse/execute/exec-review-011222b2-pr-2-general.md"
+          },
+          {
+            "subagent_id": null,
+            "persona_to_inject": null,
+            "specialization": "tests",
+            "review_file": "/home/raka/.agents/develop/psd-timelapse/execute/exec-review-011222b2-pr-2-tests.md"
+          },
+          {
+            "subagent_id": null,
+            "persona_to_inject": null,
+            "specialization": "simplicity",
+            "review_file": "/home/raka/.agents/develop/psd-timelapse/execute/exec-review-011222b2-pr-2-simplicity.md"
+          }
+        ],
+        "review_rounds": 2,
+        "started_at": "2026-11-18T00:00:00Z",
+        "completed_at": "2026-11-18T00:00:00Z",
+        "worktree_cleaned": false,
+        "orca_worktree_id": "6110b8f4-d602-4589-ac05-fc9acfee1c78::/home/raka/orca/workspaces/psd-timelapse/011222b2-pr-2"
+      },
+      {
+        "id": "pr-3",
+        "number": "3",
+        "title": "Client Agent Orchestrator & DI Container",
+        "slug": "client-agent-orchestrator-di-container",
+        "description": "Implements ClientOrchestrator coordinating all injected capabilities without direct I/O. Builds local DI container in root_client_container.ts and barrel exports in index.ts. Conformance, unit, and integration tests.",
+        "dependencies": [
+          "pr-2"
+        ],
+        "level": 2,
+        "status": "completed",
+        "branch": "execute-plan/011222b2-pr-3-client-agent-orchestrator-di-container",
+        "subagent_id": null,
+        "worktree_path": "/home/raka/orca/workspaces/psd-timelapse/011222b2-pr-3",
+        "base_sha": null,
+        "commit_sha": "141a9fa14f7f4bb87589c9341aa408afae7dde1a",
+        "error": null,
+        "reviewer_configs": [
+          {
+            "subagent_id": null,
+            "persona_to_inject": "reviewer",
+            "specialization": "general",
+            "review_file": "/home/raka/.agents/develop/psd-timelapse/execute/exec-review-011222b2-pr-3-general.md"
+          },
+          {
+            "subagent_id": null,
+            "persona_to_inject": null,
+            "specialization": "tests",
+            "review_file": "/home/raka/.agents/develop/psd-timelapse/execute/exec-review-011222b2-pr-3-tests.md"
+          },
+          {
+            "subagent_id": null,
+            "persona_to_inject": null,
+            "specialization": "simplicity",
+            "review_file": "/home/raka/.agents/develop/psd-timelapse/execute/exec-review-011222b2-pr-3-simplicity.md"
+          }
+        ],
+        "review_rounds": 1,
+        "started_at": "2026-11-18T00:00:00Z",
+        "completed_at": "2026-11-18T00:00:00Z",
+        "worktree_cleaned": false,
+        "orca_worktree_id": "6110b8f4-d602-4589-ac05-fc9acfee1c78::/home/raka/orca/workspaces/psd-timelapse/011222b2-pr-3"
+      },
+      {
+        "id": "pr-4",
+        "number": "4",
+        "title": "Surface Layer Integration & Root DI Wiring",
+        "slug": "surface-layer-integration-root-di-wiring",
+        "description": "Adds @client Vite resolve alias and tsconfig path mapping. Replaces legacy null stubs in root_web_container.ts. Introduces smart surface client hooks connecting Studio and Queue surfaces to Python backend via IClientAggregate.",
+        "dependencies": [
+          "pr-3"
+        ],
+        "level": 3,
+        "status": "completed",
+        "branch": "execute-plan/011222b2-pr-4-surface-layer-integration-root-di-wiring",
+        "subagent_id": null,
+        "worktree_path": "/home/raka/orca/workspaces/psd-timelapse/011222b2-pr-4",
+        "base_sha": null,
+        "commit_sha": "7329662d",
+        "error": null,
+        "reviewer_configs": [],
+        "review_rounds": 0,
+        "started_at": "2026-11-18T00:00:00Z",
+        "completed_at": "2026-11-18T00:00:00Z",
+        "worktree_cleaned": false,
+        "orca_worktree_id": null
+      }
+    ]
+  },
+  "final_assembly_started": true,
+  "final_branch_pushed": false,
+  "pr_urls": [
+    "https://github.com/rakaarwaky/psd-timelapse/pull/241",
+    "https://github.com/rakaarwaky/psd-timelapse/pull/242"
+  ],
+  "user_instructions": "",
+  "gh_available": true,
+  "past_issues_briefing": "",
+  "existing_patterns_snapshot": [],
+  "memory_existed_before": false,
+  "issue_patterns": [],
+  "total_issues_by_severity": {},
+  "final_assembly": {
+    "final_branch": "execute-plan/011222b2-final",
+    "final_commit_sha": "7809f996",
+    "final_orca_worktree_id": null,
+    "final_worktree_path": null,
+    "final_review_rounds": 0,
+    "final_review_passed": true,
+    "modular_branches_deleted": true,
+    "final_branch_pushed": true,
+    "final_worktree_retired": false,
+    "deferred_issues": []
+  },
+  "completed_at": "2026-11-18T06:15:00Z"
+}

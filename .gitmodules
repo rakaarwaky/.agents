@@ -37,3 +37,6 @@
 [submodule "skills/content-creation/vision-arwaky/tools"]
 	path = skills/content-creation/vision-arwaky/tools
 	url = https://github.com/rakaarwaky/vision-arwaky
+[submodule "skills/software-development/tools"]
+	path = skills/software-development/tools
+	url = https://github.com/rakaarwaky/software-development-cli.git
