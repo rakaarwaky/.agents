@@ -79,3 +79,20 @@ Verified via `git diff --name-only`: only the three files above changed. No chan
 0 bugs, 4 suggestions, 1 nit — changes required.
 
 ---
+
+## Implementation Summary
+
+All review findings addressed (0 bugs, 4 suggestions, 1 nit; 2 nits in tests review; 2 suggestions + 2 nits in simplicity review). Typecheck clean; `npm test -- --run` passes 42 files / 332 tests (was 325).
+
+### Changes
+
+- **`packages/root_web_helpers.ts`** (new): side-effect-free module exporting `persistActiveRun`, `loadActiveRun`, `clearActiveRun`, `loadCompletedRuns`, `RUN_KEY`, `COMPLETED_KEY`, and the `ActiveRunRecord` / `CompletedRunRecord` types. `persistActiveRun` and `clearActiveRun` now `console.warn` on storage failure (pr-5 pattern).
+- **`packages/root_web_main_entry.ts`**: imports the helpers instead of defining them inline; `loadActiveRun()` now returns an `ActiveRunRecord` (`{ runId, inputPath }`) rather than a bare `string | null`. `QueueContainer` maps the loaded `inputPath` into `activeRun.input_path` (previously hard-coded `""`). `StudioContainer` prefills its `serverPath` field from the persisted `inputPath` on mount. `StudioContainer` and `QueueContainer` are exported for test access.
+- **`packages/studio/tests/unit_studio_render_wiring.test.tsx`**: imports the real helpers from `root_web_helpers.ts` (local copies removed); added `StudioContainer` tests for `!client`, empty server path, `startRender` rejection, successful render → persist + `window.location.hash = "#queue"` navigation, and server-path prefill; added `QueueContainer` integration tests (persisted run picked up on mount; idle state); orphan-scan test now recurses subdirectories; trailing newline added. 11 → 18 tests.
+
+### Verification
+
+- `npm run typecheck` → exit 0.
+- `npm test -- --run` → 42 files / 332 tests pass.
+
+---

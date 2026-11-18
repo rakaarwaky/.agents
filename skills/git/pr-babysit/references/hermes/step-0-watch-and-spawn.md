@@ -37,7 +37,10 @@ State file (per session): `~/.agents/develop/<namarepo>/pr-babysit/watched-prs-<
       "ship": false,
       "last_status": null,
       "last_checked": null,
-      "fix_count": 0
+      "fix_count": 0,
+      "mergify_available": "<configured|installed|cli-only|none|declined|bootstrapping>",
+      "merge_method": null,
+      "requeue_count": 0
     }
   ]
 }
@@ -64,10 +67,15 @@ Parse JSON: `result.worktree.path` → `worktree_path`, `result.worktree.id` →
 
 Compose the brief (Grok has zero context):
 
-1. **Goal** — bring PR `<number>` to green and merge-ready: fix every failing check, resolve any unmerged conflicts, address every unresolved review/bot comment (reply with a fix commit SHA or a substantive technical explanation — never a bare "will fix").
-2. **Current state** — paste the failing check names + log excerpts from 0d, the list of open review threads, and the `fix_count` so far.
-3. **Constraints** — commit titles follow Conventional Commits grammar (`grok/step-2-auto-fix.md`); fix in the worktree, never the main clone; after each push, run the decision-tree pass from `grok/step-3-decision-tree.md` before declaring green (a green CI does not guarantee review threads are handled).
-4. **Acceptance criteria** — all checks `SUCCESS`/`NEUTRAL`/`SKIPPED` (or a documented flake), no unresolved threads, working tree clean.
+1. **Goal** — Bring PR `<number>` to green and merge-ready:
+   - Fix every failing check, resolve conflicts, address every review thread (commit titles follow Conventional Commits).
+   - **Mergify detection & bootstrap** (`grok/step-4-mergify-detect.md`): Detect `.mergify.yml` or Mergify app on repo. If missing and `--ship` is requested, bootstrap a minimal validated `.mergify.yml` on a separate PR branch.
+   - **CI diagnostics** (`grok/step-5-mergify-diagnostics.md`): If CI fails, inspect `mergify events`, detect scopes via `mergify ci scopes`, and quarantine flaky tests via `mergify tests quarantines add`.
+   - **Merge protections** (`grok/step-6-merge-protections.md`): Before merging, check `mergify freeze list`, `Depends-On:`, `Merge-After:`, and handle stacked PRs (`mergify stack list`).
+   - **Merge** (`grok/step-4-merge.md`): If `--ship` is true and PR is healthy, merge via Mergify queue (`@mergifyio queue`); fallback to `gh pr merge --squash --delete-branch` if Mergify is unavailable.
+2. **Current state** — Paste failing check names + log excerpts, list of open review threads, and `fix_count`.
+3. **Ship flag** — State whether `--ship` is active (`true`/`false`).
+4. **Acceptance criteria** — All checks passing or quarantined, zero open review threads, PR merged (if `--ship`) or reported merge-ready, worktree clean.
 
 Drop the task, once, via `orca terminal send --terminal <handle> --text "<brief>" --enter --json`:
 

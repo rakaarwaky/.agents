@@ -1,6 +1,6 @@
 ---
 name: pr-babysit
-description: "Watch a GitHub PR end to end. Two lanes: Hermes orchestrates and ships; Grok Build fixes. Run Step R0 to identify the lane, then read only that lane's references."
+description: "Watch a PR, fix CI, merge via Mergify queue."
 when-to-use: "Triggers on \"/pr-babysit\". Phrasing: \"watch PR 123 until green\", \"babysit PR 123 and merge when ready\", \"fix issue #123 and open a PR\", \"keep fixing PR 123 until it can merge\", \"pr-babysit add --ship 123\"."
 argument-hint: "add [--ship] <number> | check <number> | ship on <number> | fix <number>"
 disable-model-invocation: true
@@ -8,7 +8,9 @@ created_by: curator
 ---
 # PR Babysitter
 
-Watch a standalone GitHub PR end to end: register it, keep it green, merge it when `--ship` is active. The pipeline is event-driven — CI re-runs and new review threads each trigger a fresh pass.
+Watch a standalone GitHub PR end to end: register it, keep it green, merge it when `--ship` is active. When Mergify is configured on the repo, the merge step uses the Mergify merge queue (CI on a temporary merge commit before landing) instead of a direct `gh pr merge`. If Mergify is not configured, the skill bootstraps a minimal `.mergify.yml` with a merge-queue rule. Mergify diagnostics (events log, flaky-test quarantine, CI Insights) augment the CI re-verification loop. The pipeline is event-driven — CI re-runs and new review threads each trigger a fresh pass.
+
+Related: [`mergify`](../mergify/SKILL.md) skill — the full Mergify CLI surface (stacks, queue, freezes, CI Insights, config, events) is owned by that skill; pr-babysit consumes its references when Mergify is active.
 
 ## Global Rules
 
@@ -35,24 +37,25 @@ Read only the winning lane's references. Do not read the other lane's.
 
 Read **only** the winning lane's references:
 
-### Hermes lane 
+### Hermes lane
+
+| Step | Reference | Purpose |
+| ----: | --------- | ------- |
+| 0 | [`references/hermes/step-0-watch-and-spawn.md`](references/hermes/step-0-watch-and-spawn.md) | Verify auth, register PR in watchlist, compose detailed brief for Grok (fixes + Mergify queue/protections/diagnostics), spawn Grok worktree |
+| 1 | [`references/hermes/step-1-wait-and-reverify.md`](references/hermes/step-1-wait-and-reverify.md) | Wait for Grok pass; read Grok's report (Mergify status, diagnostics, merge result); reverify CI on live head |
+| 2 | [`references/hermes/step-2-merge.md`](references/hermes/step-2-merge.md) | Verify merge landed live on GitHub (merged by Grok via Mergify queue or fallback); retire the Grok worktree |
+| 3 | [`references/hermes/step-3-final-report.md`](references/hermes/step-3-final-report.md) | Final report to user (fixes, Mergify outcome, open items, watchlist state) |
 
 
-| Step | Reference                                                                                        | Purpose                                                                                                                                                  |
-| ----: | ------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 0    | [`references/hermes/step-0-watch-and-spawn.md`](references/hermes/step-0-watch-and-spawn.md)     | Verify auth, fetch PR, register in the watchlist, check CI once; if red or open threads, spawn a Grok worktree on the head branch and drop the fix brief |
-| 1    | [`references/hermes/step-1-wait-and-reverify.md`](references/hermes/step-1-wait-and-reverify.md) | Wait for the fix pass; re-run the CI check on the live head SHA; update `last_status`                                                                    |
-| 2    | [`references/hermes/step-2-merge.md`](references/hermes/step-2-merge.md)                         | Merge (only when `ship` is `true` and the ship-ready gates pass on a live re-query); retire the worktree                                                 |
-| 3    | [`references/hermes/step-3-final-report.md`](references/hermes/step-3-final-report.md)           | Final report to the user (fix passes, outcome, open items, watchlist state)                                                                              |
+### Grok lane
 
-
-### Grok lane 
-
-
-| Step | Reference                                                                            | When it runs                                                                                                                                                            |
-| ----: | ------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 0    | [`references/grok/step-0-add-pr.md`](references/grok/step-0-add-pr.md)               | PR details, repo, head/base refs for the pass                                                                                                                           |
-| 1    | [`references/grok/step-1-watch-ci.md`](references/grok/step-1-watch-ci.md)           | Always, at the start of the pass                                                                                                                                        |
-| 2    | [`references/grok/step-2-auto-fix.md`](references/grok/step-2-auto-fix.md)           | CI reports a red check; loops back to step 1 after each push. Commit title grammar: Conventional Commits inline                                                         |
-| 3    | [`references/grok/step-3-decision-tree.md`](references/grok/step-3-decision-tree.md) | After each step 2 push and always before declaring the PR green; CI logs ambiguous → [`references/grok/step-3-troubleshoot.md`](references/grok/step-3-troubleshoot.md) |
-| 4    | [`references/grok/step-4-merge.md`](references/grok/step-4-merge.md)                 | Ship-ready gate checks; Grok reports merge-ready (Hermes performs the merge)                                                                                            |
+| Step | Reference | When it runs |
+| ----: | --------- | ------------ |
+| 0 | [`references/grok/step-0-add-pr.md`](references/grok/step-0-add-pr.md) | PR details, repo, head/base refs for the pass |
+| 1 | [`references/grok/step-1-watch-ci.md`](references/grok/step-1-watch-ci.md) | At start of pass; observe check runs |
+| 2 | [`references/grok/step-2-auto-fix.md`](references/grok/step-2-auto-fix.md) | CI red: parse logs, fix code, Conventional Commits, push |
+| 3 | [`references/grok/step-3-decision-tree.md`](references/grok/step-3-decision-tree.md) | Conflict resolution, review threads, bot comments; troubleshooter: [`references/grok/step-3-troubleshoot.md`](references/grok/step-3-troubleshoot.md) |
+| 4 | [`references/grok/step-4-mergify-detect.md`](references/grok/step-4-mergify-detect.md) | Detect Mergify on repo; bootstrap `.mergify.yml` setup PR if missing and `--ship` active |
+| 5 | [`references/grok/step-5-mergify-diagnostics.md`](references/grok/step-5-mergify-diagnostics.md) | When CI remains red: check `mergify events`, quarantine flaky tests, upload JUnit, detect scopes |
+| 6 | [`references/grok/step-6-merge-protections.md`](references/grok/step-6-merge-protections.md) | Before merge: check active freezes (`mergify freeze`), `Depends-On:`, `Merge-After:`, stacked PRs |
+| 7 | [`references/grok/step-4-merge.md`](references/grok/step-4-merge.md) | Ship-ready gates pass: merge via Mergify queue (`@mergifyio queue`), monitor queue, fallback to direct merge |

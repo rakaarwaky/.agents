@@ -103,6 +103,7 @@ For each failed check:
    git push
    ```
 4. Set `last_status` to `"ci_failed"`. Increment `fix_count` once per successful check fix.
+   - If Mergify is available (`MERGIFY_AVAILABLE` is `"configured"` or `"installed"`), run Mergify CI diagnostics before the next fix pass — check flaky test quarantine, JUnit upload, and affected scopes ([`step-5-mergify-diagnostics.md`](step-5-mergify-diagnostics.md)).
 
 ## Changes requested (review-level body)
 
@@ -329,7 +330,7 @@ All of:
 - No unresolved review threads (human or bot) — confirmed by the passes above
 - No open conversation-tab comment without a later `Addressed in ` closer
 
-Set `last_status` to `"healthy"`. No action. The PR is ready to merge. If `--ship` is active, load [step-4-merge.md](step-4-merge.md).
+Set `last_status` to `"healthy"`. No action. The PR is ready to merge. If `--ship` is active, proceed to Mergify detect and bootstrap ([`step-4-mergify-detect.md`](step-4-mergify-detect.md)), then merge protections ([`step-6-merge-protections.md`](step-6-merge-protections.md)), then the merge step ([`step-4-merge.md`](step-4-merge.md)).
 
 ## Last-status precedence
 

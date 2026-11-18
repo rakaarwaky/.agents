@@ -1,7 +1,7 @@
 {
   "plan_id": "0ac73f1d",
   "design_doc_path": "/home/raka/.agents/develop/psd-timelapse/plan/design-doc-0ac73f1d.md",
-  "status": "executing",
+  "status": "completed",
   "created_at": "2026-11-18T21:00:00Z",
   "max_concurrent": 3,
   "linearized_order": [
@@ -100,12 +100,12 @@
           "pr-3"
         ],
         "title": "Studio RENDER wiring and bottom-bar cleanup",
-        "status": "executing",
+        "status": "completed",
         "branch": "execute-plan/0ac73f1d-pr-4-studio-render",
         "worktree_path": "/home/raka/orca/workspaces/psd-timelapse/0ac73f1d-pr-4",
-        "commit_sha": null,
-        "review_rounds": 0,
-        "review_file": null,
+        "commit_sha": "406c7194",
+        "review_rounds": 1,
+        "review_file": "exec-review-0ac73f1d-pr-4.md",
         "summary_file": "exec-summary-0ac73f1d-pr-4.md",
         "pr_url": null
       },
@@ -119,24 +119,27 @@
           "pr-6"
         ],
         "title": "Gate validation (typecheck/build/test/scan)",
-        "status": "pending",
+        "status": "completed",
         "branch": "execute-plan/0ac73f1d-pr-7-gate-validation",
-        "worktree_path": null,
-        "commit_sha": null,
-        "review_rounds": 0,
-        "review_file": null,
+        "worktree_path": "/home/raka/orca/workspaces/psd-timelapse/0ac73f1d-pr-7",
+        "commit_sha": "cc2b731e",
+        "review_rounds": 1,
+        "review_file": "exec-review-0ac73f1d-pr-7.md",
         "summary_file": "exec-summary-0ac73f1d-pr-7.md",
-        "pr_url": null
+        "pr_url": "https://github.com/rakaarwaky/psd-timelapse/pull/247"
       }
     ]
   },
-  "final_assembly_started": false,
-  "final_branch_pushed": false,
+  "final_assembly_started": true,
+  "final_branch_pushed": true,
+  "final_branch": "execute-plan/0ac73f1d-final",
+  "final_pr_url": "https://github.com/rakaarwaky/psd-timelapse/pull/247",
   "pr_urls": [
     "https://github.com/rakaarwaky/psd-timelapse/pull/243",
     "https://github.com/rakaarwaky/psd-timelapse/pull/244",
     "https://github.com/rakaarwaky/psd-timelapse/pull/245",
-    "https://github.com/rakaarwaky/psd-timelapse/pull/246"
+    "https://github.com/rakaarwaky/psd-timelapse/pull/246",
+    "https://github.com/rakaarwaky/psd-timelapse/pull/247"
   ],
   "user_instructions": "7 PRs, max parallelism 3, linearized order pr-1 -> pr-2 -> pr-3 -> pr-5 -> pr-6 -> pr-4 -> pr-7",
   "gh_available": true

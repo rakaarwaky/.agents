@@ -13,7 +13,7 @@ A broken `sac` CLI blocks both `sac lint` and `sac catalog --build`; the catalog
 1. `sac lint` passes (whole pack or scoped: `sac lint --category <name>`).
 2. Pre-publish checklist (`step-3-publish.md`) fully checked.
 3. `sac read <name>` — confirm frontmatter and body landed correctly.
-4. Body shape verified mechanically: `grep -n '^#' <SKILL.md>` returns only `# Title` and exactly `## Rules`, `## Routing`.
+4. Body shape verified mechanically: `grep -n '^#' <SKILL.md>` returns only `# Title` and exactly `## Rules`, `## Routing` (zero `###` subheadings).
 5. Every sibling mention and cross-skill link names a skill that exists in the tree.
 6. `sac catalog --build` run so `skills/catalog.json` reflects current frontmatter — a stale catalog is a publish defect.
 7. `git log --oneline -4` and `git status` checked for parallel agent commits; staged set contains only this run's files plus `catalog.json`.

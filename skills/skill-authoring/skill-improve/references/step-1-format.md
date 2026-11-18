@@ -20,7 +20,7 @@ Every skill being improved must use this exact body shape in `SKILL.md`:
 
 All task data, commands, field shapes, examples, stop conditions, and worked examples belong in `references/*.md` or `scripts/*`. If the body contains anything beyond the three sections above, move it to a reference file before publishing.
 
-Verified mechanically: `grep -n '^#' <SKILL.md>` returns only the `#` title and exactly two `##` headings — `## Rules`, `## Routing`. `sac lint` does not check this (body shape is convention-enforced); the grep is the check. Case matters: the heading is `## Rules`.
+Verified mechanically: `grep -n '^#' <SKILL.md>` returns only the `#` title and exactly two `##` headings — `## Rules`, `## Routing`. `sac lint` does not check this (body shape is convention-enforced); the grep is the check. Case matters: the heading is `## Rules`. Zero `###` subheadings are allowed anywhere in `SKILL.md` — subheadings match `^#` and fail the probe. For multi-lane skills (such as Hermes and Grok lanes), unify routing entries into a single table with a `Lane` column or use bold headers (`**Hermes lane**`), never `###` headings.
 
 A stop-condition is never its own `## Completion` section in the body — it is one row in `## Rules` (e.g. "**Completion.** <criterion>"), because a fourth heading breaks the three-section shape.
 

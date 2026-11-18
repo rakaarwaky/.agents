@@ -23,7 +23,7 @@ gh pr checks <number>
 or the git+curl variant (latest commit on `<head_ref>` → combined status + check-runs).
 
 - **All green, no open threads**: update the state file — `last_status: "green"`, `last_checked` to now. Proceed to Step 2.
-- **Still red**: report the remaining failures to the user with their check names and a one-line log excerpt each. Offer to re-drop the task to a fresh Grok worktree (`fix_count` already incremented) — but only if the user wants another pass; do not loop automatically.
+- **Still red**: report the remaining failures to the user with their check names and a one-line log excerpt each. Check Grok's report for Mergify diagnostics (flaky tests, quarantined items, scopes). Offer to re-drop the task to a fresh Grok worktree (`fix_count` already incremented) — but only if the user wants another pass; do not loop automatically.
 
 ## Report & Continue
 

@@ -37,6 +37,7 @@ Judge and fix body content so examples are concrete, defaults replace menus, and
 - Prefer referencing existing CLI tools over writing custom scripts.
 - MCP tools named fully qualified (`ServerName:tool_name`).
 - Forward slashes in paths (`scripts/helper.py`); no time-sensitive content in the body.
+- **Per-repo artifact isolation**: Tool and skill scratch artifacts (ledgers, run reports, intermediate dumps) belong in `~/.agents/develop/<namarepo>/<skill>/` (where `<namarepo>` is derived from `<repo-root>`), never in the target repository's working tree or `docs/` folder unless the skill deliverable is user-facing documentation. Keep `argument-hint` clean by omitting path override flags when the artifact location is deterministic.
 - **Safety-model consistency**: when the user re-specifies which mode control flag governs the run (e.g. `--dry-run` vs `--headless` vs no flag), the single source of truth is the Safety model bullet in `SKILL.md` Rules. Sync that bullet, the `argument-hint` in frontmatter, and every step-file line describing mode behavior — all three must agree on default-vs-flag semantics.
 
 ## Completion
