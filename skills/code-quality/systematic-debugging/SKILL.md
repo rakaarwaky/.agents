@@ -30,19 +30,16 @@ For any technical issue — test failures, production bugs, build or performance
 
 ## Rules
 
-- **Lane is determined by a physical signal, not by self-identification.** Each agent's launcher stamps a fixed attribution env var into every command it runs; the model cannot set these.
-
-  ```bash
-  if [[ -n "${HERMES_AGENT:-}" ]]; then echo HERMES
-  elif [[ -n "${GROK_AGENT:-}" ]]; then echo GROK
-  else echo UNSET; fi
-  ```
-
-  `HERMES` → **Hermes lane.** Read `references/hermes/`. Stop. `GROK` → **Grok lane.** Read `references/grok/`. Stop. `UNSET` → stop and report; do not guess the lane.
-- **Marker provenance.** Hermes re-exports `AI_AGENT=hermes-agent` and `HERMES_AGENT=true` on every command. Grok Build runs with `GROK_AGENT=1`.
-- **Read only the winning lane's references.** Do not read the other lane's.
-- **Iron law.** No fix without root-cause investigation first (Steps 1–3); no production code without a failing test first (Step 4 §1). The gate is restated in `references/grok/step-0-intake.md` and `references/grok/step-4-implement.md`.
-- **Completion.** The run is done when: the regression test that reproduces the exact symptom is RED→GREEN, the full suite passes, the output is pristine (no stray debug calls), and the reporting format in `references/grok/step-5-verify.md` (or the Hermes final report) is emitted.
+| ID | Rule | Check |
+|----|------|-------|
+| R1 | **Lane by physical signal.** Lane is determined from launcher env var (`HERMES_AGENT` -> Hermes lane; `GROK_AGENT` -> Grok lane; unset -> stop). Model cannot self-identify. | Signal evaluated via `[[ -n "${HERMES_AGENT:-}" ]]` / `[[ -n "${GROK_AGENT:-}" ]]`; UNSET halts immediately. |
+| R2 | **Winning lane isolation.** Read only the winning lane's references (`references/hermes/` or `references/grok/`). Do not cross-read the other lane. | Zero reads of the non-winning lane's files. |
+| R3 | **Iron law of root-cause.** No fix without root-cause investigation first (Steps 1–3). Proposing solutions before tracing data flow is strictly forbidden. | Step 1 investigation checklist satisfied before Step 4. |
+| R4 | **Iron law of TDD.** No production code without a failing regression test first. Watch the test fail (RED), make it pass with the minimal fix (GREEN), then refactor (REFACTOR). | Regression test observed RED before GREEN change is made. |
+| R5 | **Rule of three.** Stop after 3 failed fix attempts. A 4th attempt is forbidden without questioning the architecture and discussing with the user. | `fix_attempts` incremented; architecture review triggered when `fix_attempts >= 3`. |
+| R6 | **Diff discipline.** The fix commit must contain only the regression test and the minimal fix. Drive-by refactoring or unrelated changes are forbidden. | `git show --stat` lists only test and minimal fix files. |
+| R7 | **Clean tree verification.** Verification runs (regression test and full test suite) must execute against a clean committed worktree, never a dirty tree. | `git status --short` is clean before verification commands run. |
+| R8 | **Completion.** The run is done when: regression test is RED->GREEN, full suite passes, output is pristine with zero stray debug statements (`breakpoint()`, `dbg!()`, `console.log`), and final report is emitted. | Regression test passes; full suite green; cleanup grep returns zero hits. |
 
 ## Routing
 
