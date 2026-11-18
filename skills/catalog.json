@@ -242,14 +242,14 @@
     },
     {
       "name": "issue-maker",
-      "description": "repo → issues: zero-trust issue maker that maps AES spec documents (PRD, ROADMAP, BACKLOG, FRD, DESIGN, plus module and package feature docs) into modular GitHub tracking issues. Done rows are re-verified against live source and test evidence. Every issue carries a closing-condition that advances its ROW and all FR IDs to Done. Never opens a PR — issues only. Hermes runs the audit driver via terminal (stdlib scripts, no subagent); no source edits, no branches, no PRs — nothing to delegate to Grok.",
-      "when_to_use": "/issue-maker — map incomplete tasks to GitHub issues (repo → issues), create tracking issues from ROADMAP or BACKLOG, verify Done claims against code, ensure every issue carries a closing-condition that advances the roadmap state to Done. Outputs GitHub issues only; never edits source, never creates a branch, never opens a PR.",
+      "description": "repo → issues: zero-trust spec audit mapping AES spec documents (PRD, ROADMAP, BACKLOG, FRD, DESIGN) into modular GitHub tracking issues with closing conditions. Done rows are re-verified against live source and test evidence. Never opens a PR — issues only.",
+      "when_to_use": "Use when mapping incomplete tasks from spec documents to GitHub issues (repo → issues), creating tracking issues from ROADMAP or BACKLOG, verifying Done claims against code, or auditing task completion with validate.py. Outputs GitHub issues only; never edits source or creates PRs.",
       "category": "git"
     },
     {
       "name": "issue-worker",
-      "description": "issue worker: analyze open GitHub issues and take each one from backlog to a PR opened to main — Hermes verifies at HEAD and runs the decision quiz, then 1 issue → 1 Orca worktree → Grok Build implements → Hermes verifies → Hermes pushes branch + opens a (draft) PR to main → close/reopen the issue per result. Never merges. Takes EXISTING issues to PRs; does not create issues (that is /issue-maker's domain). CRUD recipes stay as reference only; the spine is verify → decide → isolate → delegate → verify → PR.",
-      "when_to_use": "",
+      "description": "issue → PR: analyzes open GitHub issues, verifies claims at HEAD, asks user decisions via quiz, isolates work in Orca worktrees, delegates implementation to Grok Build, verifies fixes, and pushes branches to open draft PRs. Never merges.",
+      "when_to_use": "Use when analyzing open GitHub issues to create PRs (/issue-worker <issue-number>...), triaging bug reports or feature requests, verifying issue reproduction at HEAD, running isolated Orca worktrees for issue fixes, or opening draft PRs from existing issues. Never creates issues (handled by /issue-maker) and never auto-merges.",
       "category": "git"
     },
     {
