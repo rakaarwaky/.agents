@@ -24,7 +24,7 @@ Where `<branch>` is the worktree's branch (e.g. `implement/<IMPL_ID>`) and `<wor
 
 ## Step 9.2: Open the PR
 
-Opening a PR is **mandatory by default** (ready-for-review, not draft) whenever `gh` is available and the remote is GitHub. Use `--draft` only when the user explicitly asks for a draft in this run. When `gh` is unavailable or the remote is non-GitHub, fall back to printing the compare URL — that is an environment limitation, not permission to skip the PR step.
+Opening a PR is **mandatory by default** (ready-for-review) whenever `gh` is available and the remote is GitHub. **Never pass `--draft`** — drafts are forbidden in this workflow; every PR must be ready for review the moment it is opened. When `gh` is unavailable or the remote is non-GitHub, fall back to printing the compare URL — that is an environment limitation, not permission to skip the PR step.
 
 ```bash
 gh pr create --base main --head <branch> --fill --draft

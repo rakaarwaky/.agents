@@ -48,7 +48,7 @@ git -C <worktree_path> push -u origin <worktree_branch>
 
 Then open the PR with `gh pr create --base main --head <worktree_branch>`. A rejected push to `main` is not a reason to bypass CI gates — the PR lane is the supported path.
 
-## 2e: Open the PR (default — mandatory unless the user opts out)
+## 2e: Open the PR (default — mandatory, never a draft)
 
 Creating a PR is the default and expected outcome of every run. Open a **ready-for-review** PR (not a draft) whenever `gh` is available and the remote is GitHub:
 
@@ -56,7 +56,7 @@ Creating a PR is the default and expected outcome of every run. Open a **ready-f
 gh pr create --base main --head <worktree_branch> --fill
 ```
 
-Drop `--fill` and pass an explicit `--title`/`--body` if you have a richer summary to attach. Only fall back to `--draft` when the user explicitly asks for a draft in this run.
+Drop `--fill` and pass an explicit `--title`/`--body` if you have a richer summary to attach. **Never pass `--draft`** — drafts are forbidden in this workflow; every PR must be ready for review the moment it is opened.
 
 No `gh` or non-GitHub remote: derive the compare URL
 
