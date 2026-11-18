@@ -72,7 +72,7 @@ Compose the brief (Grok has zero context):
    - **Mergify detection & bootstrap** (`grok/step-4-mergify-detect.md`): Detect `.mergify.yml` or Mergify app on repo. If missing and `--ship` is requested, bootstrap a minimal validated `.mergify.yml` on a separate PR branch.
    - **CI diagnostics** (`grok/step-5-mergify-diagnostics.md`): If CI fails, inspect `mergify events`, detect scopes via `mergify ci scopes`, and quarantine flaky tests via `mergify tests quarantines add`.
    - **Merge protections** (`grok/step-6-merge-protections.md`): Before merging, check `mergify freeze list`, `Depends-On:`, `Merge-After:`, and handle stacked PRs (`mergify stack list`).
-   - **Merge** (`grok/step-4-merge.md`): If `--ship` is true and PR is healthy, merge via Mergify queue (`@mergifyio queue`); fallback to `gh pr merge --squash --delete-branch` if Mergify is unavailable.
+   - **Merge** (`grok/step-7-merge.md`): If `--ship` is true and PR is healthy, merge via Mergify queue (`@mergifyio queue`); fallback to `gh pr merge --squash --delete-branch` if Mergify is unavailable.
 2. **Current state** — Paste failing check names + log excerpts, list of open review threads, and `fix_count`.
 3. **Ship flag** — State whether `--ship` is active (`true`/`false`).
 4. **Acceptance criteria** — All checks passing or quarantined, zero open review threads, PR merged (if `--ship`) or reported merge-ready, worktree clean.
