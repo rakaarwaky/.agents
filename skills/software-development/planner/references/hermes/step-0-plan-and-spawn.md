@@ -1,16 +1,16 @@
 # Step 0: Plan the Task & Spawn Grok Build
 
-Hermes never writes the design document. This run has exactly one subagent — the Grok Build TUI in a dedicated Orca worktree. Plan the brief, create the worktree, drop the task, stop.
+Hermes never writes the plan document. This run has exactly one subagent — the Grok Build TUI in a dedicated Orca worktree. Plan the brief, create the worktree, drop the task, stop.
 
 ## Plan the Task Brief
 
 Grok has zero conversation context. Compose a brief covering:
 
-1. **Goal** — produce a polished design document + PR plan from `<description>`: run the write → review → revise loop until the reviewer approves with 0 open issues, then summarize.
+1. **Goal** — produce a polished plan document + PR plan from `<description>`: run the write → review → revise loop until the reviewer approves with 0 open issues, then summarize.
 2. **Description** — `<description>` verbatim, plus any file paths, links, constraints, or extra context the user provided. All of it goes into the brief — the writer's prompt (Grok's Step 1) must include everything.
-3. **Constraints** — design-only: deliverables are `design_doc_file` and `summary_file` only; no feature implementation, no source/test edits, no branches/commits/worktrees, no PRs. Implementation is a separate `/execute-plan` run, not part of this one.
-4. **Review panel** — `design-doc-reviewer` persona; issues carry `Severity` (`bug`/`suggestion`/`nit`), `Section`, `Description`, `Suggestion`, `Status` (`open` → `addressed`/`wontfix`/`needs-user-input`).
-5. **Acceptance criteria** — `design_doc_file` and `summary_file` exist in the scratch dir; the final `review_file` shows 0 open issues; the `## PR Plan` section of the design doc is present and well-formed (validate-plan-parseable — this is the hand-off gate for `/execute-plan`).
+3. **Constraints** — plan-only: deliverables are `plan_doc_file` and `summary_file` only; no feature implementation, no source/test edits, no branches/commits/worktrees, no PRs. Implementation is a separate `/execute-plan` run, not part of this one.
+4. **Review panel** — `plan-doc-reviewer` persona; issues carry `Severity` (`bug`/`suggestion`/`nit`), `Section`, `Description`, `Suggestion`, `Status` (`open` → `addressed`/`wontfix`/`needs-user-input`).
+5. **Acceptance criteria** — `plan_doc_file` and `summary_file` exist in the scratch dir; the final `review_file` shows 0 open issues; the `## PR Plan` section of the plan doc is present and well-formed (validate-plan-parseable — this is the hand-off gate for `/execute-plan`).
 6. **Deliverable** — the two files in the scratch dir. Do NOT commit them into the repo, do NOT push, do NOT open a PR.
 
 ## Create the Orca Worktree

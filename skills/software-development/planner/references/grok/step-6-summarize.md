@@ -1,6 +1,6 @@
 # Step 6: Summarize and Finalize
 
-Read the final `<design_doc_file>` and present these sections to the user.
+Read the final `<plan_doc_file>` and present these sections to the user.
 
 ## 6a: Key Decisions
 
@@ -23,7 +23,7 @@ Present the PR Plan section.
 Run the plan validator to confirm the PR Plan section is well-formed and parseable by `/execute-plan`:
 
 ```bash
-sdc validate-plan <design_doc_file>
+sdc validate-plan <plan_doc_file>
 ```
 
 - Exit `0` with `valid == true` and `errors == []`: plan is valid. Report: `PR plan validated: <N> PRs, <L> levels, max parallelism <P>`.

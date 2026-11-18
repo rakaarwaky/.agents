@@ -37,7 +37,7 @@ Construct a JSON object:
   ],
   "run": {
     "date": null,
-    "description": "Execute plan: <design doc title or short description>",
+    "description": "Execute plan: <plan doc title or short description>",
     "rounds": <sum of review_rounds across all completed PRs>,
     "issues_by_severity": {"bug": <total>, "suggestion": <total>, "nit": <total>},
     "key_patterns": ["<2-3 most significant patterns from this run>"],

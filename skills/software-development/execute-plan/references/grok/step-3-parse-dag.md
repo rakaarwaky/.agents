@@ -2,14 +2,14 @@
 
 ## Step 3: Parse PR Plan DAG
 
-Read the design document at `<design_doc_path>` using `read_file`.
+Read the plan document at `<plan_doc_path>` using `read_file`.
 
 ### Prefer the bundled validator
 
 Run the bundled validator first — it encodes the exact parsing, validation, and level-assignment rules, so a malformed plan fails with a precise error before any subagent is spawned:
 
 ```bash
-sdc validate-plan <design_doc_path>
+sdc validate-plan <plan_doc_path>
 ```
 
 - Exit `0`: parse the JSON report. Require `valid == true` and `errors == []`. `linearized_order`, `level_assignments`, `nodes`, `pr_count`, and `max_parallelism` are authoritative; store `linearized_order` in the state file and skip to Step 4.

@@ -7,12 +7,12 @@ Resume the reviewer subagent to re-review the revisions.
 `spawn_subagent` parameters:
 
 - `resume_from`: `<reviewer_subagent_id>`
-- `description`: `"[reviewer] Re-review design doc"`
+- `description`: `"[reviewer] Re-review plan doc"`
 - Prompt body:
 
 ```text
 Review file: <review_file>
-Design doc: <design_doc_file>
+plan doc: <plan_doc_file>
 Summary: <summary_file>
 
 The writer responded to the previous issues. Read all files and re-review.

@@ -6,7 +6,7 @@ After each PR's implementation completes successfully, the orchestrator launches
 
 | Reviewer | Persona | Focus |
 |----------|---------|-------|
-| General | `reviewer` | Code quality, bugs, naming, SOLID, style, security-relevant defects, and plan-alignment of this PR's implementation to its design-doc scope |
+| General | `reviewer` | Code quality, bugs, naming, SOLID, style, security-relevant defects, and plan-alignment of this PR's implementation to its plan-doc scope |
 | Tests | none (prompt-only) | Test coverage, test quality, edge cases, mocking |
 | Simplicity | none (prompt-only) | Over-engineering, unused abstractions, YAGNI |
 
@@ -76,7 +76,7 @@ Review the changes made for <pr.id>: <pr.title>.
 
 The implementation summary is at: ${scratch_dir}/exec-summary-<PLAN_ID>-<pr.id>.md
 
-Review all modified files for code quality, correctness, naming, SOLID, style, and security-relevant defects (input validation, injection, secrets handling, authz), and confirm the implementation follows the design-doc section covering this PR (no scope creep, no missing planned items). The security and plan-alignment concerns are folded into this reviewer.
+Review all modified files for code quality, correctness, naming, SOLID, style, and security-relevant defects (input validation, injection, secrets handling, authz), and confirm the implementation follows the plan-doc section covering this PR (no scope creep, no missing planned items). The security and plan-alignment concerns are folded into this reviewer.
 
 <past_issues_briefing block if non-empty>
 <user_instructions block if non-empty>

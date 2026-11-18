@@ -6,7 +6,7 @@ Hermes owns every git and PR operation. Read Grok's summary and review files, ve
 
 Read the two artifact paths recorded in Step 1:
 
-- `impl-summary-<run_id>.md` — what was changed, design decisions.
+- `impl-summary-<run_id>.md` — what was changed, plan decisions.
 - `review-<run_id>.md` — the final merged review.
 
 Verify:

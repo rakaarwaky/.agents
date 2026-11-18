@@ -23,4 +23,4 @@ For each escalation, present:
 - **Stalemate**: the writer vs reviewer positions.
 - **Needs-input**: the open question.
 
-Include selectable options and relevant design context. User decisions are final. On response, resume the writer with the decisions and instruct it to apply them to the design doc and mark the corresponding issues `Status: addressed`, then return to Step 3.
+Include selectable options and relevant plan context. User decisions are final. On response, resume the writer with the decisions and instruct it to apply them to the plan doc and mark the corresponding issues `Status: addressed`, then return to Step 3.

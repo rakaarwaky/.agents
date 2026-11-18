@@ -1,13 +1,13 @@
 # Step 0: Parse the Plan, Prepare the DAG & Spawn Grok Build
 
-Hermes never writes code. This step turns the design document into a validated DAG + a self-contained brief, then drops the whole plan into a single Grok Build Orca worktree. Grok runs the full execution loop (worktrees, implementers, review panel, fix rounds, final assembly) internally — Hermes's only job is to wait and ship.
+Hermes never writes code. This step turns the plan document into a validated DAG + a self-contained brief, then drops the whole plan into a single Grok Build Orca worktree. Grok runs the full execution loop (worktrees, implementers, review panel, fix rounds, final assembly) internally — Hermes's only job is to wait and ship.
 
 ## Parse & Validate the DAG
 
 Run the bundled validator (same as `grok/step-3-parse-dag.md`):
 
 ```
-sdc validate-plan <design_doc_path>
+sdc validate-plan <plan_doc_path>
 ```
 
 - Exit `0`: parse the JSON report. Require `valid == true` and `errors == []`. `linearized_order`, `level_assignments`, `nodes`, `pr_count`, and `max_parallelism` are authoritative.
@@ -22,7 +22,7 @@ sdc validate-plan <design_doc_path>
 
 Grok has zero conversation context. Compose a brief covering:
 
-1. **Goal** — implement the full PR Plan DAG from `<design_doc_path>`: `pr_count` PRs, `max_parallelism` wide, in `linearized_order`.
+1. **Goal** — implement the full PR Plan DAG from `<plan_doc_path>`: `pr_count` PRs, `max_parallelism` wide, in `linearized_order`.
 2. **DAG summary** — the validated `linearized_order` with each PR's id, slug, and dependencies. This is Grok's authoritative execution order; it must not re-derive or re-order.
 3. **Per-PR instructions** — for each PR, the `description`, `files/components affected`, and `dependencies` from the plan.
 4. **Constraints** — style, tests, repo conventions from AGENTS.md / CONTRIBUTING.md; out-of-scope list (any path the plan never named).
@@ -47,7 +47,7 @@ If `--agent grok` is blocked (e.g. `agent_session_operation_unknown`), fall back
 Send exactly this, once, via `orca terminal send --terminal <handle> --text "<brief>" --enter --json`:
 
 ```
-/execute-plan <design_doc_path>
+/execute-plan <plan_doc_path>
 
 <constraints, DAG summary, and acceptance criteria from the brief>
 ```

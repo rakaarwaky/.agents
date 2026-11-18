@@ -1,8 +1,8 @@
 ---
 name: execute-plan
 description: "Executes a PR Plan DAG end-to-end: Hermes validates the plan and drops /execute-plan into Grok Build (Grok runs parallel Orca worktrees, implementers, the 3-reviewer panel, fix loops, and final assembly), then Hermes verifies the final branch and ships the PR."
-when-to-use: "Use for /execute-plan <design-doc-path> [--resume <PLAN_ID>], execute plan, run the plan, implement the design, or after /planner (or /design) produces a PR plan."
-argument-hint: "<design-doc-path> | --resume <PLAN_ID>"
+when-to-use: "Use for /execute-plan <plan-doc-path> [--resume <PLAN_ID>], execute plan, run the plan, implement the plan, or after /planner (or /plan) produces a PR plan."
+argument-hint: "<plan-doc-path> | --resume <PLAN_ID>"
 disable-model-invocation: true
 ---
 # Execute Plan Skill
@@ -36,7 +36,7 @@ Read only the winning lane's references. Do not read the other lane's.
 
 | Step | Reference                                                                              | Purpose                                                                                                   |
 | ----: | -------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
-| 0    | [`references/hermes/step-0-plan-and-spawn.md`](references/hermes/step-0-plan-and-spawn.md) | Validate the DAG with `sdc validate-plan`; plan the brief; create the Orca worktree with `--agent grok`; drop `/execute-plan <design-doc-path>` |
+| 0    | [`references/hermes/step-0-plan-and-spawn.md`](references/hermes/step-0-plan-and-spawn.md) | Validate the DAG with `sdc validate-plan`; plan the brief; create the Orca worktree with `--agent grok`; drop `/execute-plan <plan-doc-path>` |
 | 1    | [`references/hermes/step-1-wait-grok.md`](references/hermes/step-1-wait-grok.md)         | Wait for Grok to finish the full execution loop; read its state file and artifacts                      |
 | 2    | [`references/hermes/step-2-verify-and-ship.md`](references/hermes/step-2-verify-and-ship.md) | Verify Grok's final branch (on origin, local gate clean); handle partial failures; report                |
 | 3    | [`references/hermes/step-3-final-report.md`](references/hermes/step-3-final-report.md) | Flush new issue patterns to the workspace memory file (if any); final report to the user                |

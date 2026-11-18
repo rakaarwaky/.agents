@@ -5,10 +5,10 @@
 The user runs:
 
 ```text
-/execute-plan <design-doc-path> [--resume <PLAN_ID>]
+/execute-plan <plan-doc-path> [--resume <PLAN_ID>]
 ```
 
-- `<design-doc-path>`: Required. Design document containing the PR Plan DAG.
+- `<plan-doc-path>`: Required. plan document containing the PR Plan DAG.
 - `--resume <PLAN_ID>`: Optional. Resume a previous run. If specified, skip to Step 9.
 
 Internal defaults: `concurrency = 8`.
@@ -72,7 +72,7 @@ Define shared file paths (all under `SCRATCH_DIR`):
 
 Initialize orchestrator state variables:
 
-- `design_doc_path`, `main_clone_path` (`git rev-parse --show-toplevel`)
+- `plan_doc_path`, `main_clone_path` (`git rev-parse --show-toplevel`)
 - `max_concurrent` (default 8), `dag`, `linearized_order`, `ready_queue`, `in_progress`, `completed`, `failed`, `skipped`
 - `past_issues_briefing`: `""` (populated in Step 1)
 - `issue_patterns`: `[]` (accumulated during reviews, used in Step 12)
@@ -100,7 +100,7 @@ Initialize the state file:
 ```json
 {
   "plan_id": "<PLAN_ID>",
-  "design_doc_path": "<design-doc-path>",
+  "plan_doc_path": "<plan-doc-path>",
   "status": "initializing",
   "created_at": "<ISO 8601 timestamp>",
   "max_concurrent": 8,

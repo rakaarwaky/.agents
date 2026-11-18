@@ -1,17 +1,17 @@
-# Step 1: Write the Design Document
+# Step 1: Write the plan Document
 
-Spawn the writer subagent to draft the design document.
+Spawn the writer subagent to draft the plan document.
 
 ## Spawn
 
 `spawn_subagent` parameters:
 
-- `description`: `"[writer] Write design doc: <short summary>"`
+- `description`: `"[writer] Write plan doc: <short summary>"`
 - Prompt body: `writer_persona_instructions` prepended, then:
 
 ```text
-Write a design document for: <full user description and context from Step 0>.
-Save the document to: <design_doc_file>
+Write a plan document for: <full user description and context from Step 0>.
+Save the document to: <plan_doc_file>
 Save a summary to: <summary_file>
 
 Write ONLY to those two paths. Do NOT create files in the repo root or any other location. The repo is read-only for you — do not commit, branch, or edit source files.
@@ -25,7 +25,7 @@ The document must end with these three exact sections, in this specific order:
 (Summarize important architectural choices and rationale.)
 
 ## PR Plan
-(Break the design into concrete, ordered, independently mergeable PRs. Each PR must use this exact format:
+(Break the plan into concrete, ordered, independently mergeable PRs. Each PR must use this exact format:
 
 ### PR N: <Title>
 - **Files/components affected:** <comma-separated file paths>
@@ -37,4 +37,4 @@ Every PR must include exactly these three bullets in this order. Use sequential 
 
 ## After Completion
 
-Report: "Design document drafted. Starting review..." and continue to Step 2.
+Report: "plan document drafted. Starting review..." and continue to Step 2.

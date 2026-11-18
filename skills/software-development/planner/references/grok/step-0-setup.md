@@ -26,20 +26,20 @@ sdc host setup --subdir plan
 Parse the JSON on stdout and store:
 
 - `python` as `PYTHON`
-- `run_id` as `DESIGN_ID` (validate: exactly 8 hex characters)
+- `run_id` as `PLAN_ID` (validate: exactly 8 hex characters)
 - `scratch_dir` as the artifact base directory. `sdc` is the single source of truth for this location: `~/.agents/develop/<repo-slug>/plan/`, where `<repo-slug>` is the lowercased git repository name normalized to `[a-z0-9-]`. It also creates the directory. If setup fails (e.g. not inside a git repository), stop and report.
 
-Always use expanded absolute paths (for example `/home/<user>/.agents/develop/<repo-slug>/plan/design-doc-<DESIGN_ID>.md`), including in subagent prompts.
+Always use expanded absolute paths (for example `/home/<user>/.agents/develop/<repo-slug>/plan/plan-doc-<PLAN_ID>.md`), including in subagent prompts.
 
 ## Shared File Paths
 
 Fixed for the entire run; derive each from `scratch_dir`:
 
-- `design_doc_file`: `<scratch_dir>/design-doc-<DESIGN_ID>.md`
-- `summary_file`: `<scratch_dir>/design-summary-<DESIGN_ID>.md`
-- `review_file`: `<scratch_dir>/design-review-<DESIGN_ID>.md`
+- `plan_doc_file`: `<scratch_dir>/plan-doc-<PLAN_ID>.md`
+- `summary_file`: `<scratch_dir>/plan-summary-<PLAN_ID>.md`
+- `review_file`: `<scratch_dir>/plan-review-<PLAN_ID>.md`
 
-Never regenerate `DESIGN_ID` or these paths during review/revise iterations.
+Never regenerate `PLAN_ID` or these paths during review/revise iterations.
 
 ## Orchestrator State
 
@@ -49,7 +49,7 @@ Never regenerate `DESIGN_ID` or these paths during review/revise iterations.
 
 ## Persona Injection
 
-Load the `design-doc-writer` and `design-doc-reviewer` personas from `~/.agents/personas/<name>.toml`, extracting the full `instructions` value from each file's top-level `instructions` field into:
+Load the `plan-doc-writer` and `plan-doc-reviewer` personas from `~/.agents/personas/<name>.toml`, extracting the full `instructions` value from each file's top-level `instructions` field into:
 
 - `writer_persona_instructions`
 - `reviewer_persona_instructions`
@@ -58,4 +58,4 @@ Injection timing: prepend the persona instructions on the initial launch only, n
 
 ## Invocation Input
 
-The user ran `/planner <description>` (or `/design <description>`). Treat `<description>` as the design task: feature design, system architecture, migration plan, technical spec, or another design deliverable. Capture any file paths, links, constraints, or extra context the user provided — Step 1 must include all of it in the writer prompt.
+The user ran `/planner <description>` (or `/plan <description>`). Treat `<description>` as the plan task: feature plan, system architecture, migration plan, technical spec, or another plan deliverable. Capture any file paths, links, constraints, or extra context the user provided — Step 1 must include all of it in the writer prompt.

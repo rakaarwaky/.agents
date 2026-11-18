@@ -85,7 +85,7 @@ git push --force-with-lease origin <final_branch>
 cat > <scratch>/pr-body.md <<EOF
 ## Summary
 
-Implements <N> PRs from the design document at <design_doc_path>.
+Implements <N> PRs from the plan document at <plan_doc_path>.
 
 ## PRs Included
 
