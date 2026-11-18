@@ -16,7 +16,7 @@ Report to the user:
 2. **Execution stats** — PRs completed / failed / skipped, DAG levels, max parallelism (from the state file).
 3. **Review stats** — total rounds, issues fixed by severity and specialist (from the state file).
 4. **Final PR** — URL or compare URL; note modular branches were merged and deleted locally; list `deferred_issues` with reasons.
-5. **Post-merge action** — resolve `$ORCA` (default `/home/raka/.local/bin/orca-ide`), then:
+5. **Post-merge action** — resolve `$ORCA` (via `command -v orca-ide` or `$ORCA_CLI_COMMAND` fallback), then:
    ```
    "$ORCA" worktree rm --worktree <final_orca_worktree_id> --force --json
    ```

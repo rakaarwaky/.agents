@@ -18,7 +18,7 @@ Poll with `orca terminal read --terminal <handle> --cursor <cursor> --limit 1000
 Execute this loop in `terminal` (set `timeout=600`):
 
 ```bash
-ORCA="${ORCA_CLI_COMMAND:-/home/raka/.local/bin/orca-ide}"
+ORCA="${ORCA_CLI_COMMAND:-$(command -v orca-ide || echo "$HOME/.local/bin/orca-ide")}"
 cursor=0
 while true; do
   wait_res=$("$ORCA" terminal wait --terminal "<handle>" --for tui-idle --timeout-ms 60000 --json 2>/dev/null || true)

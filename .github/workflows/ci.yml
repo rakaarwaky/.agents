@@ -107,3 +107,26 @@ jobs:
 
       - name: Submodule integrity
         run: git submodule status
+
+      - name: Skill markdown hygiene
+        run: |
+          # Check for ORCA_RICH_MD artifacts (corrupted placeholders)
+          if grep -r "ORCA_RICH_MD" skills/software-development/ --include="*.md" -l; then
+            echo "ERROR: ORCA_RICH_MD artifacts found in skill markdown"
+            exit 1
+          fi
+
+          # Check for hardcoded /home/raka paths in skill markdown (use $HOME instead)
+          if grep -r "/home/raka" skills/software-development/ --include="*.md" -l | grep -v "node_modules"; then
+            echo "ERROR: Hardcoded /home/raka paths found in skill markdown — use \$HOME or relative paths"
+            exit 1
+          fi
+
+          # Check for hardcoded 'main' branch references in execute-plan/design grok steps
+          # (should use <default_branch> instead)
+          if grep -rn "origin main\|--base main\|\.main\b" skills/software-development/execute-plan/references/grok/ skills/software-development/design/references/grok/ --include="*.md" -l 2>/dev/null | grep -v "default_branch\|main_clone\|main clone\|\.main\b.*default\|origin/HEAD"; then
+            echo "ERROR: Hardcoded 'main' branch references found — use <default_branch> instead"
+            exit 1
+          fi
+
+          echo "Skill markdown hygiene checks passed."

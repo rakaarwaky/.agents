@@ -17,21 +17,39 @@ Poll with `orca terminal read --terminal <handle> --cursor <cursor> --limit 1000
 Execute this loop in `terminal` (set `timeout=600`):
 
 ```bash
-ORCA="${ORCA_CLI_COMMAND:-/home/raka/.local/bin/orca-ide}"
+ORCA="${ORCA_CLI_COMMAND:-$(command -v orca-ide || echo "$HOME/.local/bin/orca-ide")}"
 cursor=0
+deadline=$((SECONDS + 7200))  # 2 hour absolute deadline
+consecutive_errors=0
 while true; do
+  if (( SECONDS >= deadline )); then
+    echo "ERROR: polling deadline exceeded (2h)"
+    break 2
+  fi
   wait_res=$("$ORCA" terminal wait --terminal "<handle>" --for tui-idle --timeout-ms 60000 --json 2>/dev/null || true)
   satisfied=$(echo "$wait_res" | jq -r '.result.satisfied // false' 2>/dev/null || echo "false")
   if [[ "$satisfied" == "true" ]]; then
-    echo "Terminal reached tui-idle."
-    break
-  fi
-  read_res=$("$ORCA" terminal read --terminal "<handle>" --cursor "$cursor" --limit 100 --json 2>/dev/null || true)
-  cursor=$(echo "$read_res" | jq -r '.result.terminal.nextCursor // empty' 2>/dev/null || echo "$cursor")
-  status=$(echo "$read_res" | jq -r '.result.terminal.status // empty' 2>/dev/null || echo "")
-  if [[ "$status" == "exited" ]]; then
-    echo "Terminal process exited."
-    break
+    read_res=$("$ORCA" terminal read --terminal "<handle>" --cursor "$cursor" --limit 1000 --json 2>/dev/null || echo "")
+    if echo "$read_res" | grep -q "EXECUTE_PLAN_COMPLETE"; then
+      echo "SENTINEL: EXECUTE_PLAN_COMPLETE"
+      break 2
+    fi
+    status=$(echo "$read_res" | jq -r '.result.terminal.status // "unknown"' 2>/dev/null || echo "unknown")
+    if [[ "$status" == "exited" ]]; then
+      echo "ERROR: terminal exited without sentinel — run failed"
+      break 2
+    fi
+    new_cursor=$(echo "$read_res" | jq -r '.result.terminal.nextCursor // empty' 2>/dev/null || echo "")
+    if [[ -n "$new_cursor" ]]; then
+      cursor="$new_cursor"
+    fi
+    consecutive_errors=0
+  else
+    consecutive_errors=$((consecutive_errors + 1))
+    if (( consecutive_errors >= 30 )); then
+      echo "ERROR: 30 consecutive wait failures — aborting"
+      break 2
+    fi
   fi
   sleep 5
 done

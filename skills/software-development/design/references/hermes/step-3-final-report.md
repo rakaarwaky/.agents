@@ -16,7 +16,7 @@ Report to the user:
 7. **Worktree** — left in place (design runs never commit to the repo, so the worktree holds no repo changes, only the TUI session). Post-action:
 
    ```
-   # Resolve $ORCA (default /home/raka/.local/bin/orca-ide)
+   # Resolve $ORCA (via command -v orca-ide or $ORCA_CLI_COMMAND)
    "$ORCA" worktree rm --worktree <worktree_id> --force --json
    ```
 

@@ -5,7 +5,7 @@
 Before launching any subagents, prepare branches for all level-0 PRs (those with no dependencies). Branches for higher-level PRs are created just-in-time when their dependencies complete. **Parallel-first:** create all level-0 branches in one batch (independent `git branch` calls in a single assistant response) rather than one at a time. Branch creation for a PR depends only on its dependency's recorded commit SHA, so independent branches can be created together.
 
 ```bash
-git fetch origin main
+git fetch origin <default_branch>
 ```
 
 **For a PR with NO dependencies (level 0):**

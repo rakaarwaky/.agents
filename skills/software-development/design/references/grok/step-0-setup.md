@@ -1,6 +1,19 @@
-# Step 0: Setup
+## Step 0: Setup
 
 Prepare the environment, shared file paths, orchestrator state, and personas before spawning any subagent.
+
+### Default Branch Detection
+
+Before any git operations, detect the repository's default branch and store it as `default_branch`:
+
+```bash
+default_branch=$(git symbolic-ref refs/remotes/origin/HEAD 2>/dev/null | sed 's|refs/remotes/origin/||')
+if [ -z "$default_branch" ]; then
+  default_branch=$(gh repo view --json defaultBranchRef --jq '.defaultBranchRef.name' 2>/dev/null || echo "main")
+fi
+```
+
+Use `<default_branch>` everywhere the skill previously hardcoded `main` (fetch, reset, compare URL, PR base).
 
 ## Host Setup
 
@@ -36,7 +49,7 @@ Never regenerate `DESIGN_ID` or these paths during review/revise iterations.
 
 ## Persona Injection
 
-Load the `design-doc-writer` and `design-doc-reviewer` personas from `~/.agents/personas/<name>.toml`, extracting the full `instructions` value under the `[subagents.personas.<name>]` table into:
+Load the `design-doc-writer` and `design-doc-reviewer` personas from `~/.agents/personas/<name>.toml`, extracting the full `instructions` value from each file's top-level `instructions` field into:
 
 - `writer_persona_instructions`
 - `reviewer_persona_instructions`

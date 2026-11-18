@@ -10,8 +10,11 @@ Run the bundled validator (same as `grok/step-3-parse-dag.md`):
 sdc validate-plan <design_doc_path>
 ```
 
-- Exit `0`: parse the JSON report. `linearized_order`, `level_assignments`, `pr_count`, and `max_parallelism` are authoritative.
-- Exit `1` / `2`: report the first error from `errors` and stop. Do not spawn Grok on a malformed plan.
+- Exit `0`: parse the JSON report. Require `valid == true` and `errors == []`. `linearized_order`, `level_assignments`, `nodes`, `pr_count`, and `max_parallelism` are authoritative.
+- Exit `1`: DAG validation failed. Read the JSON on stdout and report the first error.
+- Exit `2`: usage or IO error. Read stderr and report the first error.
+- Exit `4`: plan parse error, including missing `## PR Plan` section, no entries, or malformed PR/dep fields. Read the JSON on stderr and report the first error.
+- On any non-zero exit: stop.
 
 **Only proceed to spawn if the plan is valid.** An invalid or ambiguous DAG goes back to `/design`, not into Grok.
 
@@ -28,7 +31,7 @@ Grok has zero conversation context. Compose a brief covering:
 
 ## Create the Orca Worktree
 
-Resolve `$ORCA` (`$ORCA_CLI_COMMAND` if set, else `/home/raka/.local/bin/orca-ide` — never bare `orca`). `$ORCA` is not exported by the shell, so `${ORCA}` expands to empty and bash reports `command not found`. Always call by the absolute path unless `$ORCA_CLI_COMMAND` is set. Resolve the main clone.
+Resolve `$ORCA` (`$ORCA_CLI_COMMAND` if set, else resolve via `command -v orca-ide` with fallback to `$HOME/.local/bin/orca-ide` — never bare `orca`). `$ORCA` is not exported by the shell, so `${ORCA}` expands to empty and bash reports `command not found`. Always call by the absolute path unless `$ORCA_CLI_COMMAND` is set. Resolve the main clone.
 
 ```
 "$ORCA" worktree create --repo path:<main_clone_path> --name <PLAN_ID> --agent grok --no-parent --surface terminal --json

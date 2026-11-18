@@ -27,7 +27,7 @@ Review notes format:
 [1-2 sentence verdict: approve / needs revision / major concerns]
 
 ### Issue 1: [Title]
-- **Severity**: critical | major | minor | nit
+- **Severity**: critical | major | minor
 - **Section**: [which section]
 - **Description**: [what's wrong or missing]
 - **Suggestion**: [how to fix]
