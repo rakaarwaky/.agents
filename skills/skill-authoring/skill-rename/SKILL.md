@@ -7,31 +7,27 @@ argument-hint: "<old-slug> <new-slug>"
 
 # Rename a Hermes skill
 
-A skill's frontmatter name is its slash command. Renaming = change the folder, the name field, and every place that names the skill (slash refs, sibling cross-refs, registry, tool alias maps), then verify nothing still points at the old name.
+A skill's frontmatter `name` is its slash command. Renaming = change the folder, the `name` field, and every place that names the skill (slash refs, sibling cross-refs, registry, tool alias maps), then verify nothing still points at the old name.
 
-## When to Use
+## Rules
 
-- Renaming or re-slug-ing a skill folder, or moving it under a new name.
-- Making a skill invokable under a different /slash command.
-- A freshly named skill's slash command is missing from /skills list — diagnose why before assuming a bug.
+| ID | Rule | Check |
+|----|------|-------|
+| R1 | **Gate 0 before slug commit.** Check the new slug against `hermes_cli/commands.py` `COMMAND_REGISTRY` before renaming; a built-in collision silently strips the slash command (the built-in wins; the skill is reachable only via `/skill <slug>`). If it collides, pick a different slug. | `grep -q '<new-slug>'` of the command registry returns zero hits; or the agent confirms the slug is not a built-in. |
+| R2 | **Rename the directory first.** `git mv` the skill folder to the new slug; the frontmatter `name` and heading are updated in `SKILL.md` after the move. | `ls skills/<category>/<new-slug>/SKILL.md` exists; old directory gone. |
+| R3 | **Frontmatter `name` matches directory.** After the move, `SKILL.md` `name:` equals the new directory name and the `#` heading reflects the new name. | `sac lint` reports no `name-mismatch`. |
+| R4 | **Change skill-NAME references, not domain-CONCEPT words.** The skill's own output (its documents, IDs, personas) keeps its own terminology; only the skill identity and its slash command change. Do not rename e.g. `design-document` / `design-doc-*` / `DESIGN_ID` just because the skill is no longer called that. | `grep -r` for old slug hits only identity references, not domain terms. |
+| R5 | **Keep a backward-compat alias.** Add the new slug as an alias resolving to the canonical target; keep the old slug as a legacy alias so pre-existing invocations still resolve. Mark it legacy in a comment. | Alias map contains both new and old slugs; legacy comment present. |
+| R6 | **Sibling cross-refs updated.** Grep the whole skills tree for the old slug and `/<old>`; update refs in OTHER skills that call this one (go-back pointers, sibling-skill lists, trigger text). | `grep -r '<old-slug>'` of the skills tree returns zero non-legacy hits. |
+| R7 | **Registry rebuilt.** Update the `skills/catalog.json` entry name plus any description or when-to-use that names the skill or `/<old>`; run `sac catalog --build`. | `sac read <new-slug>` resolves; catalog reflects new frontmatter. |
+| R8 | **Tool alias maps updated.** Update alias maps, subdir aliases, doc lists of which skills use the tool, and run-summary docstrings that key off skill names. | Tooling resolves the new slug; legacy alias still resolves. |
+| R9 | **Scope and iteration ceilings.** Touch only: the skill directory, sibling skills with cross-refs, `skills/catalog.json`, and tool alias-map files. Max 2 sweep-repair iterations if stale hits remain. Forbidden: editing files outside the rename scope; deleting content without archiving it first. | `git diff --cached --name-only` is a subset of rename-scope files. |
+| R10 | **Branching.** IF the new slug collides with a built-in command (Gate 0) -> pick a different slug. IF `sac lint` reports `name-mismatch` -> fix the frontmatter `name:`, not the directory. IF a sweep grep returns stale hits -> re-grep and fix only the named owner (R6 sibling, R7 registry, or R8 alias). IF `catalog.json` fails to parse -> restore from the pre-edit SHA and retry the registry edit. | Each branch has a named action and recovery path. |
+| R11 | **Failure fallback.** If `git mv` fails (path exists) -> verify the destination is empty and retry. If `sac catalog --build` fails -> `git add skills/catalog.json && git commit` as a fallback rebuild. If a dependent tool test fails -> read the failure, locate the old-slug reference the test exercises, fix it, and re-run. | Each failure has symptom, cause, and recovery command. |
+| R12 | **Completion.** Case-insensitive sweep grep of the affected tree for the old slug and `/<old>` returns zero stale hits except intentional legacy-alias mentions; `catalog.json` parses as JSON; dependent tool test suites pass. | Sweep grep clean; `python -c 'import json; json.load(open("skills/catalog.json"))'` exits 0. |
 
-## Gate 0: check the new slug against built-in commands FIRST
+## Routing
 
-Before accepting a target slug, verify it is not a core Hermes command name or alias. Source of truth is hermes_cli/commands.py COMMAND_REGISTRY (resolve_command returns a def only when the slug or an alias is built-in). If it collides, the skill will NOT own the slash command: the built-in wins and the skill becomes reachable only via /skill <slug>. Mechanism: agent/skill_commands.py skips auto-registration for any slug matching a core command name or alias, and /skills list marks it name-taken-by-built-in. This failure is silent, so pick the slug, run the gate, and if it collides choose a different slug.
-
-## Procedure
-
-1. git mv the skill folder to the new slug.
-2. Edit SKILL.md: the name field, the heading, and every /<old> to /<new> in the body. Also fix any persona or subagent names you accidentally retitled during the move (do not rename domain names that live elsewhere on disk).
-3. Sibling cross-refs: grep the skills tree for the old slug and /<old>; update refs in OTHER skills that call this one (go-back pointers, sibling-skill lists, trigger text).
-4. Registry: skills/catalog.json entry name plus any description or when-to-use that names the skill or /<old>.
-5. Tooling that keys off skill names (alias maps, subdir aliases, doc lists of which skills use the tool, run-summary docstrings). Add the new slug as an alias resolving to the canonical target; keep the old slug as a legacy alias so pre-existing invocations still resolve.
-6. Sweep: case-insensitive grep the affected tree for the old slug and /<old>; confirm only intentional legacy-alias mentions remain.
-7. Verify: validate catalog.json parses as JSON, and run any tool test suite that depends on the rename.
-
-## Always-on rules and pitfalls
-
-- Renaming to a built-in-adjacent slug silently strips the slash command; run Gate 0 before committing to the slug, not after.
-- A rename is NOT just the folder; frontmatter name, catalog.json, sibling cross-refs, and tool alias maps each carry the old name; verify each. A missed sibling ref leaves a dead slash command in another skill's docs.
-- Change skill-NAME references, not domain-CONCEPT words. The skill's own output (its documents, IDs, personas) keeps its own terminology; only the skill identity and its slash command change. Do not rename e.g. design-document / design-doc-* / DESIGN_ID just because the skill is no longer called that.
-- Keep a backward-compat alias (old to canonical) rather than deleting it, so old invocations and artifacts still resolve; mark it legacy in a comment.
+| Step | File | Purpose |
+|------|------|---------|
+| 1 | [`references/step-1-procedure.md`](references/step-1-procedure.md) | Gate 0 slug check, rename procedure (7 steps), completion criteria |
