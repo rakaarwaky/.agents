@@ -4,7 +4,7 @@
 
 When invoked with `--resume <PLAN_ID>`:
 
-Setup is skipped on resume, so first **recompute the scratch directory** — re-run `<PYTHON> <HOST_PY> setup` and read `scratch_dir` from the JSON output so the path matches the original run's per-repo plans dir (Step 0):
+Setup is skipped on resume, so first **recompute the scratch directory** — re-run `sdc host setup --subdir execute` and read `scratch_dir` from the JSON output so the path matches the original run's per-repo plans dir (Step 0):
 
 1. Read the state file at `<scratch_dir>/exec-plan-<PLAN_ID>.json`.
 2. If the file does not exist, report the error and stop.

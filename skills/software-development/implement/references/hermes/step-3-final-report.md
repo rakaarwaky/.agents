@@ -1,9 +1,9 @@
 # Step 3: Memory Flush (if applicable) & Final Report
 
-If Grok's run produced new issue patterns (visible in `review-<run_id>.md` or in Grok's terminal output), flush them to the workspace memory file the same way `grok/step-8-memory-flush.md` describes — run the memory helper from the worktree:
+If Grok's run produced new issue patterns (visible in `review-<run_id>.md` or in Grok's terminal output), flush them to the workspace memory file the same way `grok/step-8-memory-flush.md` describes — run `sdc memory update` from the worktree:
 
 ```
-cd <worktree_path> && "${PYTHON}" "<memory_helper_path>" update --file <spec-json>
+cd <worktree_path> && sdc memory update --file <spec-json>
 ```
 
 Build the JSON spec from the issues Grok raised. Generalize patterns before writing (same rules as `grok/step-8-memory-flush.md`). If the helper fails, log a warning and continue — never fail the run over memory.

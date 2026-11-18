@@ -4,17 +4,17 @@ Prepare the environment, shared file paths, orchestrator state, and personas bef
 
 ## Host Setup
 
-Run all host commands through `run_terminal_command` (bash on Linux; standard utilities allowed). Resolve `HOST_PY` as `<skill_dir>/scripts/host.py`, where `<skill_dir>` is the directory containing `SKILL.md`. Then run:
+Run all host commands through `run_terminal_command` (bash on Linux; standard utilities allowed). Run `sdc host setup --subdir plan`:
 
 ```bash
-python3 <HOST_PY> setup
+sdc host setup --subdir plan
 ```
 
 Parse the JSON on stdout and store:
 
 - `python` as `PYTHON`
 - `run_id` as `DESIGN_ID` (validate: exactly 8 hex characters)
-- `scratch_dir` as the artifact base directory. `host.py` is the single source of truth for this location: `~/.agents/develop/<repo-slug>/plan/`, where `<repo-slug>` is the lowercased git repository name normalized to `[a-z0-9-]`. It also creates the directory. If setup fails (e.g. not inside a git repository), stop and report.
+- `scratch_dir` as the artifact base directory. `sdc` is the single source of truth for this location: `~/.agents/develop/<repo-slug>/plan/`, where `<repo-slug>` is the lowercased git repository name normalized to `[a-z0-9-]`. It also creates the directory. If setup fails (e.g. not inside a git repository), stop and report.
 
 Always use expanded absolute paths (for example `/home/<user>/.agents/develop/<repo-slug>/plan/design-doc-<DESIGN_ID>.md`), including in subagent prompts.
 

@@ -4,23 +4,19 @@
 
 Before launching any implementers, attempt to load past issue patterns from the workspace memory file. This briefing is injected into both implementer and reviewer prompts to help avoid recurring issues. The execute-plan skill **shares the same memory file** as the `/implement` skill -- patterns from both skills help each other.
 
-### Resolve the helper path
+### Resolve the helper command once
 
-The memory helper lives in the implement skill's directory. Derive the path from the implement skill's known location in the system context (the skills list announces each skill's path). The helper is at:
+All memory operations go through `sdc memory <path|read|snapshot|update>`. The `sdc` launcher is already on PATH after installation at `~/.local/bin/sdc`. Capture it once as orchestrator state:
 
 ```
-memory_helper_path = dirname(<path-to-implement-SKILL.md>) + "/scripts/memory.py"
+memory_cmd = "sdc memory"
 ```
 
-For example, if the implement skill's SKILL.md is at `/root/.agents/worktrees/xai/repo/.grok/skills/implement/SKILL.md`, then `memory_helper_path` is `/root/.agents/worktrees/xai/repo/.grok/skills/implement/scripts/memory.py`.
-
-**Substitute this absolute path directly** into every helper invocation -- do not rely on a shell environment variable surviving across `run_terminal_command` calls. All examples below show `${MEMORY_HELPER}` for readability; in practice, inline the absolute path.
-
-**Invoke the helper from the workspace root** (the default cwd for `run_terminal_command`). The helper derives the workspace id from the cwd's git context.
+Invoke the helper from the workspace root (the default cwd for `run_terminal_command`). The helper derives the workspace id from the cwd's git context.
 
 ### Read Path
 
-1. Run `"${PYTHON}" "${MEMORY_HELPER}" snapshot` via `run_terminal_command` and capture stdout. The helper prints structured JSON:
+1. Run `sdc memory snapshot` via `run_terminal_command` and capture stdout. The helper prints structured JSON:
 
    ```json
    {

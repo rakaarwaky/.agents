@@ -18,10 +18,10 @@ Cross-check:
 
 ## 2b: Validate the PR Plan
 
-This is the hand-off gate for `/execute-plan`. Extract the `## PR Plan` section from the design doc and run it through the plan validator the `execute-plan` skill uses:
+This is the hand-off gate for `/execute-plan`. Extract the `## PR Plan` section from the design doc and run it through the plan validator:
 
 ```
-python3 <execute-plan skill dir>/scripts/validate-plan.py <path to a file containing the PR Plan section>
+sdc validate-plan <path to a file containing the PR Plan section>
 ```
 
 (If the design doc is the whole file, point the validator at it directly — the validator reads the `## PR Plan` section from the file.)

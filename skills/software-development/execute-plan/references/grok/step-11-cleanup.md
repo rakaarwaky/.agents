@@ -27,7 +27,7 @@ The final Orca worktree is exempt from Step 11 — it is retired post-merge only
 Then delete each per-PR summary, merged review, and individual reviewer file:
 
 ```
-<PYTHON> <HOST_PY> cleanup <each ${scratch_dir}/exec-summary-<PLAN_ID>-<pr-id>.md, ${scratch_dir}/exec-review-<PLAN_ID>-<pr-id>.md, and config.review_file you created>
+sdc host cleanup <each ${scratch_dir}/exec-summary-<PLAN_ID>-<pr-id>.md, ${scratch_dir}/exec-review-<PLAN_ID>-<pr-id>.md, and config.review_file you created>
 ```
 
 **Keep the state file** -- the user may want to reference PR URLs or run history; remove manually if desired:

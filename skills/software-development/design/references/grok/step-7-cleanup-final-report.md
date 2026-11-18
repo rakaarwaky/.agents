@@ -15,7 +15,7 @@ Present a final summary to the user containing:
 Delete the temporary artifacts with the host helper:
 
 ```bash
-<PYTHON> <HOST_PY> cleanup <summary_file> <review_file>
+sdc host cleanup <summary_file> <review_file>
 ```
 
 The design document itself is kept.

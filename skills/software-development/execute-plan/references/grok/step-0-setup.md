@@ -40,11 +40,10 @@ Extract the `instructions` value under the `[subagents.personas.<name>]` table i
 
 When launching a subagent, **prepend** the appropriate persona instructions to its prompt. Do NOT pass a `persona` parameter to `spawn_subagent`. Prefix the `description` with a bracketed role tag (`[implementer]`, `[reviewer]`, `[tests]`, `[simplicity]`). Keep the tag on `resume_from` follow-ups.
 
-## Host &amp; Environment Setup
+## Host & Environment Setup
 
 Host commands run in bash on Linux. Use `run_terminal_command`.
-Resolve `HOST_PY` as `<dirname of this SKILL.md>/scripts/host.py`.
-Run `python3 <HOST_PY> setup` and parse the JSON stdout. Store `python` as `PYTHON`, `scratch_dir` as `SCRATCH_DIR`, and `run_id` as `PLAN_ID`.
+Run `sdc host setup --subdir execute` and parse the JSON stdout. Store `python` as `PYTHON`, `scratch_dir` as `SCRATCH_DIR`, and `run_id` as `PLAN_ID`.
 
 `SCRATCH_DIR` is `~/.agents/develop/<repo-slug>/execute/`. State, summaries, and reviews live here.
 **Validate** that `PLAN_ID` is 8 hex characters.

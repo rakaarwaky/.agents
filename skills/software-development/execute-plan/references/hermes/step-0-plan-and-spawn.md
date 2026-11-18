@@ -7,7 +7,7 @@ Hermes never writes code. This step turns the design document into a validated D
 Run the bundled validator (same as `grok/step-3-parse-dag.md`):
 
 ```
-<python> <HOST_PY_DIR>/validate-plan.py <design_doc_path>
+sdc validate-plan <design_doc_path>
 ```
 
 - Exit `0`: parse the JSON report. `linearized_order`, `level_assignments`, `pr_count`, and `max_parallelism` are authoritative.

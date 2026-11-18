@@ -8,13 +8,13 @@ Run `lint-arwaky-cli report .` from the owning repo or worktree (absolute path: 
 
 ## Host Setup
 
-Resolve `HOST_PY` as `<dirname of this SKILL.md>/scripts/host.py`. Run `<python> <HOST_PY> setup` via `run_terminal_command` and parse the JSON stdout. Store `python` as `PYTHON`, `scratch_dir` as `scratch_dir`, and `run_id` as `IMPL_ID`. `scratch_dir` is `~/.agents/develop/<repo-slug>/implement/` (per-repo, created by `host.py`); every artifact path in later steps is derived from it.
+Run `sdc host setup --subdir implement` via `run_terminal_command` and parse the JSON stdout. Store `python` as `PYTHON`, `scratch_dir` as `scratch_dir`, and `run_id` as `IMPL_ID`. `scratch_dir` is `~/.agents/develop/<repo-slug>/implement/` (per-repo, created by `sdc`); every artifact path in later steps is derived from it.
 
-The helper is Linux-only and requires the current directory to be inside a git repository — it exits with a clear error on either condition. If it exits non-zero, report the error and stop.
+The helper requires the current directory to be inside a git repository — it exits with a clear error on either condition. If it exits non-zero, report the error and stop.
 
 **Validate** that `IMPL_ID` is 8 hex characters.
 
-**Inline the resolved absolute `scratch_dir` and `PYTHON`** into every later command and subagent prompt. Do not rely on a shell variable surviving across `run_terminal_command` calls (the same reason this skill inlines `${MEMORY_HELPER}`).
+**Inline the resolved absolute `scratch_dir` and `PYTHON`** into every later command and subagent prompt. Do not rely on a shell variable surviving across `run_terminal_command` calls.
 
 ### Shared File Paths
 
@@ -46,7 +46,7 @@ The entire run runs inside a single dedicated Orca worktree whose path is `~/orc
 
 | Phase | When |
 |-------|------|
-| Resolve the owning repo | Right after `host.py setup`, before worktree creation |
+| Resolve the owning repo | Right after `sdc host setup`, before worktree creation |
 | Reuse or create the worktree | Once per run |
 
 ## Scope Disambiguation (before the implementer launches)
@@ -108,7 +108,7 @@ the worktree lifecycle and all commits.
 
 ### Memory helper runs from a worktree
 
-Step 2 (Memory Retrieval) and Step 8 (Memory Flush) invoke `${MEMORY_HELPER}` with cwd inside `<worktree_path>` (`cd <worktree_path> && "${PYTHON}" "${MEMORY_HELPER}" ...`). The worktree shares the owning repo's remote, so the workspace id follows the project that owns the task even when the session sits in a superproject workspace. Never run the helper from the helper's own directory (see Step 2).
+Step 2 (Memory Retrieval) and Step 8 (Memory Flush) invoke `sdc memory` with cwd inside `<worktree_path>` (`cd <worktree_path> && sdc memory ...`). The worktree shares the owning repo's remote, so the workspace id follows the project that owns the task even when the session sits in a superproject workspace.
 
 ## Safety Rules (Worktree)
 

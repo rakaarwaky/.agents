@@ -6,7 +6,7 @@ Runs once per run, after every unit has reached 0 open issues. This file is the 
 
 Update the workspace memory file with patterns from this run, using the `issue_patterns` list accumulated during Step 5. The orchestrator performs this directly using its own tools — no subagent is needed for this step.
 
-The write goes through `"${PYTHON}" "${MEMORY_HELPER}" update --file <spec>` so that:
+The write goes through `sdc memory update --file <spec>` so that:
 - The path resolves to the **shared workspace-scoped file** (`$HOME/.agents/implement-memory/<workspace-id>.md`), not a per-worktree file.
 - An exclusive lock (`fcntl.flock` on POSIX, `msvcrt.locking` on Windows; no `flock(1)` shell binary required) is held during the read-merge-write, so a /implement run in another worktree of the same repo can't clobber this update.
 - Dedup against existing entries is enforced **deterministically** (case- and whitespace-insensitive match within each category).
@@ -81,7 +81,7 @@ Field notes (the helper rejects wrong-typed input with exit code 4 and a clear e
 Use the `write` tool to create `${scratch_dir}/impl-mem-${IMPL_ID}.json` with the JSON spec above (using a temp file avoids quoting issues that heredocs introduce), then invoke the helper via `run_terminal_command`:
 
 ```
-<PYTHON> <MEMORY_HELPER> update --file <scratch_dir>/impl-mem-<IMPL_ID>.json
+sdc memory update --file <scratch_dir>/impl-mem-<IMPL_ID>.json
 ```
 
 The helper acquires the lock, parses the existing file, merges, compacts, writes atomically, and prints a JSON stats summary on stdout (pretty-printed with `indent=2`):
@@ -117,7 +117,7 @@ Or if `existed_before` is `false`:
 
 The helper writes a markdown file with this structure:
 
-<!-- mirror-of: scripts/memory.py DEFAULT_HEADER -->
+<!-- mirror-of: sdc memory DEFAULT_HEADER -->
 <!-- The 5-line block immediately following this comment must match -->
 <!-- '\n'.join(memory.DEFAULT_HEADER) verbatim. The drift-check unit -->
 <!-- test TestDocsConsistency.test_skill_md_default_header_matches -->
