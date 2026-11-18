@@ -1,5 +1,5 @@
 ---
-name: review
+name: code-review
 description: "Reviews a commit, uncommitted changes, a PR, or a file/directory in place with parallel reviewer subagents. The orchestrator auto-selects 1–3 relevant lens personas from a roster of 10 based on the target's content. Each reviewer subagent reads the diff (diff modes) or the current files (path mode) and writes a per-persona review file to the host scratch directory. The orchestrator aggregates per-persona issue counts and writes a module summary file to disk."
 when-to-use: "Use when asked to 'review the last commit', 'review my uncommitted changes', 'review PR 48', 'review modules/skills', 'review this folder', '/review commit', '/review uncommit', '/review pr 48', '/review path <dir>', or when the user drops a commit, PR number, or directory path and wants a code review. Persona selection is automatic — no flags needed."
 argument-hint: "commit | uncommit | pr <pr-number> | path <path>"
