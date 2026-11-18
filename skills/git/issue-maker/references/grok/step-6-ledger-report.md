@@ -1,6 +1,6 @@
 # Step 6 — ledger + report
 
-Append one JSON object per row to `<repo-root>/docs/task-tracker-ledger.jsonl`:
+Append one JSON object per row to `~/.agents/develop/<namarepo>/issue-maker/task-tracker-ledger.jsonl`:
 
 ```json
 {"run":"YYYY-MM-DD","row":"<ROW-ID>","doc":"<source_doc>","feature":"<feature or root>","fr":["<FR-ID>"],"state":"<state>","priority":"<P0/P1/P2>","class":"<incomplete|doc_sync|unverified|fr_orphan|skip|skip_next_action|next_action_complete|next_action_pending>","proof":{"verdict":"<verdict>","evidence":"<reproduced evidence or failed check>"},"closing_condition":"<the Check from the issue's ## Closing condition — the one line that, when passed, sets this row to Done>","issue":<issue-number>,"action":"<created|commented|skipped-exists|skipped-evidence>"}
@@ -19,7 +19,7 @@ conditions K | pending-infra P`.
 
 ## Run report (two-phase artifact)
 
-The run also writes `<repo-root>/docs/task-tracker-report.json` in two phases, in
+The run also writes `~/.agents/develop/<namarepo>/issue-maker/task-tracker-report.json` in two phases, in
 addition to the ledger:
 
 - **Phase 1 — end of Classify.** The report file is created with the
@@ -46,9 +46,7 @@ The machine-checkable completion gate is
 invoking the model:
 
 ```bash
-python3 <this-skill>/scripts/validate.py --repo-root <repo-root> \
-    --ledger <repo-root>/docs/task-tracker-ledger.jsonl \
-    --report <repo-root>/docs/task-tracker-report.json [--gh]
+python3 <this-skill>/scripts/validate.py --repo-root <repo-root> [--gh]
 ```
 
 Without `--gh`, the open-issue liveness criterion is reported as
@@ -103,6 +101,6 @@ the four personas, defined in `personas/task-tracker-*.toml`:
 - [ ] No `skip` row dropped silently — each has its reproduced evidence cited in the ledger.
 - [ ] Every created, commented, and dry-run issue carries exactly one `## Closing condition` whose Advance sets its row to `Done` in the source doc, and the ledger records its Check.
 - [ ] No issue is counted as created until its `## Closing condition` is present in the body.
-- [ ] No file changed outside `docs/task-tracker-ledger.jsonl` and `docs/task-tracker-report.json` (the two-phase run report described in Step 6).
-- [ ] `validate.py` exits 0 against the ledger (and the run report when present): `python3 <this-skill>/scripts/validate.py --repo-root <repo> --ledger <repo>/docs/task-tracker-ledger.jsonl --report <repo>/docs/task-tracker-report.json` — the machine-checkable completion gate.
+- [ ] No file changed outside `~/.agents/develop/<namarepo>/issue-maker/` (`task-tracker-ledger.jsonl` and `task-tracker-report.json`).
+- [ ] `validate.py` exits 0 against the ledger and run report: `python3 <this-skill>/scripts/validate.py --repo-root <repo>` — the machine-checkable completion gate.
 - [ ] No branch, PR, or code change created.

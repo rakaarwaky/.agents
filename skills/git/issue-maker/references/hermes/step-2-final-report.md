@@ -1,6 +1,6 @@
 # Step 2: Final Report (Hermes)
 
-Summarize the run report (ledger + `docs/task-tracker-report.json`):
+Summarize the run report (ledger + `task-tracker-report.json` in `~/.agents/develop/<namarepo>/issue-maker/`):
 
 - Rows discovered, rows classified per class, actionable rows → issues opened (or deferred under `--dry-run`), rows with `done` verdict already at target state.
 - Each issue's closing condition vs. its source doc's target row state.

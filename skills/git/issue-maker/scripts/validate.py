@@ -38,7 +38,7 @@ from typing import Any
 # when imported as the ``scripts.validate`` package module the
 # ``scripts.common`` import works.
 try:
-    from scripts.common import GhAuthError, GhRateLimited, gh
+    from scripts.common import GhAuthError, GhRateLimited, artifact_dir, gh
     from scripts.ledger import (
         InvariantViolation,
         LedgerEntry,
@@ -50,6 +50,7 @@ except ModuleNotFoundError:
     from common import (  # type: ignore[import-not-found,no-redef]
         GhAuthError,
         GhRateLimited,
+        artifact_dir,
         gh,
     )
     from ledger import (  # type: ignore[import-not-found,no-redef]
@@ -251,22 +252,23 @@ def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(prog="validate.py")
     parser.add_argument("--repo-root", required=True, help="Absolute path to the AES repo.")
     parser.add_argument(
-        "--ledger", required=True, help="Path to the task-tracker ledger JSONL."
+        "--ledger", default=None, help="Path to the task-tracker ledger JSONL (default ~/.agents/develop/<namarepo>/issue-maker/task-tracker-ledger.jsonl)."
     )
     parser.add_argument(
         "--report",
         default=None,
-        help="Run-report JSON artifact (Classify + Issue phase fields).",
+        help="Run-report JSON artifact (default ~/.agents/develop/<namarepo>/issue-maker/task-tracker-report.json).",
     )
     parser.add_argument("--gh", action="store_true", help="Enable the network liveness check.")
     parser.add_argument("--out", default=None, help="Write the validate report JSON here.")
     args = parser.parse_args(argv)
 
-    ledger_path = Path(args.ledger)
+    art_dir = artifact_dir(args.repo_root)
+    ledger_path = Path(args.ledger) if args.ledger else art_dir / "task-tracker-ledger.jsonl"
     if not ledger_path.is_file():
         log(f"ledger not found: {ledger_path}")
         return 1
-    report_path = Path(args.report) if args.report else None
+    report_path = Path(args.report) if args.report else (art_dir / "task-tracker-report.json" if (art_dir / "task-tracker-report.json").is_file() else None)
     if report_path is not None and not report_path.is_file():
         log(f"run report not found: {report_path}")
         report_path = None
