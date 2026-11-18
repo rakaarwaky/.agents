@@ -5,6 +5,17 @@ consumer (autocomplete, `/help`, Telegram menu, Slack mapping) derives from
 it. New commands land often; `/help` in-session is always authoritative.
 (CLI) = interactive CLI/TUI only. (GW) = gateway platforms only.
 
+## Skill slash-command collisions
+
+Skills that carry a `name:` are auto-registered as dynamic `/<name>` slash
+commands. If the name (or its slug) matches a built-in command or alias, the
+built-in wins: the skill's `/<name>` is never registered and the skill stays
+loadable only via `/skill <name>`. `/skills list` and the command palette mark
+such a skill with `slash command /<name> unavailable — name taken by built-in;
+use /skill <name>`. No config flag disables a built-in command — to give a
+skill its own slash command, name it something that does not collide (e.g.
+avoid `plan`, `learn`, `init`).
+
 ### Session
 ```
 /new (/reset) [name]     Fresh session

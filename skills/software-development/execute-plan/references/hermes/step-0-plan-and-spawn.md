@@ -16,7 +16,7 @@ sdc validate-plan <design_doc_path>
 - Exit `4`: plan parse error, including missing `## PR Plan` section, no entries, or malformed PR/dep fields. Read the JSON on stderr and report the first error.
 - On any non-zero exit: stop.
 
-**Only proceed to spawn if the plan is valid.** An invalid or ambiguous DAG goes back to `/design`, not into Grok.
+**Only proceed to spawn if the plan is valid.** An invalid or ambiguous DAG goes back to `/planner`, not into Grok.
 
 ## Plan the Task Brief
 

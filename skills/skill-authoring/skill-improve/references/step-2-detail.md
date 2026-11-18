@@ -16,7 +16,8 @@ sac read <new-name>
 sac catalog --build
 ```
 
-`sac read` confirms the directory and frontmatter match; `sac catalog --build` refreshes the catalog rows that carry the old path. If `sac lint` reports `name-mismatch`, the frontmatter `name:` was not updated to match the new directory name — fix the frontmatter, not the directory.
+- `sac read` confirms the directory and frontmatter match; `sac catalog --build` refreshes the catalog rows that carry the old path. If `sac lint` reports `name-mismatch`, the frontmatter `name:` was not updated to match the new directory name — fix the frontmatter, not the directory.
+- **Check the new name against built-in slash commands before renaming.** A skill whose `name:` matches a Hermes built-in command (or alias) never gets its own `/<name>` slash command — the built-in wins and the skill stays loadable only via `/skill <name>`. Built-ins are hardcoded in `hermes_cli/commands.py` (`COMMAND_REGISTRY`); there is no config flag to disable one, so a colliding name permanently shadows the skill's slash command. Before any rename or new skill, verify the slug against the registry (frequent built-ins: `plan`, `learn`, `init`); if it collides, pick a non-colliding name rather than expecting the skill command to take over.
 
 ## Description detail
 

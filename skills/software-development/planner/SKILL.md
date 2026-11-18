@@ -1,13 +1,13 @@
 ---
-name: design
+name: planner
 description: "Orchestrates a write-review-revise loop using `design-doc-writer` and `design-doc-reviewer` subagents to produce a polished design document and PR plan."
-when-to-use: "Use when asked to write a design doc, produce a system architecture/spec, or via the `/design <description>` slash command. Triggers: 'design a feature', 'write a design doc', 'create technical spec'."
+when-to-use: "Use when asked to write a design doc, produce a system architecture/spec, or via the `/planner <description>` slash command. Triggers: 'design a feature', 'plan a feature', 'write a design doc', 'create technical spec'."
 argument-hint: "<description of what to design>"
 disable-model-invocation: true
 ---
-# Design Skill
+# Planner Skill
 
-You orchestrate a **write -&gt; review -&gt; revise** loop that produces a polished design document and PR plan. This file is the lane identification step only; the working method lives in `references/hermes/` and `references/grok/`.
+You orchestrate a **write -> review -> revise** loop that produces a polished design document and PR plan. This file is the lane identification step only; the working method lives in `references/hermes/` and `references/grok/`.
 
 ## Global Rules
 
@@ -37,7 +37,7 @@ Read only the winning lane's references. Do not read the other lane's.
 
 | Step | Reference                                                                                    | Purpose                                                                                                                                                         |
 | ----: | -------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 0    | [`references/hermes/step-0-plan-and-spawn.md`](references/hermes/step-0-plan-and-spawn.md)   | Plan the brief from `<description>` (description, constraints, acceptance criteria); create the Orca worktree with `--agent grok`; drop `/design <description>` |
+| 0    | [`references/hermes/step-0-plan-and-spawn.md`](references/hermes/step-0-plan-and-spawn.md)   | Plan the brief from `<description>` (description, constraints, acceptance criteria); create the Orca worktree with `--agent grok`; drop `/planner <description>` |
 | 1    | [`references/hermes/step-1-wait-grok.md`](references/hermes/step-1-wait-grok.md)             | Wait for Grok to finish the write→review→revise loop; read its design doc, summary, and review files                                                            |
 | 2    | [`references/hermes/step-2-verify-and-ship.md`](references/hermes/step-2-verify-and-ship.md) | Verify 0 open issues + scope held; run the plan validator on the PR plan as the `/execute-plan` hand-off gate                                                   |
 | 3    | [`references/hermes/step-3-final-report.md`](references/hermes/step-3-final-report.md)       | Final report to the user (key decisions, rounds, validated PR plan stats, next-step command, worktree teardown)                                                 |

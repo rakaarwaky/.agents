@@ -45,7 +45,7 @@
     {
       "name": "grok-build",
       "description": "Delegates coding and multi-agent orchestration to the local Grok Build CLI over the OmniRoute gateway (model myomniroute, not an xAI subscription) via Orca CLI worktrees. Hermes delegates exclusively through Orca CLI (`orca worktree create ... --agent grok` and `orca terminal send`) — never running grok directly in a headless terminal. Use when a coding task should go to Grok instead of being implemented inline, or when authoring Rhai workflows. Sibling of the orca skill: orca owns the worktrees and terminals; this defines the Grok agent surface inside them.",
-      "when_to_use": "Use when the user asks to build a feature, refactor, review a PR, or fix issues via Grok Build; when a coding task should be delegated to Grok instead of implemented inline; or when the user wants to author a Rhai workflow, automate a multi-agent pipeline, or runs /create-workflow, /implement, /design, /execute-plan. Observed user phrasing: '/implement paths cek dpc rules', '/implement ... buat pr untuk perbaiki template dari PRD', '/design file palse redesign rules aes ... remove all legacy', 'fix doc violations in crate', 'find any segfault error in my environment and clean it', 'we need to spawn sub agent to make all FRD becoming real FRD'.",
+      "when_to_use": "Use when the user asks to build a feature, refactor, review a PR, or fix issues via Grok Build; when a coding task should be delegated to Grok instead of implemented inline; or when the user wants to author a Rhai workflow, automate a multi-agent pipeline, or runs /create-workflow, /implement, /planner, /execute-plan. Observed user phrasing: '/implement paths cek dpc rules', '/implement ... buat pr untuk perbaiki template dari PRD', '/planner file palse redesign rules aes ... remove all legacy', 'fix doc violations in crate', 'find any segfault error in my environment and clean it', 'we need to spawn sub agent to make all FRD becoming real FRD'.",
       "category": "autonomous-ai-agents"
     },
     {
@@ -391,15 +391,15 @@
       "category": "skill-authoring"
     },
     {
-      "name": "design",
+      "name": "planner",
       "description": "Orchestrates a write-review-revise loop using `design-doc-writer` and `design-doc-reviewer` subagents to produce a polished design document and PR plan.",
-      "when_to_use": "Use when asked to write a design doc, produce a system architecture/spec, or via the `/design <description>` slash command. Triggers: 'design a feature', 'write a design doc', 'create technical spec'. Also acts as a step dependency inside `execute-plan`.",
+      "when_to_use": "Use when asked to write a design doc, produce a system architecture/spec, or via the `/planner <description>` slash command. Triggers: 'design a feature', 'plan a feature', 'write a design doc', 'create technical spec'. Also acts as a step dependency inside `execute-plan`.",
       "category": "software-development"
     },
     {
       "name": "execute-plan",
       "description": "Executes a PR Plan DAG end-to-end: Hermes validates the plan and drops /execute-plan into Grok Build (Grok runs parallel Orca worktrees, implementers, the 3-reviewer panel, fix loops, and final assembly), then Hermes verifies the final branch and ships the PR.",
-      "when_to_use": "Use for /execute-plan <design-doc-path>, execute plan, run the plan, implement the design, or after /design produces a PR plan.",
+      "when_to_use": "Use for /execute-plan <design-doc-path>, execute plan, run the plan, implement the design, or after /planner produces a PR plan.",
       "category": "software-development"
     },
     {

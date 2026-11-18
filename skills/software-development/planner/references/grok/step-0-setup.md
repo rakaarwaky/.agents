@@ -58,4 +58,4 @@ Injection timing: prepend the persona instructions on the initial launch only, n
 
 ## Invocation Input
 
-The user ran `/design <description>`. Treat `<description>` as the design task: feature design, system architecture, migration plan, technical spec, or another design deliverable. Capture any file paths, links, constraints, or extra context the user provided — Step 1 must include all of it in the writer prompt.
+The user ran `/planner <description>` (or `/design <description>`). Treat `<description>` as the design task: feature design, system architecture, migration plan, technical spec, or another design deliverable. Capture any file paths, links, constraints, or extra context the user provided — Step 1 must include all of it in the writer prompt.

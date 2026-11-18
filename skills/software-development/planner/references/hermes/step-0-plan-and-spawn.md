@@ -18,21 +18,21 @@ Grok has zero conversation context. Compose a brief covering:
 Resolve `$ORCA` (`$ORCA_CLI_COMMAND` if set, else resolve via `command -v orca-ide` with fallback to `$HOME/.local/bin/orca-ide` — never bare `orca`). `$ORCA` is not exported by the shell, so `${ORCA}` expands to empty and bash reports `command not found`. The default path may not exist even when `which orca`/`which orca-ide` returns a shim elsewhere. Probe the default first, fall back to `which orca`, and always call the resolved absolute path; `${ORCA}` alone is not reliable. Resolve the owning repo (same resolution as the other lanes: `git -C <parent-dir> rev-parse --show-toplevel` on a path named in the brief, else the current workspace cwd; tie-break preferring the standalone clone).
 
 ```
-"$ORCA" worktree create --repo path:<repo_path> --name design-<task-slug> --agent grok --no-parent --surface terminal --json
+"$ORCA" worktree create --repo path:<repo_path> --name planner-<task-slug> --agent grok --no-parent --surface terminal --json
 ```
 
 - `task-slug`: lowercase `[a-z0-9-]` slug of `<description>`, ≤ 40 chars.
 - Parse JSON: `result.worktree.path` → `worktree_path`, `result.worktree.id` → `worktree_id`, `result.worktree.branch` → `worktree_branch` (strip `refs/heads/`).
 - **Failure:** if create fails or no Orca CLI resolves, report the error and stop. Never fall back to the main clone.
 
-If `--agent grok` is blocked, fall back to plain `git worktree add` at `~/orca/workspaces/<repo-basename>/design-<task-slug>` and drive Grok headless **inside that worktree** via `grok -p '<brief>' --cwd <worktree_path> --always-approve`. Never run bare `grok` / `grok -p` directly in the Hermes terminal session outside a worktree context.
+If `--agent grok` is blocked, fall back to plain `git worktree add` at `~/orca/workspaces/<repo-basename>/planner-<task-slug>` and drive Grok headless **inside that worktree** via `grok -p '<brief>' --cwd <worktree_path> --always-approve`. Never run bare `grok` / `grok -p` directly in the Hermes terminal session outside a worktree context.
 
 ## Drop the Task
 
 Send exactly this, once, via `orca terminal send --terminal <handle> --text "<brief>" --enter --json`:
 
 ```
-/design <description>
+/planner <description>
 
 <constraints and acceptance criteria from the brief>
 ```
@@ -43,4 +43,4 @@ Confirm `accepted: true`. The response may carry a warning that the provider can
 
 Do NOT end the turn after dropping the task. Hermes must stay active and proceed immediately to Step 1 in this session to wait and poll for Grok Build to finish:
 
-> Dropped /design into Grok Build at <worktree_path> (task: <description>). Proceeding to Step 1 to wait for completion.
+> Dropped /planner into Grok Build at <worktree_path> (task: <description>). Proceeding to Step 1 to wait for completion.
