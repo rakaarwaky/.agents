@@ -3,14 +3,12 @@ name: pr-babysit
 description: "Watch a PR, fix CI, merge via Mergify queue."
 when-to-use: "Triggers on \"/pr-babysit\". Phrasing: \"watch PR 123 until green\", \"babysit PR 123 and merge when ready\", \"fix issue #123 and open a PR\", \"keep fixing PR 123 until it can merge\", \"pr-babysit add --ship 123\"."
 argument-hint: "add [--ship] <number> | check <number> | ship on <number> | fix <number>"
-disable-model-invocation: true
-created_by: curator
 ---
 # PR Babysitter
 
 Watch a standalone GitHub PR end to end: register it, keep it green, merge it when `--ship` is active. Mergify CLI surface (merge queue, stacked PRs, merge protections, CI insights, config validation, activity log) is fully integrated into the pipeline. If Mergify is not configured on the repo, the skill bootstraps a minimal `.mergify.yml` with a merge-queue rule. Mergify diagnostics (events log, flaky-test quarantine, CI Insights) augment the CI re-verification loop. The pipeline is event-driven — CI re-runs and new review threads each trigger a fresh pass.
 
-## Global Rules
+## Rules
 
 This file is the lane identification step only. The lane is determined from physical signals, in this order. Each is observable without asking the agent to name itself. Each agent's launcher stamps a fixed attribution env var into every command it runs. The model cannot set these; only the launcher can.
 
@@ -35,7 +33,7 @@ Read only the winning lane's references. Do not read the other lane's.
 
 Read **only** the winning lane's references:
 
-### Hermes lane
+**Hermes lane**
 
 | Step | Reference | Purpose |
 | ----: | --------- | ------- |
@@ -45,7 +43,7 @@ Read **only** the winning lane's references:
 | 3 | [`references/hermes/step-3-final-report.md`](references/hermes/step-3-final-report.md) | Final report to user (fixes, Mergify outcome, open items, watchlist state) |
 
 
-### Grok lane
+**Grok lane**
 
 | Step | Reference | When it runs |
 | ----: | --------- | ------------ |
