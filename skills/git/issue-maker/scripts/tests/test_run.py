@@ -59,3 +59,16 @@ def test_run_dry_run_report_phase_fields(tmp_path: Path) -> None:
     # Dry-run creates/comments nothing yet.
     assert report["created"] == 0
     assert report["commented"] == 0
+
+
+def test_run_main_cwd_and_trust_mode(tmp_path: Path, monkeypatch: Any) -> None:
+    repo = tmp_path / "sample_repo"
+    import shutil
+    shutil.copytree(REPO_ROOT, repo)
+    monkeypatch.chdir(repo)
+    fake_home = tmp_path / "home"
+    monkeypatch.setattr(Path, "home", lambda: fake_home)
+
+    code = run.main(["trust", "--dry-run"])
+    assert code == 0
+

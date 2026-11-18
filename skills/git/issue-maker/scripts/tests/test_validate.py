@@ -223,3 +223,9 @@ def test_main_resolves_default_artifact_dir(tmp_path: Path, monkeypatch: Any) ->
     code = validate.main(["--repo-root", str(repo)])
     assert code == 0
 
+    # Also test defaulting to cwd when --repo-root is omitted
+    monkeypatch.chdir(repo)
+    code_cwd = validate.main([])
+    assert code_cwd == 0
+
+

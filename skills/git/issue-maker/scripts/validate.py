@@ -28,6 +28,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import sys
 from pathlib import Path
 from typing import Any
@@ -250,7 +251,7 @@ def _summary(checks: dict[str, Any]) -> str:
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(prog="validate.py")
-    parser.add_argument("--repo-root", required=True, help="Absolute path to the AES repo.")
+    parser.add_argument("--repo-root", default=None, help="Absolute path to the AES repo (defaults to cwd).")
     parser.add_argument(
         "--ledger", default=None, help="Path to the task-tracker ledger JSONL (default ~/.agents/develop/<namarepo>/issue-maker/task-tracker-ledger.jsonl)."
     )
@@ -263,7 +264,8 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--out", default=None, help="Write the validate report JSON here.")
     args = parser.parse_args(argv)
 
-    art_dir = artifact_dir(args.repo_root)
+    repo_root = args.repo_root or os.getcwd()
+    art_dir = artifact_dir(repo_root)
     ledger_path = Path(args.ledger) if args.ledger else art_dir / "task-tracker-ledger.jsonl"
     if not ledger_path.is_file():
         log(f"ledger not found: {ledger_path}")

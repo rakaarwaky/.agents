@@ -46,7 +46,7 @@ The machine-checkable completion gate is
 invoking the model:
 
 ```bash
-python3 <this-skill>/scripts/validate.py --repo-root <repo-root> [--gh]
+python3 <this-skill>/scripts/validate.py
 ```
 
 Without `--gh`, the open-issue liveness criterion is reported as
@@ -102,5 +102,5 @@ the four personas, defined in `personas/task-tracker-*.toml`:
 - [ ] Every created, commented, and dry-run issue carries exactly one `## Closing condition` whose Advance sets its row to `Done` in the source doc, and the ledger records its Check.
 - [ ] No issue is counted as created until its `## Closing condition` is present in the body.
 - [ ] No file changed outside `~/.agents/develop/<namarepo>/issue-maker/` (`task-tracker-ledger.jsonl` and `task-tracker-report.json`).
-- [ ] `validate.py` exits 0 against the ledger and run report: `python3 <this-skill>/scripts/validate.py --repo-root <repo>` — the machine-checkable completion gate.
+- [ ] `validate.py` exits 0 against the ledger and run report: `python3 <this-skill>/scripts/validate.py` — the machine-checkable completion gate.
 - [ ] No branch, PR, or code change created.

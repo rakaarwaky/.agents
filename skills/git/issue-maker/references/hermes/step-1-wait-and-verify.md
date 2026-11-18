@@ -4,7 +4,7 @@
 
 ## Verification Gate
 
-1. Confirm `validate.py` exited 0 (run.py runs it at the end; or run `python3 <this-skill>/scripts/validate.py --repo-root <repo-root>` against `~/.agents/develop/<namarepo>/issue-maker/`).
+1. Confirm `validate.py` exited 0 (run.py runs it at the end; or run `python3 <this-skill>/scripts/validate.py` in the repo root against `~/.agents/develop/<namarepo>/issue-maker/`).
 2. Confirm every actionable row got one modular issue: ledger row count vs. `gh issue create` calls (unless `--dry-run`).
 3. Confirm no source edits / branch / PR happened — issue-maker's invariant is "issues only."
 

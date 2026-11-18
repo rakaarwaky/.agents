@@ -16,6 +16,7 @@ from __future__ import annotations
 import argparse
 import datetime
 import json
+import os
 import subprocess
 import sys
 from pathlib import Path
@@ -226,8 +227,11 @@ def run(repo_root: str,
         disc = discovery or str(repo / "docs" / "feature_schema.json")
         if not Path(disc).is_file():
             alt_disc = art_dir / "task-tracker-discovery.json"
+            alt_repo_disc = repo / "discovery.json"
             if alt_disc.is_file():
                 disc = str(alt_disc)
+            elif alt_repo_disc.is_file():
+                disc = str(alt_repo_disc)
             else:
                 log(f"discovery JSON not found: {disc}")
                 return 1
@@ -403,21 +407,26 @@ def run(repo_root: str,
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(prog="run.py")
-    parser.add_argument("--repo-root", required=True, help="Absolute path to the AES repo.")
-    parser.add_argument("--discovery", default=None, help="Discovery JSON (feature_schema).")
-    parser.add_argument("--scan-out", default=None, help="Write/read ScanOutput JSON here.")
-    parser.add_argument("--classify-out", default=None, help="Write/read classified JSON here.")
-    parser.add_argument("--trust-mode", choices=["no-trust", "trust"], default="no-trust")
+    parser.add_argument("trust_mode", nargs="?", choices=["no-trust", "trust"], default="no-trust",
+                        help="Trust mode (no-trust | trust, default no-trust).")
+    parser.add_argument("--repo-root", default=None,
+                        help="Absolute path to the AES repo (defaults to current working directory).")
+    parser.add_argument("--trust-mode", dest="trust_mode_opt", choices=["no-trust", "trust"], default=None,
+                        help=argparse.SUPPRESS)
     parser.add_argument("--dry-run", action="store_true",
                         help="Print would-be issues without calling gh issue create.")
-    parser.add_argument("--ledger", default=None,
-                        help="Ledger JSONL path (default <repo>/docs/task-tracker-ledger.jsonl).")
-    parser.add_argument("--report", default=None,
-                        help="Run-report JSON path (default <repo>/docs/task-tracker-report.json).")
+    parser.add_argument("--discovery", default=None, help=argparse.SUPPRESS)
+    parser.add_argument("--scan-out", default=None, help=argparse.SUPPRESS)
+    parser.add_argument("--classify-out", default=None, help=argparse.SUPPRESS)
+    parser.add_argument("--ledger", default=None, help=argparse.SUPPRESS)
+    parser.add_argument("--report", default=None, help=argparse.SUPPRESS)
     args = parser.parse_args(argv)
 
-    return run(args.repo_root, args.discovery, args.scan_out, args.classify_out,
-               args.trust_mode, args.dry_run, args.ledger, args.report)
+    repo_root = args.repo_root or os.getcwd()
+    trust_mode = args.trust_mode_opt or args.trust_mode
+
+    return run(repo_root, args.discovery, args.scan_out, args.classify_out,
+               trust_mode, args.dry_run, args.ledger, args.report)
 
 
 if __name__ == "__main__":
