@@ -37,7 +37,7 @@ Commit message: conventional, repo-conforming. Amend any stray artifacts before 
 
 ```
 git -C <worktree_path> push --force-with-lease origin <worktree_branch>
-gh pr create --base main --head <worktree_branch> --fill --draft
+gh pr create --base main --head <worktree_branch> --fill
 ```
 
 Always `--force-with-lease`, never bare `--force`. No `gh` or non-GitHub remote: derive the compare URL `https://<host>/<owner>/<repo>/compare/main...<worktree_branch>?expand=1`.
