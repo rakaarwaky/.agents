@@ -1,7 +1,7 @@
 ---
 name: code-review
 description: "Reviews a commit, uncommitted changes, a PR, or a file/directory in place with parallel reviewer subagents. The orchestrator auto-selects 1–3 relevant lens personas from a roster of 10 based on the target's content. Each reviewer subagent reads the diff (diff modes) or the current files (path mode) and writes a per-persona review file to the host scratch directory. The orchestrator aggregates per-persona issue counts and writes a module summary file to disk."
-when-to-use: "Use when asked to 'review the last commit', 'review my uncommitted changes', 'review PR 48', 'review modules/skills', 'review this folder', '/review commit', '/review uncommit', '/review pr 48', '/review path <dir>', or when the user drops a commit, PR number, or directory path and wants a code review. Persona selection is automatic — no flags needed."
+when-to-use: "Use when asked to 'review the last commit', 'review my uncommitted changes', 'review PR 48', 'review modules/skills', 'review this folder', '/code-review commit', '/code-review uncommit', '/code-review pr 48', '/code-review path <dir>', or when the user drops a commit, PR number, or directory path and wants a code review. Persona selection is automatic — no flags needed."
 argument-hint: "commit | uncommit | pr <pr-number> | path <path>"
 ---
 
@@ -33,10 +33,10 @@ Read only the winning lane's references. Do not read the other lane's.
 ## Argument form
 
 ```
-/review commit            # review changes in the last commit (HEAD~1..HEAD)
-/review uncommit          # review uncommitted working-tree changes (diff vs HEAD)
-/review pr <pr-number>    # review the diff of a GitHub PR (via gh pr diff)
-/review path <path>       # review the current content of a file or directory
+/code-review commit            # review changes in the last commit (HEAD~1..HEAD)
+/code-review uncommit          # review uncommitted working-tree changes (diff vs HEAD)
+/code-review pr <pr-number>    # review the diff of a GitHub PR (via gh pr diff)
+/code-review path <path>       # review the current content of a file or directory
 ```
 
 No persona flags. Persona selection is automatic: the orchestrator reads the target's content and picks the 1–3 most relevant personas from the roster of 10.
@@ -53,7 +53,7 @@ backend-engineer, business-analyst, devops-engineer, frontend-engineer, product-
 
 | Step | Reference                                                                     | Purpose                                                                                                  |
 | ----: | ----------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
-| 0    | [`references/hermes/step-0-plan-and-spawn.md`](references/hermes/step-0-plan-and-spawn.md) | Plan the brief (roster, scope, constraints, acceptance criteria); create the Orca worktree with `--agent grok`; drop `/review <mode> <target>` |
+| 0    | [`references/hermes/step-0-plan-and-spawn.md`](references/hermes/step-0-plan-and-spawn.md) | Plan the brief (roster, scope, constraints, acceptance criteria); create the Orca worktree with `--agent grok`; drop `/code-review <mode> <target>` |
 | 1    | [`references/hermes/step-1-wait-grok.md`](references/hermes/step-1-wait-grok.md) | Wait for Grok to finish the fan-out; read its summary and per-persona files                              |
 | 2    | [`references/hermes/step-2-verify-and-ship.md`](references/hermes/step-2-verify-and-ship.md) | Verify count parity and that the source tree is unmodified; triage summary; aggregate                   |
 | 3    | [`references/hermes/step-3-final-report.md`](references/hermes/step-3-final-report.md) | Final report to the user (issues by severity, per-persona breakdown, top issues, deliverable paths, worktree teardown) |

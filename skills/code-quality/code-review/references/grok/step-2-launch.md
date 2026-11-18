@@ -6,10 +6,10 @@ Spawn one reviewer subagent per entry in `personas` (1–3, set by Step 0 auto-s
 
 | Command | Behavior |
 |---|---|
-| `/review commit` | review the last commit; agent auto-selects 1–3 personas from the diff signal |
-| `/review uncommit` | review uncommitted working-tree changes; agent auto-selects personas |
-| `/review pr 48` | review the diff of PR #48; agent auto-selects personas from the diff |
-| `/review path modules/skills` | review the current content of that directory; agent auto-selects personas |
+| `/code-review commit` | review the last commit; agent auto-selects 1–3 personas from the diff signal |
+| `/code-review uncommit` | review uncommitted working-tree changes; agent auto-selects personas |
+| `/code-review pr 48` | review the diff of PR #48; agent auto-selects personas from the diff |
+| `/code-review path modules/skills` | review the current content of that directory; agent auto-selects personas |
 
 Argument parsing and the persona auto-selection rules live in [step-0-argument-parsing.md](step-0-argument-parsing.md).
 

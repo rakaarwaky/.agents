@@ -3,10 +3,10 @@
 ## Argument form
 
 ```
-/review commit
-/review uncommit
-/review pr <pr-number>
-/review path <path>
+/code-review commit
+/code-review uncommit
+/code-review pr <pr-number>
+/code-review path <path>
 ```
 
 One target, exactly one. No persona flags, no `--all`. Persona selection is automatic (see below).
@@ -24,17 +24,17 @@ Parse the raw argument tokens:
    | `pr` | pr | `<pr-number>` (integer, 1–4096, e.g. `48`) |
    | `path` | path | `<path>` (one path, directory **or** file, relative to cwd or absolute) |
 
-2. **`commit` / `uncommit` with extra tokens:** reject with `Extra tokens not allowed: <extras>. Usage: /review commit` (or `uncommit` respectively) and stop.
+2. **`commit` / `uncommit` with extra tokens:** reject with `Extra tokens not allowed: <extras>. Usage: /code-review commit` (or `uncommit` respectively) and stop.
 
-3. **`pr` missing or invalid number:** reject with `PR number required. Usage: /review pr <pr-number>` and stop.
+3. **`pr` missing or invalid number:** reject with `PR number required. Usage: /code-review pr <pr-number>` and stop.
 
-4. **`path` missing second token:** reject with `Path required. Usage: /review path <path>` and stop.
+4. **`path` missing second token:** reject with `Path required. Usage: /code-review path <path>` and stop.
 
 5. **`path` resolves to a file:** allowed. `mode = path`, `target = <resolved absolute file path>`.
 
 6. **`path` does not exist:** reject with `Path <path> not found.` and stop.
 
-7. **First token not one of `commit`, `uncommit`, `pr`, `path`:** reject with `Unknown target. Usage: /review commit | uncommit | pr <pr-number> | path <path>` and stop.
+7. **First token not one of `commit`, `uncommit`, `pr`, `path`:** reject with `Unknown target. Usage: /code-review commit | uncommit | pr <pr-number> | path <path>` and stop.
 
 ## Persona selection (automatic, 1–3 per run)
 

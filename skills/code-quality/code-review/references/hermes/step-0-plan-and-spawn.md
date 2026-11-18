@@ -37,7 +37,7 @@ If `--agent grok` is blocked, fall back to plain `git worktree add` at `~/orca/w
 Send exactly this, once, via `orca terminal send --terminal <handle> --text "<brief>" --enter --json`:
 
 ```
-/review <mode> [<target>]
+/code-review <mode> [<target>]
 
 <constraints and acceptance criteria from the brief>
 ```
@@ -49,6 +49,6 @@ Confirm `accepted: true`. **After this send, do not send any more text to Grok.*
 
 ## Report & Stop
 
-> Dropped /review into Grok Build at <worktree_path> (<mode>: <target>). Waiting for completion.
+> Dropped /code-review into Grok Build at <worktree_path> (<mode>: <target>). Waiting for completion.
 
 Then end the turn. When the Orca terminal becomes idle (detected when this conversation resumes), proceed to Step 1.
