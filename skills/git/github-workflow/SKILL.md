@@ -21,19 +21,13 @@ argument-hint: "<auth | repo> <subcommand> [flags]"
 
 ## Routing
 
-| Step | File | Purpose |
-|------|------|---------|
-| Auth detect | [`references/step-0-detect.md`](references/step-0-detect.md) | Check git, gh, auth status; choose git-only or gh-cli path. |
-| Auth gh-cli | [`references/step-1-gh-cli-auth.md`](references/step-1-gh-cli-auth.md) | `gh` login: browser, device flow, hosts.yml fallback. |
-| Auth git-only | [`references/step-2-git-only-auth.md`](references/step-2-git-only-auth.md) | HTTPS PAT or SSH key setup. |
-| Clone | [`references/clone.md`](references/clone.md) | `git clone` and `gh repo clone`. |
-| Create | [`references/create.md`](references/create.md) | `gh repo create`. |
-| Fork | [`references/fork.md`](references/fork.md) | `gh repo fork` and sync. |
-| Settings | [`references/setting.md`](references/setting.md) | `gh repo edit` + branch protection. |
-| Actions | [`references/action.md`](references/action.md) | `gh workflow` / `gh run` / `gh secret` / `gh release`. |
-| Gitignore | [`references/gitignore-audit.md`](references/gitignore-audit.md) | Three-way diff + `git check-ignore -v`. |
-| Info | [`references/info.md`](references/info.md) | `gh repo view` / `gh repo list` / `gh search repos`. |
-| **Sibling: issue-worker** | — | Issue-to-PR pipeline (triage, spawn, verify, ship). |
-| **Sibling: pr-babysit** | — | PR watch, CI fix, Mergify queue/merge. |
-| **Sibling: releasing** | — | CalVer release prep, build, publish, recovery. |
-| **Sibling: issue-maker** | — | Spec audit → GitHub tracking issues. |
+| Step      | File                                                 | Purpose                                                                                                                                 |
+| --------- | ---------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
+| Auth      | [`references/auth.md`](references/auth.md)           | Detection flow, `gh` CLI login (browser, device, hosts.yml fallback), git-only HTTPS PAT or SSH setup, API-without-gh, troubleshooting. |
+| Clone     | [`references/clone.md`](references/clone.md)         | `git clone` and `gh repo clone`.                                                                                                        |
+| Create    | [`references/create.md`](references/create.md)       | `gh repo create`.                                                                                                                       |
+| Fork      | [`references/fork.md`](references/fork.md)           | `gh repo fork` and sync.                                                                                                                |
+| Settings  | [`references/setting.md`](references/setting.md)     | `gh repo edit` + branch protection.                                                                                                     |
+| Actions   | [`references/action.md`](references/action.md)       | `gh workflow` / `gh run` / `gh secret` / `gh release`.                                                                                  |
+| Gitignore | [`references/gitignore.md`](references/gitignore.md) | Three-way diff + `git check-ignore -v`.                                                                                                 |
+| Info      | [`references/info.md`](references/info.md)           | `gh repo view` / `gh repo list` / `gh search repos`.                                                                                    |

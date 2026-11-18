@@ -1,6 +1,32 @@
+# GitHub Authentication
+
+Covers detection, `gh` CLI login (browser, device flow, token, hosts.yml fallback), and git-only auth (HTTPS PAT or SSH key). Choose the method that fits the environment.
+
 ---
 
-## Method 2: gh CLI Authentication
+## 1. Detection Flow
+
+Run this check first whenever GitHub work is requested:
+
+```bash
+# Check what's available
+git --version
+gh --version 2>/dev/null || echo "gh not installed"
+
+# Check if already authenticated
+gh auth status 2>/dev/null || echo "gh not authenticated"
+git config --global credential.helper 2>/dev/null || echo "no git credential helper"
+```
+
+**Decision tree:**
+
+1. If `gh auth status` shows authenticated → good, use `gh` for everything.
+2. If `gh` is installed but not authenticated → **Method 2: gh CLI Authentication**.
+3. If `gh` is not installed → **Method 1: Git-Only Authentication**.
+
+---
+
+## 2. Method 2: gh CLI Authentication
 
 If `gh` is installed, it handles both API access and git credentials in one step.
 
@@ -14,7 +40,7 @@ gh auth login
 # Select: HTTPS
 # Authenticate via browser
 
-```text
+```
 
 ### Manual OAuth Device Flow (no TTY needed — PROVEN)
 
@@ -55,7 +81,7 @@ while true; do
   esac
 done
 
-```text
+```
 
 Note: on Windows winget installs, gh lands at `/c/Program Files/GitHub CLI` — add it to PATH in the same shell: `export PATH="$PATH:/c/Program Files/GitHub CLI"`.
 
@@ -69,7 +95,7 @@ Note: on Windows winget installs, gh lands at `/c/Program Files/GitHub CLI` — 
 > ```bash
 > # $TOKEN = the access token from the device flow above (never echo it)
 > mkdir -p ~/.config/gh
-> LOGIN=$(curl -s -H "Authorization: token $TOKEN" https://api.github.com/user \
+> LOGIN=$(curl -s -H "Authorization: token ***" https://api.github.com/user \
 >   | sed 's/.*"login": *"\([^"]*\)".*/\1/')
 > printf 'github.com:\n    users:\n        %s:\n            oauth_token: %s\n    git_protocol: https\n    oauth_token: %s\n    user: %s\n' \
 >   "$LOGIN" "$TOKEN" "$TOKEN" "$LOGIN" > ~/.config/gh/hosts.yml
@@ -90,7 +116,7 @@ echo "<THEIR_TOKEN>" | gh auth login --with-token
 # Set up git credentials through gh
 gh auth setup-git
 
-```text
+```
 
 If `--with-token` hangs here, use the hosts.yml fallback from the pitfall above.
 
@@ -99,11 +125,116 @@ If `--with-token` hangs here, use the hosts.yml fallback from the pitfall above.
 ```bash
 gh auth status
 
-```text
+```
 
 ---
 
-## Using the GitHub API Without gh
+## 3. Method 1: Git-Only Authentication (No gh, No sudo)
+
+Works on any machine with `git` installed. No root access needed.
+
+### Option A: HTTPS with Personal Access Token (Recommended)
+
+The most portable method — works everywhere, no SSH config needed.
+
+#### Step 1: Create a personal access token
+
+Go to: **https://github.com/settings/tokens**
+
+- Click "Generate new token (classic)"
+- Give it a name like "hermes-agent"
+- Select scopes:
+  - `repo` (full repository access — read, write, push, PRs)
+  - `workflow` (trigger and manage GitHub Actions)
+  - `read:org` (if working with organization repos)
+- Set expiration (90 days is a good default)
+- Copy the token — it won't be shown again
+
+#### Step 2: Configure git to store the token
+
+```bash
+# "store" saves to ~/.git-credentials in plaintext (simple, persistent)
+git config --global credential.helper store
+
+# Test operation that triggers auth — git will prompt for credentials
+# Username: <their-github-username>
+# Password: <paste the personal access token, NOT their GitHub password>
+git ls-remote https://github.com/<their-username>/<any-repo>.git
+```
+
+After entering credentials once, they're saved and reused for all future operations.
+
+**Alternative: cache helper** (credentials expire from memory):
+
+```bash
+git config --global credential.helper 'cache --timeout=28800'
+```
+
+**Alternative: token in remote URL** (avoids credential prompts entirely, per-repo):
+
+```bash
+git remote set-url origin https://<username>:<token>@github.com/<owner>/<repo>.git
+```
+
+#### Step 3: Configure git identity
+
+```bash
+git config --global user.name "Their Name"
+git config --global user.email "their-email@example.com"
+```
+
+#### Step 4: Verify
+
+```bash
+git ls-remote https://github.com/<their-username>/<any-repo>.git
+git config --global user.name
+git config --global user.email
+```
+
+### Option B: SSH Key Authentication
+
+For users who prefer SSH or already have keys set up.
+
+#### Step 1: Check for existing SSH keys
+
+```bash
+ls -la ~/.ssh/id_*.pub 2>/dev/null || echo "No SSH keys found"
+```
+
+#### Step 2: Generate a key if needed
+
+```bash
+# ed25519: modern, secure, fast
+ssh-keygen -t ed25519 -C "their-email@example.com" -f ~/.ssh/id_ed25519 -N ""
+cat ~/.ssh/id_ed25519.pub
+```
+
+Add the public key at **https://github.com/settings/keys** → "New SSH key" → paste → title it "hermes-agent-<machine-name>".
+
+#### Step 3: Test the connection
+
+```bash
+ssh -T git@github.com
+# Expected: "Hi <username>! You've successfully authenticated..."
+```
+
+#### Step 4: Configure git to use SSH for GitHub
+
+```bash
+# Rewrite HTTPS GitHub URLs to SSH automatically
+git config --global url."git@github.com:".insteadOf "https://github.com/"
+```
+
+#### Step 5: Configure git identity
+
+```bash
+git config --global user.name "Their Name"
+git config --global user.email "their-email@example.com"
+```
+
+---
+
+## 4. Using the GitHub API Without gh
 
 When `gh` is not available, you can still access the full GitHub API using `curl` with a personal access token. This is how the other GitHub skills implement their fallbacks.
 
@@ -114,10 +245,10 @@ When `gh` is not available, you can still access the full GitHub API using `curl
 export GITHUB_TOKEN="<token>"
 
 # Then use in curl calls:
-curl -s -H "Authorization: token $GITHUB_TOKEN" \
+curl -s -H "Authorization: token ***" \
   https://api.github.com/user
 
-```text
+```
 
 ### Extracting the Token from Git Credentials
 
@@ -132,7 +263,7 @@ for R in "${HERMES_HOME:-$HOME/.hermes}/skills" "$HOME/.qwen/skills" "$HOME/.con
 done
 uv run python "$R/github/github-workflow/scripts/git-credential-token.py"
 
-```text
+```
 
 ### Helper: Detect Auth Method
 
@@ -149,11 +280,11 @@ echo "AUTH_METHOD=$GH_AUTH_METHOD"
 echo "OWNER=$GH_OWNER REPO=$GH_REPO"
 [ "$GH_AUTH_METHOD" = "none" ] && echo "Need to set up authentication first"
 
-```text
+```
 
 ---
 
-## Troubleshooting
+## 5. Troubleshooting
 
 | Problem | Solution |
 |---------|----------|
