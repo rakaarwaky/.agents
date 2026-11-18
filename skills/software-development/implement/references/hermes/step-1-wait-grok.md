@@ -39,12 +39,18 @@ done
 
 ## When Grok Is Done
 
-Grok writes two artifacts to its scratch dir (`~/.agents/develop/<repo-slug>/implement/`):
+Grok writes artifacts to `/tmp/grok-<username>/` (resolved by `scripts/host.py` via `scratch_dir()`), keyed by `REVIEW_ID`:
 
-- **Implementation summary**: `impl-summary-<run_id>.md` — files changed, design decisions.
-- **Review**: `review-<run_id>.md` — the final merged review, 0 open issues when the loop exits.
+- **Per-persona review files**: `grok-review-<REVIEW_ID>-<persona>.md` for every auto-selected persona.
+- **Summary file**: `grok-review-summary-<REVIEW_ID>.md` — aggregate counts and top issues.
 
-The run id appears in Grok's terminal output. If Grok reports failure or exits non-idle with an error, report it verbatim to the user and stop — do not retry, do not hand-fix the worktree.
+The run id (`REVIEW_ID`) is an 8-hex-character identifier (e.g. `cca7ab30`) printed in Grok's terminal output or visible in artifact filenames. After Grok exits, locate artifacts with:
+
+```bash
+ls -lt /tmp/grok-<username>/grok-review-* 2>/dev/null
+```
+
+If Grok reports failure or exits non-idle with an error, report it verbatim to the user and stop — do not retry, do not hand-fix the worktree.
 
 Report to the user: "Grok Build finished the implement→review→fix loop. <worktree_path> is ready."
 

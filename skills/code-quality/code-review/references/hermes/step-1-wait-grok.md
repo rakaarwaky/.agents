@@ -40,13 +40,18 @@ done
 
 ## When Grok Is Done
 
-Grok writes artifacts to its scratch dir (`~/.agents/develop/<repo-slug>/`):
+Grok writes artifacts to `/tmp/grok-<username>/` (resolved by `scripts/host.py` via `scratch_dir()`), keyed by `REVIEW_ID`:
 
-- **Per-persona review files**: `grok-review-<REVIEW_ID>-<persona>.md` for every auto-selected persona (1–3).
-- **Summary file**: the aggregated review summary with per-persona issue counts by severity.
-- **ERROR rows**: any persona that failed or timed out is recorded as `ERROR` with its error text — the run continues, it is not aborted.
+- **Per-persona review files**: `grok-review-<REVIEW_ID>-<persona>.md` for every auto-selected persona.
+- **Summary file**: `grok-review-summary-<REVIEW_ID>.md` — aggregate counts and top issues.
 
-Read the summary file first, then spot-check one per-persona file for a persona you care about most. If Grok reports failure or exits non-idle with an error, report it verbatim to the user and stop — do not retry, do not hand-review the target yourself.
+The run id (`REVIEW_ID`) is an 8-hex-character identifier (e.g. `cca7ab30`) printed in Grok's terminal output or visible in artifact filenames. After Grok exits, locate artifacts with:
+
+```bash
+ls -lt /tmp/grok-<username>/grok-review-* 2>/dev/null
+```
+
+If Grok reports failure or exits non-idle with an error, report it verbatim to the user and stop — do not retry, do not hand-review the target yourself.
 
 Report to the user: "Grok Build finished the <mode> review of <target>. <N>/<P> personas completed (<M> errored). <bugs> bugs, <suggestions> suggestions, <nits> nits. Summary: <path>."
 
