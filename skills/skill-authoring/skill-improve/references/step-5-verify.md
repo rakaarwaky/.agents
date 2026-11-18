@@ -2,9 +2,11 @@
 
 **Goal:** mechanically verify the improved skill and end with one report carrying the gate verdict.
 
-## SAC lint fallback
+## SAC lint invocation
 
-When `sac lint` is unavailable (missing `modules/` → `ModuleNotFoundError: No module named 'cli'`, skills-root path error, or broken install), do not block the improve run. Run the equivalent grep-class checks directly: body shape (`grep -n '^#' <SKILL.md>`), frontmatter scan for four mandatory keys, description/when-to-use char-count against 1,024, unlinked-refs probe (`ls references/ | while read f; do grep -q "$f" SKILL.md || echo "unlinked: $f"; done`), and dangling-ref sweep (`grep -r "old-name"`). Report the fallback explicitly — a broken lint gate is an infra defect, not a blocker.
+Invoke `sac` as a bare command (`sac lint`, `sac catalog --build`), never `python -m sac` — the CLI is a bash launcher at `~/.local/bin/sac` that activates its own venv and sets `PYTHONPATH`; `python -m sac` bypasses that setup and fails with `ModuleNotFoundError`.
+
+When `sac lint` is genuinely unavailable (missing `modules/`, skills-root path error, or broken install), do not block the improve run. Run the equivalent grep-class checks directly: body shape (`grep -n '^#' <SKILL.md>`), frontmatter scan for four mandatory keys, description/when-to-use char-count against 1,024, unlinked-refs probe (`ls references/ | while read f; do grep -q "$f" SKILL.md || echo "unlinked: $f"; done`), and dangling-ref sweep (`grep -r "old-name"`). Report the fallback explicitly — a broken lint gate is an infra defect, not a blocker.
 
 A broken `sac` CLI blocks both `sac lint` and `sac catalog --build`; the catalog rebuild falls back to `git add skills/catalog.json && git commit` if stale — state the missing rebuild in the report; do not block the run.
 
