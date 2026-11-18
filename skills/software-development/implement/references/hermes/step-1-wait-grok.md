@@ -50,6 +50,8 @@ The run id (`REVIEW_ID`) is an 8-hex-character identifier (e.g. `cca7ab30`) prin
 ls -lt /tmp/grok-<username>/grok-review-* 2>/dev/null
 ```
 
+**Pitfall — Grok may write no review artifacts.** A headless or single-pass Grok run produces no files under `/tmp/grok-<username>/` and its terminal `tail` can stay empty for minutes, showing only the `grok '--permission-mode' 'bypassPermissions'` launch line while it works. Neither is a failure: confirm the run did its job by checking `git -C <worktree> diff` / `status --short` for the expected edits rather than blocking on artifacts that may never appear. The worktree diff is the primary proof of completion, not the artifact files.
+
 If Grok reports failure or exits non-idle with an error, report it verbatim to the user and stop — do not retry, do not hand-fix the worktree.
 
 Report to the user: "Grok Build finished the implement→review→fix loop. <worktree_path> is ready."

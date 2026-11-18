@@ -46,7 +46,7 @@ If declined, set `MERGIFY_AVAILABLE="declined"` and skip to the direct-merge pat
 
 ### Write the config
 
-Fetch the Mergify docs before writing — never invent config from memory. See the `mergify` skill `references/config.md` for the full workflow and schema.
+Fetch the Mergify docs before writing — never invent config from memory. See [`../mergify/config.md`](../mergify/config.md) for the full workflow and schema.
 
 Minimal config:
 

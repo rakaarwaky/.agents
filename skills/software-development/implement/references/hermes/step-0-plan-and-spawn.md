@@ -33,6 +33,8 @@ ORCA="$(command -v orca-ide)"
 
 If `--agent grok` is blocked (e.g. `agent_session_operation_unknown`), fall back to plain `git worktree add` at `~/orca/workspaces/<repo-basename>/<task-slug>` and drive Grok headless **inside that worktree** via `grok -p '<brief>' --cwd <worktree_path> --always-approve`, passing the full natural-language brief (not a slash command). Never run bare `grok` / `grok -p` directly in the Hermes terminal session outside a worktree context.
 
+**Pitfall — confirm the brief actually started a turn.** `orca terminal send` can return `accepted: true` while only having written the text to the TUI input box without submitting a turn, so Grok never runs. Read the terminal once (`orca terminal read --terminal <handle> --cursor 0 --limit 100 --json`) and check the process list for `systemd-inhibit --who=grok --why="agent turn in progress"`; if no grok turn is running and the worktree stays empty, re-send the brief once before proceeding to Step 1.
+
 ## Drop the Task
 
 Send exactly this, once, via `orca terminal send --terminal <handle> --text "<brief>" --enter --json`:

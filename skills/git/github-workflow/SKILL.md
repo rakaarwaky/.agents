@@ -46,6 +46,7 @@ Clone/create/fork repos; manage remotes, releases, settings, secrets, Actions CI
 Analyze open GitHub issues and take each from backlog to a PR opened to main. Verify at HEAD, run the decision quiz, 1 issue → 1 Orca worktree → Grok Build implements → Hermes verifies → Hermes pushes branch + opens a (draft) PR to main → close/reopen per result. Never merges.
 
 - **Verify at HEAD** per issue; ask the decision quiz.
+- **Resolve the issue set first.** For a "N newest / N oldest" batch, query by sort order rather than hand-listing numbers: newest = `gh issue list --state open --limit N --json number --jq '.[].number'`; oldest = `gh issue list --state open --search "sort:created-asc" --limit N --json number --jq '.[].number'`. Sort oldest via the `--search` `sort:` qualifier, not a `--sort` flag — `gh issue list` has no native oldest-first flag, and the search qualifier is the only supported path. Zero rows returned means stop and report no open issues.
 - **Spawn one Grok worktree per still-broken issue** and drop the brief.
 - **Wait** for each Grok session; verify commits, code, re-run symptom repro.
 - **Push** each verified branch, open one draft PR per issue.
@@ -96,12 +97,12 @@ Cut a CalVer release of the mergify CLI autonomously: bump via bump script, open
 | PR reverify | `references/hermes/step-1-wait-and-reverify.md` | Wait for fix pass, re-run CI. |
 | PR merge | `references/hermes/step-2-merge.md` | Merge when ship-ready gates pass. |
 | PR report | `references/hermes/step-3-final-report.md` | Final report to user. |
-| Mergify stack | `references/stack.md` | Stacked PRs via `mergify stack *`. |
-| Mergify queue | `references/merge-queue.md` | Queue/dequeue, diagnose dequeued PRs. |
-| Mergify protections | `references/merge-protections.md` | Depends-On, Merge-After, freezes. |
-| Mergify CI | `references/ci.md` | JUnit upload, quarantines, scopes. |
-| Mergify config | `references/config.md` | Validate, simulate, write `.mergify.yml`. |
-| Mergify events | `references/events.md` | Timeline of Mergify actions. |
+| Mergify stack | `../pr-babysit/references/mergify/stack.md` | Stacked PRs via `mergify stack *`. |
+| Mergify queue | `../pr-babysit/references/mergify/merge-queue.md` | Queue/dequeue, diagnose dequeued PRs. |
+| Mergify protections | `../pr-babysit/references/mergify/merge-protections.md` | Depends-On, Merge-After, freezes. |
+| Mergify CI | `../pr-babysit/references/mergify/ci.md` | JUnit upload, quarantines, scopes. |
+| Mergify config | `../pr-babysit/references/mergify/config.md` | Validate, simulate, write `.mergify.yml`. |
+| Mergify events | `../pr-babysit/references/mergify/events.md` | Timeline of Mergify actions. |
 | Release bump | `references/step-0-version-bump.md` | Version bump and changelog generation. |
 | Release prep | `references/step-1-prep-pr.md` | Release prep PR: branch, CI green, merge. |
 | Release preflight | `references/step-2-preflight.md` | Verify main clean, report what ships. |

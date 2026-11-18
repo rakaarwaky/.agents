@@ -253,12 +253,6 @@
       "category": "git"
     },
     {
-      "name": "mergify",
-      "description": "Mergify CLI surface — stacked PRs, merge queue, CI insights, config validation, mergify events.",
-      "when_to_use": "Run any Mergify workflow — push or stack commits/PRs, diagnose merge-queue PRs, Depends-On/Merge-After/scheduled freezes, JUnit upload and quarantine, scopes detection, write or validate .mergify.yml, browse Mergify events.",
-      "category": "git"
-    },
-    {
       "name": "pr-babysit",
       "description": "Watch a PR, fix CI, merge via Mergify queue.",
       "when_to_use": "Triggers on \\\"/pr-babysit\\\". Phrasing: \\\"watch PR 123 until green\\\", \\\"babysit PR 123 and merge when ready\\\", \\\"fix issue #123 and open a PR\\\", \\\"keep fixing PR 123 until it can merge\\\", \\\"pr-babysit add --ship 123\\\".",

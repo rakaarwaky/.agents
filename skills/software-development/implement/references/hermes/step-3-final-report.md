@@ -16,8 +16,8 @@ Run `lint-arwaky-cli report .` from the worktree or owning repo (absolute path: 
 
 Report to the user:
 
-1. What was implemented (from `impl-summary-<run_id>.md`).
-2. Review panel outcome (issues found, all resolved).
+1. What was implemented (from the worktree diff, or `impl-summary-<run_id>.md` if Grok wrote one).
+2. Review panel outcome (issues found, all resolved — or "headless run; verified via worktree diff and gates").
 3. PR URL and branch name.
 4. Worktree path and the post-merge retirement command:
 

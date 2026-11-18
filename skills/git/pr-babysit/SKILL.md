@@ -8,9 +8,7 @@ created_by: curator
 ---
 # PR Babysitter
 
-Watch a standalone GitHub PR end to end: register it, keep it green, merge it when `--ship` is active. When Mergify is configured on the repo, the merge step uses the Mergify merge queue (CI on a temporary merge commit before landing) instead of a direct `gh pr merge`. If Mergify is not configured, the skill bootstraps a minimal `.mergify.yml` with a merge-queue rule. Mergify diagnostics (events log, flaky-test quarantine, CI Insights) augment the CI re-verification loop. The pipeline is event-driven — CI re-runs and new review threads each trigger a fresh pass.
-
-Related: [`mergify`](../mergify/SKILL.md) skill — the full Mergify CLI surface (stacks, queue, freezes, CI Insights, config, events) is owned by that skill; pr-babysit consumes its references when Mergify is active.
+Watch a standalone GitHub PR end to end: register it, keep it green, merge it when `--ship` is active. Mergify CLI surface (merge queue, stacked PRs, merge protections, CI insights, config validation, activity log) is fully integrated into the pipeline. If Mergify is not configured on the repo, the skill bootstraps a minimal `.mergify.yml` with a merge-queue rule. Mergify diagnostics (events log, flaky-test quarantine, CI Insights) augment the CI re-verification loop. The pipeline is event-driven — CI re-runs and new review threads each trigger a fresh pass.
 
 ## Global Rules
 
