@@ -3,23 +3,22 @@ name: releasing
 description: "Release, cut a release, ship a new version, publish or tag a release for the mergify CLI, recover a failed release run."
 when-to-use: 'Cut a CalVer release of the mergify CLI autonomously — bump via the bump script, open and merge a release prep PR, build and publish the draft through GitHub workflows, and recover failed release runs. Triggers: "release", "cut a release", "ship a new version", "publish a release", "tag a version", "release run recovery".'
 argument-hint: "--tag <tag> --target_commitish <sha>"
-created_by: curator
 ---
 
 # Releasing `mergify-cli` — autonomous headless release agent
 
-## Global Rules
+Execute end-to-end CalVer releases for the `mergify-cli` project through automated version bumps, release prep pull requests, artifact builds, and PyPI publishing.
 
-- **Repo guard first:** confirm `git remote -v` is `Mergifyio/mergify-cli` and the version scheme is CalVer (`YYYY.M.D.N`) targeting PyPI + Homebrew. If the repo uses semver/crates.io (e.g. a Rust workspace like lint-arwaky), stop — this skill does not apply; use that repo's own release process.
-- This is an **agent instruction**, not a human runbook. Run every step end-to-end, stop only on hard failures, and report a final status at the end.
-- The only step reported to the user and *not* executed is the Homebrew tap PR merge, which needs a human.
-- Everything is driven by `.github/workflows/release.yml`. There is no version to bump in any file — `pyproject.toml` and `Cargo.toml` keep placeholder versions and the workflow stamps the tag at build time. The release prep PR commits the version stamp and changelog; it is not a manual edit of version files.
-- Versions are calver: `YYYY.M.D.N` (no zero padding, `N` starts at 1 each UTC day).
-- **Never commit the version bump directly to main or push a release tag outside the prep PR flow.** The prep PR (Step 1) is mandatory: CI must run green on the release branch before merge, and the tag is created only on the merge commit. Bypassing it ships an unverified release.
-- **Never run `gh release create` or push a tag by hand.** A release created outside the workflow has no binaries, and once published it is immutable — the asset assertion then permanently blocks the PyPI publish for that version.
-- **Never click / script "Draft a new release" in the Releases UI.** Same trap.
-- **Step 4 (Publish) is irreversible and outward-facing** — it locks the release and pushes to PyPI. The headless flow proceeds straight to publish; this is the intended autonomous behavior, not a stop-and-ask step.
-- `RELEASING.md` at the repo root explains *why* the flow is shaped this way (GitHub's immutable-releases policy). Read it when something goes wrong or the workflow itself needs changing.
+## Rules
+
+| ID | Rule | Check |
+|----|------|-------|
+| R1 | Confirm repository remote is `Mergifyio/mergify-cli` with CalVer versioning scheme before proceeding. | Verify `git remote -v` and version format match `mergify-cli` requirements. |
+| R2 | Drive versioning strictly through `.github/workflows/release.yml`; never manually edit version strings in config files. | Verify placeholder version retention in `pyproject.toml` and `Cargo.toml`. |
+| R3 | Enforce mandatory prep PR flow: never commit version bumps directly to main or push tags manually. | Check that release branch PR is opened, approved, and merged with green CI. |
+| R4 | Never create releases via `gh release create` or the GitHub Releases UI, which bypasses workflow asset builders. | Ensure release drafts are initiated strictly by workflow dispatch. |
+| R5 | Treat Step 4 (Publish) as irreversible and autonomous, proceeding straight to publish without stopping for approval. | Verify automated transition from validated draft to published release. |
+| R6 | Report Homebrew tap PR merge as the only human-actionable manual step upon release completion. | Confirm final output highlights Homebrew tap merge link for manual sign-off. |
 
 ## Routing
 

@@ -12,16 +12,18 @@ Scaffold AES layer files — agent orchestrators, capabilities, contracts, compo
 
 ## Rules
 
-- Argument shape: `<path> [create|improve] [--dry-run]`. `<path>` is a folder (crate/module/package) or a single file; missing mode defaults to improve.
-- Language auto-detection: resolve the path, detect python (.py) / rust (.rs) / typescript (.ts/.tsx/.js/.jsx/.mts/.cts) from files present; on mixed or ambiguous input, list the detected languages and proceed with the dominant one, naming it in the report.
-- Routing: dispatch to `reference/<layer>/<language>.md` based on the detected layer and language; that language HOW-TO owns the workflow steps.
-- Mode create: scaffold a new file from the language HOW-TO template section.
-- Mode improve: audit the named file/folder against the language HOW-TO rules, list findings, apply fixes.
-- Safety model: default (no `--dry-run`) = autonomous, no permission prompts, execute directly. `--dry-run` = read-only: produce the findings report and STOP before any write; the report is the deliverable. This bullet is the single source of truth for mode/safety semantics.
-- Report: every run ends with a report block — files touched (dry-run: files that WOULD be touched), language detected, mode, findings/fixes.
-- Verify: `lint-arwaky-cli scan <layer-path>` → 0 violations. Language compile is fallback only.
-- On-disk verify: a parallel agent or `git reset` can revert files without notice — after applying any edit, re-read the touched region (or grep the new content) before declaring the run done.
-- One fact, one home: the language HOW-TO carries its layer's suffix, imports, and structure — read it, do not restate here. Cite the linter, not this file, when pointing at a rule. Each bullet states a fact once; references point at the bullet.
+| ID | Rule | Check |
+|----|------|-------|
+| R1 | **Argument shape.** `<path> [create\|improve] [--dry-run]`. `<path>` is a folder (crate/module/package) or a single file; missing mode defaults to improve. | Arguments match expected syntax. |
+| R2 | **Language auto-detection.** Resolve the path, detect python (.py) / rust (.rs) / typescript (.ts/.tsx/.js/.jsx/.mts/.cts) from files present; on mixed or ambiguous input, list the detected languages and proceed with the dominant one, naming it in the report. | Dominant language reported correctly. |
+| R3 | **Routing.** Dispatch to `reference/<layer>/<language>.md` based on the detected layer and language; that language HOW-TO owns the workflow steps. | Correct reference loaded per layer and language. |
+| R4 | **Mode create.** Scaffold a new file from the language HOW-TO template section. | Template used for creation. |
+| R5 | **Mode improve.** Audit the named file/folder against the language HOW-TO rules, list findings, apply fixes. | Audit findings listed and resolved. |
+| R6 | **Safety model.** Default (no `--dry-run`) = autonomous, no permission prompts, execute directly. `--dry-run` = read-only: produce the findings report and STOP before any write; the report is the deliverable. | No writes when --dry-run is supplied. |
+| R7 | **Report.** Every run ends with a report block — files touched (dry-run: files that WOULD be touched), language detected, mode, findings/fixes. | Report block present at completion. |
+| R8 | **Verify.** `lint-arwaky-cli scan <layer-path>` → 0 violations. Language compile is fallback only. | 0 violations reported by lint-arwaky-cli scan. |
+| R9 | **On-disk verify.** A parallel agent or `git reset` can revert files without notice — after applying any edit, re-read the touched region (or grep the new content) before declaring the run done. | Touched files verified on disk. |
+| R10 | **One fact, one home.** The language HOW-TO carries its layer's suffix, imports, and structure — read it, do not restate here. Cite the linter, not this file, when pointing at a rule. Each bullet states a fact once; references point at the bullet. | No duplicate rule declarations across files. |
 
 ### Cross-language consistency (all 3 languages)
 

@@ -3,31 +3,20 @@ name: notion
 description: 'Notion API + ntn CLI: pages, databases, markdown, Workers.'
 when-to-use: "Use when reading or writing Notion pages, databases, markdown, file uploads, or Workers via the ntn CLI or the Notion API (curl)."
 argument-hint: "ntn api v1/search|ntn api v1/users|ntn api v1/pages <parent[page_id]> [properties...]|ntn api v1/pages/<id>/markdown|ntn api v1/pages/<id>/markdown -X PATCH|ntn api v1/blocks/<id>/children|ntn api v1/data_sources/<id>/query -X POST|ntn files create|ntn files list|ntn workers new|ntn workers deploy|ntn workers exec"
-version: 2.0.0
-author: community
-license: MIT
-platforms: [linux, macos, windows]
-prerequisites:
-  env_vars: [NOTION_API_KEY]
-metadata:
-  hermes:
-    tags: [Notion, Productivity, Notes, Database, API, CLI, Workers]
-    homepage: https://developers.notion.com
 ---
 
 # Notion
 
-Talk to Notion two ways. Same integration token works for both — pick by what's available.
+Interact with Notion databases, pages, blocks, and Workers using the official `ntn` CLI or raw HTTP REST API endpoints.
 
-◆ **`ntn` CLI** — Notion's official CLI. Shorter syntax, one-line file uploads, required for Workers. macOS + Linux only as of May 2026 (Windows support "coming soon"). **Default when installed.**
-◆ **HTTP + curl** — works everywhere including Windows. **Default fallback** when `ntn` isn't installed.
+## Rules
 
-## Global rules
-
-- **An integration token is required for both paths** — create it at notion.so/my-integrations and store it as `NOTION_API_KEY`; skip `ntn login` and use the token instead.
-- **Share target pages/databases with the integration in Notion** (page menu `...` → `Connect to` → your integration name); without this the API returns 404 for that page even though it exists.
-- **Rate limit is ~3 requests/second average** — the CLI doesn't bypass it; batch and back off rather than hammering.
-- **Always pass `-s` to curl** to suppress progress bars (cleaner agent output); pipe JSON through `jq` when reading.
+| ID | Rule | Check |
+|----|------|-------|
+| R1 | Require integration token configured as `NOTION_API_KEY` for both CLI and HTTP execution paths. | Verify `NOTION_API_KEY` environment variable is defined. |
+| R2 | Ensure target Notion pages and databases are shared with the integration to avoid 404 errors. | Test page access and confirm 404 errors are diagnosed as missing integration permissions. |
+| R3 | Respect Notion API rate limits of approximately 3 requests per second with backoff and batching. | Check request throttling and retry logic on rate limit responses. |
+| R4 | Use `-s` flag with curl commands and parse JSON responses with `jq` for clean automated parsing. | Verify curl commands include silent flag and format outputs cleanly. |
 
 ## Routing
 

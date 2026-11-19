@@ -3,64 +3,32 @@ name: llm-wiki
 description: "Karpathy's LLM Wiki: build/query interlinked markdown KB."
 when-to-use: Use when the user asks to create, build, or start a wiki, ingest a source into a wiki, ask a question about an existing wiki, or lint/audit/health-check a wiki.
 argument-hint: "<init | ingest | query | lint> [wiki-path | source]"
-version: 2.1.0
-author: Hermes Agent
-license: MIT
-platforms: [linux, macos, windows]
-metadata:
-  hermes:
-    tags: [wiki, knowledge-base, research, notes, markdown, rag-alternative]
-    category: research
-    related_skills: [arxiv]
 ---
 
 # Karpathy's LLM Wiki
 
-Build and maintain a persistent, compounding knowledge base as interlinked
-markdown files. Based on
-[Andrej Karpathy's LLM Wiki pattern](https://gist.github.com/karpathy/442a6bf555914893e9891c11519de94f).
-Unlike traditional RAG (which rediscovers knowledge from scratch per query),
-the wiki compiles knowledge once and keeps it current. Cross-references are
-already there. Contradictions have already been flagged.
+Build and maintain a persistent, compounding knowledge base of interlinked Markdown files following Karpathy's LLM Wiki architecture.
 
-**Division of labor:** The human curates sources and directs analysis. The
-agent summarizes, cross-references, files, and maintains consistency.
+## Rules
 
-## Global rules
-
-- **Orient every session before any operation.** Read `SCHEMA.md` +
-  `index.md` + recent `log.md` entries first — see
-  [`references/resuming-wiki.md`](references/resuming-wiki.md). Skipping this
-  causes duplicates and missed cross-references.
-- **`raw/` is immutable.** The agent reads but never modifies files in
-  `raw/`. Corrections go in wiki pages, not in the source.
-- **Always update `index.md` and `log.md`** after any operation — these are
-  the navigational backbone. Skipping this makes the wiki degrade.
-- **Page threshold.** Don't create pages for passing mentions — follow the
-  Page Thresholds in `SCHEMA.md`. Every new page must link to at least 2
-  other pages via `[[wikilinks]]`; isolated pages are invisible.
-- **Tags come from the taxonomy** in `SCHEMA.md`. Add new tags to
-  `SCHEMA.md` first, then use them — freeform tags decay into noise.
-- **Confidence frontmatter.** For opinion-heavy, fast-moving, or
-  single-source claims, set `confidence: medium` or `low`. Don't mark
-  `high` unless well-supported across multiple sources.
-- **Rotate the log.** When `log.md` exceeds 500 entries, rename it
-  `log-YYYY.md` and start fresh. The agent should check log size during
-  lint.
-- **Handle contradictions explicitly** — don't silently overwrite. Note
-  both claims with dates, mark in frontmatter, flag for user review.
-- **Ask before mass-updating** — if an ingest would touch 10+ existing
-  pages, confirm the scope with the user first.
+| ID | Rule | Check |
+|----|------|-------|
+| R1 | Orient session before any operation by reading `SCHEMA.md`, `index.md`, and recent `log.md` entries. | Verify orientation files are read before executing modifications. |
+| R2 | Treat `raw/` directory contents as strictly immutable; record corrections in wiki articles rather than modifying sources. | Confirm no write operations target files in `raw/`. |
+| R3 | Update navigational anchors `index.md` and `log.md` immediately following any page creation or modification. | Check git diff to ensure navigation files are updated alongside content. |
+| R4 | Require every new page to link to at least 2 existing pages via `[[wikilinks]]`. | Validate incoming and outgoing links for all new concept pages. |
+| R5 | Constrain taxonomy tags to those defined in `SCHEMA.md`; register new tags in the schema before applying them. | Audit page tags against schema allowed set. |
+| R6 | Handle contradicting information explicitly with dates and citations instead of silently overwriting earlier facts. | Verify contradictory claims are documented and flagged for user review. |
+| R7 | Seek user confirmation before executing bulk updates that touch 10 or more existing pages. | Confirm approval prompt is issued for large ingest operations. |
 
 ## Routing
 
 | Step | Reference | Purpose |
 | ---- | --------- | ------- |
 | Orient (every session) | [`references/resuming-wiki.md`](references/resuming-wiki.md) | Read `SCHEMA.md` + `index.md` + recent `log.md`; do this before ingesting, querying, or linting. |
-| Init new wiki | Create directory structure + `SCHEMA.md` + `index.md` + `log.md` (templates in [`references/schema-templates.md`](references/schema-templates.md)) | Path from `$WIKI_PATH` env var (default `~/wiki`); ask the user what domain the wiki covers; write the three initial files; confirm ready. |
-| Ingest | [`references/ingest.md`](references/ingest.md) | Capture raw source → discuss takeaways → check what exists → write/update pages (with cross-refs, provenance, confidence) → update nav → report changes. |
-| Query | [`references/query.md`](references/query.md) | Read `index.md` → search for key terms (wikis with 100+ pages) → read relevant pages → synthesize → file valuable answers back to `queries/` or `comparisons/` → update `log.md`. |
-| Lint | [`references/lint-checklist.md`](references/lint-checklist.md) | Full 13-point checklist: orphan pages, broken wikilinks, index completeness, frontmatter validation, stale content, contradictions, quality signals, source drift, page size, tag audit, log rotation, report findings, append to log. |
+| Init new wiki | [`references/schema-templates.md`](references/schema-templates.md) | Path from `$WIKI_PATH` env var; write initial structure, schema, index, and log. |
+| Ingest | [`references/ingest.md`](references/ingest.md) | Capture raw source, extract takeaways, write/update pages, update navigation. |
+| Query | [`references/query.md`](references/query.md) | Search key terms, read relevant pages, synthesize answers, update query logs. |
+| Lint | [`references/lint-checklist.md`](references/lint-checklist.md) | 13-point health checklist: orphans, broken links, frontmatter, log rotation. |
 | Working with the wiki | [`references/working-with-wiki.md`](references/working-with-wiki.md) | Searching, bulk ingest, archiving, Obsidian integration, headless setup. |
-| Obsidian headless | [`references/obsidian-headless.md`](references/obsidian-headless.md) | On headless machines, use `obsidian-headless` instead of the desktop app; syncs vaults via Obsidian Sync without a GUI. |
-| Related tooling | [llm-wiki-compiler](https://github.com/atomicmemory/llm-wiki-compiler) | Node.js CLI that compiles sources into a concept wiki; Obsidian-compatible; use it for scheduled batch compile, this skill for agent-in-the-loop curation. |
+| Obsidian headless | [`references/obsidian-headless.md`](references/obsidian-headless.md) | Headless vault synchronization without requiring desktop GUI. |

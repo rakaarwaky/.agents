@@ -3,145 +3,34 @@ name: orca
 description: "Orca CLI agent environment: Orca-managed worktrees, folder contexts, terminals, repos, automations and cron jobs, embedded browser, artifacts, and skill sharing via the orca CLI; visible local app windows via orca computer; iOS and Android emulator control; Linear ticket work; per-workspace environment recipes; multi-agent orchestration with DAGs and decision gates. Use for $orca-cli, Orca worktree, child worktree, spawn codex/claude in a worktree, read/wait/send Orca terminal, handoff/handover/give this to another agent, Orca browser, orca artifacts, share skills, scheduled agent tasks or cron jobs, visible GUI windows, booted iOS Simulator or Android emulator, linked Linear issue, per-workspace environment recipe setup, multi-agent DAG coordination. Observed user phrasing: 'build the worktree in orca', 'worktree deleted from disk / recreate worktree', 'why isn't it showing in orca IDE', 'check all open PRs', 'resolve conflicts in another worktree', orca cli-commands, orca config-system."
 when-to-use: "Use for any Orca CLI agent-environment task. Load references/cli.md for worktrees, terminals, repos, automations, artifacts, skill sharing, and the embedded browser; references/automations.md for scheduled agent runs and cron jobs; references/computer-use.md for visible GUI windows; references/emulator.md for a booted iOS Simulator; references/emulator-android.md for an adb-connected Android emulator or phone; references/linear.md for Linear ticket work; references/per-workspace-env.md for per-workspace environment recipes; references/orchestration.md for supervised multi-agent coordination with DAGs and decision gates. Also matches observed user phrasing: 'build the worktree in orca', 'worktree deleted from disk / recreate worktree', 'why isn't it showing in orca IDE', 'check all open PRs', 'resolve conflicts in another worktree'."
 argument-hint: "open --json | skills get <skill-name> [--json] [--reference <path>] | <command> [<flags>]"
-license: Apache-2.0
 ---
 
 # Orca CLI Agent Environment
 
-One consolidated skill for the Orca agent environment. Each sub-scenario is a
-[reference file](references/); the shared rules live here once.
+Unified control surface for Orca-managed worktrees, terminal execution, GUI computer-use, mobile emulators, Linear integrations, and multi-agent DAG orchestration.
 
-This skill is the single entry point for every `$orca-cli` invocation. The former
-`skills/orca-cli/` stub has been merged here; its newer `runtime_unavailable` and
-`ORCA open` retry guidance lives in §"Load the version-matched guide" below.
+## Rules
 
-## Resolve the CLI for this session
+| ID | Rule | Check |
+|----|------|-------|
+| R1 | Resolve CLI executable once via precedence: `ORCA_CLI_COMMAND` > `orca-dev` > `orca-ide` on Linux > `orca`; never run bare `/usr/bin/orca`. | Verify resolved CLI path is not the GNOME screen reader before running commands. |
+| R2 | Load version-matched guide via `ORCA skills get <skill-name> --json` before executing unfamiliar commands. | Check skill schema or help flags before executing complex operations. |
+| R3 | Treat `runtime_unavailable` as transient; retry after a brief pause and never run `ORCA open` to retry commands. | Confirm `ORCA open` is only called if Orca is truly not running. |
+| R4 | Configure Grok Build in worktrees using `--agent grok --no-parent` and enforce single orchestration mode per worktree. | Verify worktree creation flags and slot mode configuration. |
+| R5 | Never rely solely on `tui-idle`; verify worktree progress using `git diff`, `git log`, and full test execution. | Inspect worktree directory status and test outputs directly on disk. |
+| R6 | Maintain strict separation between full handoff (disengage after acceptance) and supervised orchestration (drive via DAG gates). | Check orchestration type and prevent overlapping control calls. |
+| R7 | Run headless Grok invocations strictly inside the created Orca worktree context using `--cwd`. | Verify execution directory is the root of the managed worktree. |
 
-Choose the executable once and reuse it for every later command:
+## Routing
 
-- If the `ORCA_CLI_COMMAND` environment variable is set, use its value. Orca exports this
-  for managed WSL sessions.
-- Otherwise, in a dev checkout whose session exposes `ORCA_DEV_REPO_ROOT`, use `orca-dev`.
-- Otherwise, on Linux outside an Orca-managed terminal, use `orca-ide` (e.g. `/home/raka/.local/bin/orca-ide` or `command -v orca-ide`). Never run bare
-  `orca` there — outside Orca's terminals it normally resolves to the
-  GNOME Orca screen reader (`/usr/bin/orca`) and starts speech on the user's machine.
-- Otherwise, use `orca`.
-
-Below, `ORCA` is a placeholder for the executable you resolved. Substitute it before
-running anything; do not create a shell variable or run `ORCA` literally. (In standard shells, `$ORCA` is not exported by default and expands to empty, causing `: command not found`). This works the
-same way in POSIX shells, PowerShell, and cmd.exe.
-
-If the selected executable cannot run, report its exact error and stop. Do not fall through
-to another executable, which could silently target a different Orca build.
-
-## Load the version-matched guide before running Orca commands
-
-Each reference file names the guide its scenario loads. Prefer `ORCA skills get <skill-name> --json`.
-Use the selected executable's `--help` for commands or flags the guide does not cover.
-
-A `runtime_unavailable` error is usually transient while Orca is busy or restarting: wait a few
-seconds and retry the command. Before retrying a command that changes something, check whether
-it already took effect, and reuse any request ID the error names.
-
-`ORCA open` can bring Orca's window to the front over the user's work. Never run it to retry a
-failed command. Run it only when the user asks, or when Orca is really not running:
-`ORCA status --json` reports `result.app.running: false`, or every command (`ORCA status`
-included) still cannot connect after about 30 seconds of retries.
-
-If a command fails with `runtime_access_denied`, your sandbox blocked the connection: re-run it
-with escalated permissions, and do not run `ORCA open` or restart Orca.
-If `skills get` is unknown, explain that updating Orca restores the guide; use `--help` for
-read-only discovery and do not guess unsupported commands.
-
-## Scenario routing
-
-| Scenario | Reference | Load guide with |
+| Scenario | Reference | Purpose |
 |---|---|---|
-| Worktrees, folder contexts, terminals, repos, automations, artifacts, skill sharing, embedded browser | [cli.md](references/cli.md) | `ORCA skills get orca-cli` |
-| Scheduled automations and cron jobs | [automations.md](references/automations.md) | `ORCA skills get orca-cli --reference references/automations.md` |
-| Visible local app windows (native apps, browsers, webviews) | [computer-use.md](references/computer-use.md) | `ORCA skills get computer-use` |
-| Booted iOS Simulator on macOS | [emulator.md](references/emulator.md) | `ORCA skills get orca-emulator` |
-| adb-connected Android emulator or phone | [emulator-android.md](references/emulator-android.md) | `ORCA skills get orca-emulator-android` |
-| Linear ticket work | [linear.md](references/linear.md) | `ORCA skills get orca-linear` |
-| Per-workspace environment recipes | [per-workspace-env.md](references/per-workspace-env.md) | `ORCA skills get orca-per-workspace-env` |
-| Supervised multi-agent coordination, DAGs, decision gates | [orchestration.md](references/orchestration.md) | `ORCA skills get orchestration` |
-| Large briefs and long-context guidance | [large-briefs.md](references/large-briefs.md) | `ORCA skills get orca --reference references/large-briefs.md` |
-
-## Grok Build in Orca worktrees (agent slot)
-
-Attach Grok Build to a worktree with `orca worktree create ... --agent grok --no-parent` — the
-Grok TUI runs in the worktree's first terminal (`--surface terminal`; `--surface chat` for
-pure read-only analysis). Two ways to use that slot:
-
-- **Supervised (default for /implement, /execute-plan runs)**: subagents bind to the
-  worktree via `cwd`; task text is NEVER sent to the TUI (`--prompt` stays off). The TUI
-  is the orchestrator's monitoring surface only. A monitoring TUI that stays idle or holds
-  unmerged local changes blocks later `worktree rm --force` — kill the terminal or retire
-  the worktree before assembly/teardown.
-- **Full handoff**: send the brief via `orca terminal send` after
-  `orca terminal wait --for tui-idle`; confirm `accepted: true`, then stop
-  driving it. Hermes-style agents (Hermes orchestrating a Grok Build TUI in
-  the worktree) use this mode exclusively: plan the brief, drop it once, wait
-  for idle, then verify the worktree state and ship (commit/push/PR)
-  themselves.
-
-**Full-handoff pitfalls** — these cost rework when ignored:
-
-- **`tui-idle` is not a reliable progress signal.** The terminal stream can
-  stay empty (`tail: []`, 0 returned lines) while Grok is actively writing
-  files and committing in the worktree. Never assume idleness from an empty
-  `orca terminal read` output. Verify progress directly in the worktree
-  directory: `git log --oneline -3`, `git status --short`,
-  `git show --stat <head-sha>`, and `ls <expected-new-file>`.
-- **`orca terminal wait` promotes past the 600s cap.** When a wait exceeds
-  the foreground cap it becomes a tracked background process with
-  `notify_on_complete=true` instead of being refused. Do not re-run the
-  wait; poll with `process_manage(action="poll", session_id=<session_id>)`
-  or wait for its completion notification.
-- **After `orca terminal send` returns `accepted: true`, stop driving.**
-  Grok owns the worktree from there; continued sends interleave with its
-  work. Confirm acceptance, then disengage and verify via worktree state.
-- **Grok can omit pieces it considers incidental.** Grok may drop functions
-  or methods it thinks are "legacy" (e.g. `load_rows`, `read_catalog_text`)
-  while keeping callers that need them. Always run the full test suite in
-  the worktree before declaring done — not just the subset Grok mentions —
-  and `git show --stat <head>` to confirm exactly which files changed.
-- **Base the worktree intentionally.** `worktree create` bases on
-  `origin/main` regardless of `--prompt`. For a task stacked on a sibling
-  feature branch, check `git log --oneline -3` in the worktree and
-  `git reset --hard <base-sha>` (or recreate) before sending the brief —
-  otherwise the work conflicts or misses predecessor commits. The full
-  handoff contract — including what to put in the brief, how to wait, and how
-  to verify + ship after Grok finishes — is codified in the agents-arwaky repo
-  skills `implement` and `execute-plan` under `references/hermes/` (their
-  Hermes lane). Load those step files before running a /implement or
-  /execute-plan handoff; they are the authoritative procedure for that class
-  of task.
-
-Mutually exclusive per worktree — pick one per worktree, never both. The `implement` and
-`execute-plan` skills in the agents-arwaky tree use the supervised mode; their step files
-are the authoritative protocol for that class of task.
-
-## Handoff vs. supervision boundary
-
-Full ownership handoff — "hand off", "handover", "give this to another agent", "another
-worktree" — routes to [cli.md](references/cli.md) and stops after the prompt is accepted.
-Supervised orchestration — the user asked to monitor, coordinate a DAG, use decision gates,
-or manage ask/reply — routes to [orchestration.md](references/orchestration.md) and keeps the
-original agent in control. The two are mutually exclusive.
-
-## Headless vs. TUI launch — agent slot must go through this skill
-
-Hermes delegates to Grok Build **only** through this skill (orca). When a user-facing
-agent (Hermes or a Grok-style orchestrator) wants a headless Grok run, the canonical
-pattern is:
-
-```bash
-# 1. Orca worktree with the Grok agent slot
-$ORCA worktree create --repo path:<repo> --name <task-slug> --agent grok --no-parent --json
-
-# 2. Drive Grok headless INSIDE that worktree (the worktree is the launch context)
-cd <worktree_path> && grok -p '<brief>' --cwd <worktree_path> --always-approve --max-turns <n>
-
-# 3. Collect Grok's output, then retire/verify the worktree
-```
+| Worktrees, folder contexts, terminals, repos, automations, artifacts, skill sharing, embedded browser | [`references/cli.md`](references/cli.md) | Core CLI operations and worktree management |
+| Scheduled automations and cron jobs | [`references/automations.md`](references/automations.md) | Periodic jobs, triggers, and automations |
+| Visible local app windows (native apps, browsers, webviews) | [`references/computer-use.md`](references/computer-use.md) | Local window automation and computer use |
+| Booted iOS Simulator on macOS | [`references/emulator.md`](references/emulator.md) | iOS Simulator controls and app lifecycle |
+| adb-connected Android emulator or phone | [`references/emulator-android.md`](references/emulator-android.md) | Android emulator and device workflows |
+| Linear ticket work | [`references/linear.md`](references/linear.md) | Linear issue updates and tracker sync |
+| Per-workspace environment recipes | [`references/per-workspace-env.md`](references/per-workspace-env.md) | Environment configuration and setup recipes |
+| Supervised multi-agent coordination, DAGs, decision gates | [`references/orchestration.md`](references/orchestration.md) | Orchestration DAGs and multi-agent coordination |
+| Large briefs and long-context guidance | [`references/large-briefs.md`](references/large-briefs.md) | Context management for multi-file briefs |
