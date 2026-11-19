@@ -10,7 +10,7 @@ The reviewer panel is **fixed**: every run launches exactly **5 reviewers** — 
 | **Tests** | None (prompt-only) | Test coverage, test quality, edge cases, mocking | Always (every run) |
 | **Simplicity** | None (prompt-only) | Over-engineering, extra helpers/files for one caller, unused abstractions, reinvented stdlib, YAGNI | Always (every run) |
 | **Lint** | None (prompt-only) | Running `lint-arwaky-cli` and project linters/formatters/typecheckers, flagging violations, syntax, formatting, and typing errors until 0 issues remain | Always (every run) |
-| **User** | None (prompt-only) | User POV: what the user wants, needs, and expects; UX/DX, CLI ergonomics, error messages, output clarity, and friction | Always (every run) |
+| **User** | None (prompt-only) | User POV & Quality of Life (QoL): zero-friction, minimal configuration/setup, intelligent automation, reduced cognitive load, clear actionable feedback, and time-saving ergonomics | Always (every run) |
 
 The security and plan-alignment concerns are folded into the General reviewer; they no longer get a dedicated specialist.
 

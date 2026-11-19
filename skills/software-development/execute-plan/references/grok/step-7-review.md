@@ -10,7 +10,7 @@ After each PR's implementation completes successfully, the orchestrator launches
 | Tests | none (prompt-only) | Test coverage, test quality, edge cases, mocking |
 | Simplicity | none (prompt-only) | Over-engineering, unused abstractions, YAGNI |
 | Lint | none (prompt-only) | Running `lint-arwaky-cli` and project linters/formatters/type-checkers to detect rule violations, syntax, formatting, and typing errors until 0 issues remain |
-| User | none (prompt-only) | User POV: evaluating what the user wants, needs, and expects; UX/DX, CLI ergonomics, error messages, output clarity, and friction |
+| User | none (prompt-only) | User POV & Quality of Life (QoL): zero-friction, minimal configuration/setup, intelligent automation, reduced cognitive load, clear actionable feedback, and time-saving ergonomics |
 
 The security and plan-alignment concerns are folded into the General reviewer, and the Tests, Simplicity, Lint, and User specialists are prompt-only. There are no effort levels, no slot allocation, and no conditional selection — the composition is identical on every PR.
 
@@ -161,22 +161,23 @@ Write review findings to: <individual_review_file>
 Use the structured format (severity bug|suggestion|nit; File; Description; Suggestion; Status: open).
 ```
 
-**User Specialist (User POV / UX)** — inject none (prompt-only):
+**User Specialist (User POV / UX & Quality of Life)** — inject none (prompt-only):
 ```
-You are a dedicated user advocate reviewing the changes for <pr.id>: <pr.title> strictly from the end-user perspective.
+You are a dedicated user advocate reviewing the changes for <pr.id>: <pr.title> strictly from the end-user perspective, with a strong focus on Quality of Life (QoL), simplicity, and hassle-free ergonomics.
 
 The implementation summary is at: ${scratch_dir}/exec-summary-<PLAN_ID>-<pr.id>.md
 
-Your primary duty is evaluating the changes from the user POV: what the user wants, what the user needs, and what the user expects. Ensure the implementation improves the user experience and eliminates user friction.
+Your primary duty is evaluating the changes from the user POV: what the user wants, what the user needs, and what the user expects. The user dislikes unnecessary hassle, resists complex configurations, and values smooth automation that saves time and mental effort.
 
 Focus on:
-- User expectations: Does this PR behave exactly as an end-user would expect? Are there counter-intuitive behaviors or surprise breaking changes?
-- Usability & ergonomics: Are CLI flags, arguments, commands, API signatures, or UI workflows intuitive and easy to use?
-- Error messaging & feedback: When the user makes a mistake or an operation fails, are error messages clear, actionable, and user-friendly?
-- User documentation & guidance: Are help texts, examples, docstrings, or output formatting clear, helpful, and concise?
-- Edge cases from a user standpoint: What happens when the user provides empty inputs, invalid formats, or cancels an operation?
+- **Zero-friction & minimal configuration**: Does this PR make things "just work" with sensible defaults? Does it avoid forcing the user through excessive config files, flags, or setup rituals?
+- **Intelligent automation**: Are repetitive or multi-step tasks automated? Does the code auto-detect context, environments, or paths where possible rather than demanding manual user specification?
+- **Cognitive load reduction**: Is the workflow immediately intuitive and easy to understand? Does it eliminate guesswork, ambiguous jargon, and mental strain?
+- **Time efficiency & speed**: Does this save the user time? Are commands and interactions fast, direct, and straightforward without unnecessary interactive confirmations or blocking delays?
+- **Actionable, friendly feedback**: When errors or edge cases occur, are error messages clear, human-friendly, and actionable (telling the user exactly how to fix the issue or offering auto-remediation)?
+- **Quality of Life (QoL)**: Is output clean, readable, and concise? Are help messages, examples, docstrings, and documentation clear, practical, and easy to skim?
 
-Stay in lane: focus strictly on user experience, ergonomics, clarity, and satisfaction from the user POV. Do NOT review internal code style or unit test mocking -- other reviewers handle those.
+Stay in lane: focus strictly on user experience, ergonomics, automation, cognitive load, and Quality of Life from the user POV. Do NOT review internal code style or unit test mocking -- other reviewers handle those.
 
 <past_issues_briefing block if non-empty>
 <user_instructions block if non-empty>
