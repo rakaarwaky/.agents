@@ -19,6 +19,7 @@ Construct self-contained Python renderers using NumPy, Pillow, and ffmpeg to gen
 | R4 | Incorporate at least one project-specific custom palette, procedural effect, or unique visual element per project. | Check codebase for customized visual effects or custom character maps. |
 | R5 | Build single-file Python renderers with hardware profile detection using NumPy, Pillow, and ffmpeg pipelines. | Confirm renderer script is self-contained and manages process pipelines cleanly. |
 | R6 | Verify test frames at key timestamps meet minimum brightness thresholds (`canvas.mean() > 8`) and match target formats. | Inspect sample rendered frames and test media container output. |
+| R7 | For a themed/concept video where the user supplies no assets, prefer a fully procedural/generative build over asking for their footage/audio — this user favors code-generated "from-zero" results. | Offer the zero-asset path first; request input media only when the user explicitly wants their own content converted. |
 
 ## Routing
 

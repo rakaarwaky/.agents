@@ -164,6 +164,10 @@ If mean < 20, the scene needs attention. Common fixes:
 - Increase value field multipliers (e.g., `vf_plasma(...) * 1.5`)
 - Check that the shader chain doesn't have an aggressive solarize or threshold
 
+### Whole-Frame Mean Understates Sparse Subjects
+
+`canvas.mean()` assumes content fills the frame. When the subject is a small fraction of the frame (a single figure on a black stage, a few stars in a void), the global mean sits near 0 even when the subject is perfectly lit — the `> 8` gate then reports "too dark" for a frame that is actually fine, and you chase a phantom problem by brightening the wrong things. For sparse-subject frames, judge brightness by the mean over the non-black pixels (`canvas[canvas.sum(2) > 30].mean()`), or by a vision review of the test frame — not the whole-canvas mean.
+
 ### v1 Brightness Pattern (Deprecated)
 
 The old pattern used a linear multiplier:
@@ -208,6 +212,33 @@ If the number of frames written to the pipe doesn't match what ffmpeg expects (b
 - Audio-video desync
 
 **Fix**: Calculate frame count explicitly: `n_frames = int(duration * FPS)`. Don't use `range(int(start*FPS), int(end*FPS))` without verifying the total matches.
+
+### Chunk Worker Re-imports the Module (Globals Reset)
+
+With `ProcessPoolExecutor`, some spawn modes re-import the render module in each worker instead of forking. Any module-level globals you set in the parent (`FPS`, `VW`, `VH`, `CRF`, render quality, etc.) are reset to their module-level defaults inside the worker. Chunk frame indices then mismatch the grid and crash with `index N is out of bounds for axis 0 with size M`, even though the parent set the correct spec. Fix: pass the resolved render spec as an explicit argument to the worker function and re-assign all globals at the top of that function on every call — never rely on parent-process module state surviving into workers.
+
+```python
+def render_chunk(c, features, clip_path, spec):
+    global VW, VH, FPS, CRF, QUALITY
+    VW, VH, FPS, CRF = spec["vw"], spec["vh"], spec["fps"], spec["crf"]
+    # ...
+```
+
+### Deterministic Static-Star Fields: Per-Cell Threshold, Not Density Scale
+
+"Sparse bright stars" generators that multiply random noise by a density constant produce values too dim to ever cross the `val2char` threshold — you get a blank sky instead of stars, and raising brightness elsewhere is the wrong fix. Select the lit cells with a boolean threshold, then give each lit cell brightness by its value rank:
+
+```python
+n = _value_noise_2d(g.cc * 0.9, g.rr * 0.9 + 13.7)   # deterministic static hash, 0..1
+lit = (n < density)                                     # fraction of cells = density
+val = lit.astype(np.float32) * np.clip(n * 1.6, 0.35, 1.0) * tw
+```
+
+Because `n` is a function of grid position (not time), stars stay fixed in place and twinkle slowly instead of flickering randomly every frame. The cell grid is the pixel grid: a dense char threshold on a high-frequency field forms amorphous blobs, so use a coarser field or an explicit threshold floor when you want distinct cells to read as characters.
+
+### One-Shot Burst Durations Use Local Time, Not Frame Count
+
+A "burst" that lasts under a second across multiple scenes (supernova flash, impact flash, shockwave) is almost always the frame-count signature of local-time quantization: each clip passes its own frame counter or `t - clip_start` into the effect, so a one-shot `life -= 0.008` at 24 fps drains in ~0.4 s and the flash vanishes before the eye registers it. Fix: emit the burst as a per-scene local-time gate that covers the first ~1.5 s of the scene, and scale decay per-frame so the burst spans a perceptible window; add a shockwave ring and residual afterglow that resolve over ~2 s so the scene reads as a climax, not a blip.
 
 ### Concat Fails with "unsafe file name"
 

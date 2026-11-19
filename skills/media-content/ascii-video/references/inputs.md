@@ -145,6 +145,22 @@ def frame_to_ascii(frame_rgb, grid, pal=PAL_DEFAULT):
     return chars, colors
 ```
 
+### Thin/Bright Content: Max-Pool, Not Average, Downsampling
+
+`frame_to_ascii` above averages pixels into each grid cell (LANCZOS/BILINEAR). That is correct for dense filled footage, but it **washes thin bright strokes into mid-grey**: a 4-8px bright line inside a cell averages with the black around it, drops below the `val2char` threshold, and the figure/lines/stars disappear or read as dim grey. When the source content is thin bright strokes on a dark field (stick figures, line art, star fields, high-contrast silhouettes), max-pool luminance per cell and take the color of the brightest pixel instead:
+
+```python
+# resize to full cell footprint, then max-pool per cell (cw/ch are the grid cell dims)
+cell = np.array(Image.fromarray(canvas).resize((cols*cw, rows*ch), Image.BILINEAR)).astype(np.float32)
+cr = cell.reshape(rows, ch, cols, cw, 3)
+lum = cr[...,0]*0.299 + cr[...,1]*0.587 + cr[...,2]*0.114
+val = np.clip(lum.max(axis=(1,3)) / 255.0 ** 0.8, 0, 1)        # any bright pixel lights the cell
+i = np.argmax(lum.reshape(rows, cols, ch*cw), axis=2)
+color = cr[np.arange(rows)[:,None], i//cw, np.arange(cols)[None,:], i%cw]  # color of brightest px
+```
+
+Rule of thumb: average downsample for filled/dense footage, max-pool for sparse thin bright strokes.
+
 ### Edge-Weighted Character Mapping
 
 Use edge detection for more detail in contour regions:
