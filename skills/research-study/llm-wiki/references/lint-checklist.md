@@ -10,7 +10,7 @@ below, then report and log.
 # Use execute_code for this — programmatic scan across all wiki pages
 import os, re
 from collections import defaultdict
-wiki = "<WIKI_PATH>"
+wiki = "/home/raka/.agents/wiki"
 # Scan all .md files in entities/, concepts/, comparisons/, queries/
 # Extract all [[wikilinks]] — build inbound link map
 # Pages with zero inbound links are orphans

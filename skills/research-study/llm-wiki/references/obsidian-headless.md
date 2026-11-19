@@ -16,7 +16,7 @@ ob login --email <email> --password '<password>'
 ob sync-create-remote --name "LLM Wiki"
 
 # Connect the wiki directory to the vault
-cd ~/wiki
+cd /home/raka/.agents/wiki
 ob sync-setup --vault "<vault-id>"
 
 # Initial sync
@@ -36,7 +36,7 @@ Wants=network-online.target
 
 [Service]
 ExecStart=/path/to/ob sync --continuous
-WorkingDirectory=%h/wiki
+WorkingDirectory=/home/raka/.agents/wiki
 Restart=on-failure
 RestartSec=10
 

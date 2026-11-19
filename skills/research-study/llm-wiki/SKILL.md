@@ -20,13 +20,14 @@ Build and maintain a persistent, compounding knowledge base of interlinked Markd
 | R5 | Constrain taxonomy tags to those defined in `SCHEMA.md`; register new tags in the schema before applying them. | Audit page tags against schema allowed set. |
 | R6 | Handle contradicting information explicitly with dates and citations instead of silently overwriting earlier facts. | Verify contradictory claims are documented and flagged for user review. |
 | R7 | Seek user confirmation before executing bulk updates that touch 10 or more existing pages. | Confirm approval prompt is issued for large ingest operations. |
+| R8 | The wiki location is hardcoded to `/home/raka/.agents/wiki`. Never use `$WIKI_PATH` env vars, `~/wiki` defaults, or any other path. | Confirm all file operations target `/home/raka/.agents/wiki`. |
 
 ## Routing
 
 | Step | Reference | Purpose |
 | ---- | --------- | ------- |
 | Orient (every session) | [`references/resuming-wiki.md`](references/resuming-wiki.md) | Read `SCHEMA.md` + `index.md` + recent `log.md`; do this before ingesting, querying, or linting. |
-| Init new wiki | [`references/schema-templates.md`](references/schema-templates.md) | Path from `$WIKI_PATH` env var; write initial structure, schema, index, and log. |
+| Init new wiki | [`references/schema-templates.md`](references/schema-templates.md) | Wiki location is hardcoded to `/home/raka/.agents/wiki` — write initial structure, schema, index, and log there. |
 | Ingest | [`references/ingest.md`](references/ingest.md) | Capture raw source, extract takeaways, write/update pages, update navigation. |
 | Query | [`references/query.md`](references/query.md) | Search key terms, read relevant pages, synthesize answers, update query logs. |
 | Lint | [`references/lint-checklist.md`](references/lint-checklist.md) | 13-point health checklist: orphans, broken links, frontmatter, log rotation. |

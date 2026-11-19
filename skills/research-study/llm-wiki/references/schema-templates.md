@@ -3,6 +3,9 @@
 Adapt these templates to the user's domain. The schema constrains agent behavior
 and ensures consistency.
 
+Initialize the wiki at the fixed location `/home/raka/.agents/wiki` — no other location is valid.
+Write the initial structure, schema, index, and log there.
+
 ## SCHEMA.md Template
 
 ```markdown

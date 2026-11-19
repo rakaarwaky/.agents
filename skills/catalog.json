@@ -290,12 +290,12 @@
     },
     {
       "name": "email",
-      "description": "Mailbox: triage, read, search, reply, send — one umbrella for mailbox work split by access path and job: himalaya terminal IMAP/SMTP, the Google Workspace MCP connector, thread-aware triage, Gmail query operators, and the start-of-day brief. himalaya is the terminal access path for IMAP/SMTP mailboxes; google-workspace is the MCP path for Gmail/Docs/Drive/Calendar-only tasks. Not for Google Docs/Drive/Calendar-only tasks (that is google-workspace).",
-      "when_to_use": "Use for any mailbox task: 'triage my inbox', 'draft replies', 'list mail from X', 'send email', 'what needs answering', 'morning brief'. Not for Google Docs/Drive/Calendar-only tasks. Use himalaya for terminal IMAP/SMTP mailbox management (folders, read/search, replies, move/copy/delete, flags, attachments). Use google-workspace for Gmail via the workspace MCP server.",
+      "description": "Mailbox: triage, read, search, reply, send — one umbrella for mailbox work split by access path and job: himalaya terminal IMAP/SMTP, the Google Workspace MCP connector, thread-aware triage, Gmail query operators, and the start-of-day brief. himalaya is the terminal access path for IMAP/SMTP mailboxes; google is the MCP path for Gmail/Docs/Drive/Calendar-only tasks. Not for Google Docs/Drive/Calendar-only tasks (that is google).",
+      "when_to_use": "Use for any mailbox task: 'triage my inbox', 'draft replies', 'list mail from X', 'send email', 'what needs answering', 'morning brief'. Not for Google Docs/Drive/Calendar-only tasks. Use himalaya for terminal IMAP/SMTP mailbox management (folders, read/search, replies, move/copy/delete, flags, attachments). Use google for Gmail via the workspace MCP server.",
       "category": "office"
     },
     {
-      "name": "google-workspace",
+      "name": "google",
       "description": "Daily Google ops via workspace MCP: Gmail, Drive, Calendar, Docs, Sheets, Slides, Forms, Tasks, Contacts, Chat. For user tasks.",
       "when_to_use": "Use when performing daily Google Workspace operations — Gmail, Drive, Calendar, Docs, Sheets, Slides, Forms, Tasks, Contacts, or Chat — via the workspace MCP server.",
       "category": "office"

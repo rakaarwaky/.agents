@@ -7,7 +7,8 @@ When the user has an existing wiki, **always orient yourself before doing anythi
 ③ **Scan recent `log.md`** — read the last 20-30 entries to understand recent activity.
 
 ```bash
-WIKI="${WIKI_PATH:-$HOME/wiki}"
+# Wiki location is fixed — never read from an env var or default to ~/wiki
+WIKI="/home/raka/.agents/wiki"
 # Orientation reads at session start
 read_file "$WIKI/SCHEMA.md"
 read_file "$WIKI/index.md"

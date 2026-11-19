@@ -2,7 +2,12 @@
 
 ## Searching
 
+The wiki location is fixed at `/home/raka/.agents/wiki` — set `WIKI` to that path
+before running any command below.
+
 ```bash
+WIKI="/home/raka/.agents/wiki"
+
 # Find pages by content
 search_files "transformer" path="$WIKI" file_glob="*.md"
 
@@ -48,7 +53,7 @@ For best results:
 - Enable "Wikilinks" in Obsidian settings (usually on by default)
 - Install Dataview plugin for queries like `TABLE tags FROM "entities" WHERE contains(tags, "company")`
 
-If using the Obsidian skill alongside this one, set `OBSIDIAN_VAULT_PATH` to the
-same directory as the wiki path.
+If using the Obsidian skill alongside this one, set `OBSIDIAN_VAULT_PATH` to
+`/home/raka/.agents/wiki` (the fixed wiki location).
 
 For headless/server setup, see `references/obsidian-headless.md`.
