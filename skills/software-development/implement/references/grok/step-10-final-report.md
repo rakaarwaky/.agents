@@ -17,7 +17,7 @@ When the review-fix loop reaches 0 open issues, memory is flushed (Step 8), and 
 
 ## End-Turn Gate: Lint Verification
 
-Before the final report, run `lint-arwaky-cli report .` from the worktree or owning repo (absolute path: `/home/raka/.local/bin/lint-arwaky-cli`). Compare against the start-turn baseline recorded in Step 0. The Delta column must be zero or negative — a positive delta means the run introduced new lint violations. Any regression: stop and fix before reporting; never claim completion while deltas are positive. Include the final report output in the final report to the user.
+Before the final report, run `lint-arwaky-cli report .` from the worktree or owning repo (absolute path: `$HOME/.local/bin/lint-arwaky-cli`). Compare against the start-turn baseline recorded in Step 0. The Delta column must be zero or negative — a positive delta means the run introduced new lint violations. Any regression: stop and fix before reporting; never claim completion while deltas are positive. Include the final report output in the final report to the user.
 
 ## Cleanup
 

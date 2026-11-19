@@ -10,7 +10,7 @@ Build the JSON spec from the issues Grok raised. Generalize patterns before writ
 
 ## End-Turn Gate: Lint Verification
 
-Run `lint-arwaky-cli report .` from the worktree or owning repo (absolute path: `/home/raka/.local/bin/lint-arwaky-cli`). Compare the output against the start-turn baseline. The Delta column must be zero or negative (no new violations introduced by the run). Any positive delta is a regression: stop, report the offending file(s), and do not open the PR until it is fixed. Include the final report output in the report to the user.
+Run `lint-arwaky-cli report .` from the worktree or owning repo (absolute path: `$HOME/.local/bin/lint-arwaky-cli`). Compare the output against the start-turn baseline. The Delta column must be zero or negative (no new violations introduced by the run). Any positive delta is a regression: stop, report the offending file(s), and do not open the PR until it is fixed. Include the final report output in the report to the user.
 
 ## Final Report
 

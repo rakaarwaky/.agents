@@ -4,21 +4,22 @@ description: "Create or improve docs: minimum tokens, exact names, zero AI slop.
 when-to-use: "Use ONLY for concise document creation (--create) or for improving existing text (--improve)."
 argument-hint: "[--create|--improve] <path>"
 ---
+
 # LLM-Optimized Writing
 
-Create or shorten docs with minimum tokens, exact names, and zero AI slop.
+Create or shorten documentation with minimum tokens, exact symbol names, and zero AI slop across authoring and improvement workflows.
 
 ## Rules
 
-| ID | Rule |
-|----|------|
-| R1 | One owner per fact. |
-| R2 | Action-only sentences. |
-| R3 | Exact name or `UNKNOWN`. |
-| R4 | Backtick control keywords; log `CONFLICT:`. |
-| R5 | No new facts in rewrite. |
-| R6 | Preserve user voice; no over-sterilizing. |
-| R7 | **Completion.** `--create`: skeleton chosen, doc written, keep-set diffed. `--improve`: R1–R6 applied, keep-set diffed, cut target met or meaning-preserved. Report emitted (≤10 lines). |
+| ID | Rule | Check |
+|----|------|-------|
+| R1 | Maintain one owner per fact across the document set. | Verify no duplicated facts across sections. |
+| R2 | Write action-only sentences without introductory or narrative filler. | Check sentences begin with active imperative verbs. |
+| R3 | Use exact entity names or explicitly state `UNKNOWN`. | Verify all referenced identifiers match actual symbol names. |
+| R4 | Backtick control keywords and log `CONFLICT:` when contradictions appear. | Inspect text for backticked keywords and conflict flags. |
+| R5 | Introduce no new ungrounded facts during text rewrites. | Verify semantic equivalence against source text. |
+| R6 | Preserve user voice without over-sterilizing tone. | Confirm unique stylistic attributes remain intact. |
+| R7 | Emit concise completion report (under 10 lines) after diffing keep-sets. | Check output report length and keep-set diff verification. |
 
 ## Routing
 

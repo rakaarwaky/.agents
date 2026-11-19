@@ -7,16 +7,18 @@ argument-hint: "<video-to-ascii|audio-reactive|generative|hybrid|lyrics|tts> <in
 
 # ASCII Video Production Pipeline
 
-You build a single self-contained Python renderer per project and pipe it through the 6-stage pipeline `INPUT → ANALYZE → SCENE_FN → TONEMAP → SHADE → ENCODE` to produce colored ASCII character video (MP4, GIF, image sequence). No GPU required. Six input modes (video-to-ASCII, audio-reactive, generative, hybrid, lyrics/text, TTS narration) route to `references/inputs.md` and `references/effects.md`; the 4-step build sequence is in `references/workflow.md`.
+Construct self-contained Python renderers using NumPy, Pillow, and ffmpeg to generate cinematic colored ASCII character videos across audio-reactive, generative, and hybrid input modes.
 
-## Global rules
+## Rules
 
-- **Creative standard.** This is visual art — ASCII characters are the medium, cinema is the standard. Articulate the creative concept before writing code; the output must be visually striking on the first render (full rubric in `references/creative-standard.md`).
-- **Adaptive tonemap only.** ASCII on black is inherently dark — use adaptive `tonemap()`, never `canvas * N` multipliers (implementation notes in `references/implementation-notes.md`).
-- **Per-section variation.** Never use one config for the whole video — vary background effect, character palette, color strategy, and shader intensity per scene/section.
-- **Invent, don't just pick.** The effect, shader, and palette catalogs are a starting vocabulary; every project includes at least one custom palette, effect, or visual moment.
-- **Single-file renderer.** One self-contained Python script per project: NumPy + Pillow + ffmpeg CLI, with SciPy for audio modes; hardware-detect a quality profile before building.
-- **Completion.** Test frames at key timestamps pass the brightness check (`canvas.mean() > 8`) and the creative vision check against `references/creative-standard.md`; output matches the selected mode's shape (MP4, GIF, or image sequence).
+| ID | Rule | Check |
+|----|------|-------|
+| R1 | Define artistic concepts and visual styling explicitly before code generation to meet cinematic quality standards. | Verify aesthetic plan and scene transitions before executing renderer. |
+| R2 | Apply adaptive `tonemap()` algorithms exclusively; never multiply dark canvas values by static scalar constants. | Inspect rendering code to ensure adaptive tonemapping is implemented. |
+| R3 | Introduce per-section visual variations in background effects, character palettes, color schemes, and shader intensity. | Verify scene configuration varies across distinct timeline segments. |
+| R4 | Incorporate at least one project-specific custom palette, procedural effect, or unique visual element per project. | Check codebase for customized visual effects or custom character maps. |
+| R5 | Build single-file Python renderers with hardware profile detection using NumPy, Pillow, and ffmpeg pipelines. | Confirm renderer script is self-contained and manages process pipelines cleanly. |
+| R6 | Verify test frames at key timestamps meet minimum brightness thresholds (`canvas.mean() > 8`) and match target formats. | Inspect sample rendered frames and test media container output. |
 
 ## Routing
 

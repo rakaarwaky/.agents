@@ -3,27 +3,20 @@ name: media-acquisition
 description: Download music lists to a local MP3 library via mdl.
 when-to-use: "Use when the user wants to download songs to a local MP3 music library, build/replenish a music library from a named list, or acquire media assets from external sources."
 argument-hint: "<song-list | songs...> [--out-dir DIR] [--format mp3|m4a|opus|flac|wav] [--bitrate 128K..320K|best]"
-metadata:
-  tags:
-    - media
-    - music
-    - mp3
-    - download
-    - library
-  related_skills:
-    - gif-search
 ---
 
 # Media Asset Acquisition
 
-Acquire media assets from external sources into a local library. Split by source and format.
+Acquire media assets from external sources into a local library, resolving target URLs and downloading audio formats through command line utilities.
 
-## Global Rules
+## Rules
 
-- **Resolve-first.** Tools that pull audio/video from a URL (e.g. `mdl`) never search — resolve every item to a concrete track/playlist URL before downloading.
-- **One tool run = one collection.** N items need N tool calls; never concatenate URLs into one call.
-- **Verify resolution before batching.** Check the first query returns real results; a silently empty endpoint makes every item look NOT FOUND.
-- **Locate binaries explicitly.** Global npm installs may not put the binary on PATH; resolve with `npm root -g` / `ls $(npm root -g)/../bin`.
+| ID | Rule | Check |
+|----|------|-------|
+| R1 | Resolve all items to concrete track or playlist URLs before invoking download tools. | Check that URL parameters are fully qualified before running downloader. |
+| R2 | Execute one tool invocation per collected item; never concatenate multiple URLs into a single run. | Confirm download processes are invoked individually per media item. |
+| R3 | Verify query resolution on initial items before dispatching large batch operations. | Test output of first query to ensure endpoint returns valid metadata. |
+| R4 | Resolve CLI binary paths explicitly through npm root resolution if not directly present in system PATH. | Verify binary location via `npm root -g` if command is not found. |
 
 ## Routing
 

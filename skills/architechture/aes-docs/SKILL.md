@@ -10,15 +10,17 @@ argument-hint: '<improve | make | design> [document type] [path]'
 
 Scaffold and audit the ten AES project documents — PRD, ROADMAP, FRD, BACKLOG, README, AGENTS, ARCHITECTURE, CONTRIBUTING, DESIGN, DATA — each with its own rules, exemplar, template, and workflow file under `references/`. The audience is the agent creating or improving a project document; the **document type** decides which reference set loads and which gate applies. A missing document is diagnosed by its reader's question — the reader who could not answer the question is the document to write. Invariants read by more than one step live in Global Rules below.
 
-## Global Rules
+## Rules
 
-- Split spec from status: `PRD` / `FRD` / `DESIGN` state intent, `BACKLOG` and `ROADMAP` state what is true now — status words never appear in spec documents (status-in-spec).
-- One document per reader: root documents (`PRD`, `ROADMAP`, `README`, `AGENTS`, `ARCHITECTURE`, `CONTRIBUTING`) live at the workspace root; `FRD` / `BACKLOG` live per feature folder; `DESIGN` per surface folder; `DATA` per shared folder.
-- Feature folders carry `FRD.md` and `BACKLOG.md`; a folder with neither capabilities nor an agent is not a feature and owes no document pair (AES702).
-- Surface folders carry `DESIGN.md` with the six sections — Kind, Entry Points, Request Shape, States, Error States, Invariants, Change Checklist; every row names this folder's real files (AES703).
-- Improve vs make: audit mode checks each document against its rules file and exemplar; make mode scaffolds from the template file in the same reference set.
-- Verify: `lint-arwaky-cli docs <workspace>` passes — the document-invariant gate resolves every link and reports any pointer into nothing.
-- One fact, one home: each `references/<doc>/` set owns that document's shape — rules, exemplar, template, workflow. Read it, do not restate here. Cite the gate, not this file, when pointing at a rule. Each bullet states a fact once; references point at the bullet.
+| ID | Rule | Check |
+|----|------|-------|
+| R1 | **Split spec from status.** `PRD` / `FRD` / `DESIGN` state intent, `BACKLOG` and `ROADMAP` state what is true now — status words never appear in spec documents (status-in-spec). | No status words in spec documents. |
+| R2 | **One document per reader.** Root documents (`PRD`, `ROADMAP`, `README`, `AGENTS`, `ARCHITECTURE`, `CONTRIBUTING`) live at the workspace root; `FRD` / `BACKLOG` live per feature folder; `DESIGN` per surface folder; `DATA` per shared folder. | Documents placed in matching hierarchy locations. |
+| R3 | **Feature folder documents.** Feature folders carry `FRD.md` and `BACKLOG.md`; a folder with neither capabilities nor an agent is not a feature and owes no document pair (AES702). | FRD.md and BACKLOG.md present in feature folders. |
+| R4 | **Surface folder documents.** Surface folders carry `DESIGN.md` with the six sections — Kind, Entry Points, Request Shape, States, Error States, Invariants, Change Checklist; every row names this folder's real files (AES703). | Six sections present in surface DESIGN.md. |
+| R5 | **Improve vs make.** Audit mode checks each document against its rules file and exemplar; make mode scaffolds from the template file in the same reference set. | Template or exemplar followed per mode. |
+| R6 | **Verify.** `lint-arwaky-cli docs <workspace>` passes — the document-invariant gate resolves every link and reports any pointer into nothing. | lint-arwaky-cli docs passes cleanly. |
+| R7 | **One fact, one home.** Each `references/<doc>/` set owns that document's shape — rules, exemplar, template, workflow. Read it, do not restate here. Cite the gate, not this file, when pointing at a rule. Each bullet states a fact once; references point at the bullet. | No duplicated facts across document references. |
 
 ## Routing
 
