@@ -4,56 +4,23 @@ Grok Build runs the full execution loop itself — per-PR worktrees, implementer
 
 ## Wait
 
-Poll with `orca terminal read --terminal <handle> --cursor <cursor> --limit 1000 --json` until the session is idle. A multi-PR plan can run for a long time; use `orca terminal wait --terminal <handle> --for tui-idle --timeout-ms 60000 --json` and retry with a larger timeout while `satisfied: false`.
+A full-screen TUI agent (Grok) renders to its terminal *screen*, not to the line stream. `orca terminal read --cursor <n>` returns only the PTY line stream — for a TUI agent that is just the launching shell echo (one line, `nextCursor` stuck at `1`), never the agent's rendered output. The `EXECUTE_PLAN_COMPLETE` sentinel lives on the rendered screen and is ONLY visible via `orca terminal read --screen`. A cursor-paged poll therefore never sees the sentinel and will spin until its failure cap — reporting a false failure on a run that actually succeeded.
 
-- First read: use `--cursor 0`. The JSON response reports `result.terminal.nextCursor` (the paging token for the next read) and `result.terminal.status` (`running` | `exited` | `unknown`).
-- Subsequent reads: pass the previous `nextCursor` as `--cursor` so only new output since that read is returned. Stop paging when `nextCursor` is null or unchanged from `latestCursor`.
-- `limit` defaults to 120 for tail previews; use `--limit 1000` for long agent responses.
-- `orca terminal status --terminal <handle>` is **not** a valid subcommand (returns `invalid_argument`). Use `terminal wait --for tui-idle` to test idle and `terminal read` to drain output.
-- Do NOT send text while waiting.
+Poll with BOTH: use `orca terminal wait --terminal <handle> --for tui-idle --timeout-ms 60000 --json` to detect idle, and `orca terminal read --terminal <handle> --screen --json` to inspect the rendered screen for the sentinel and the final report. A multi-PR plan routinely runs 15–25 minutes; background the loop (see below), do not run it in the foreground.
+
+- `terminal wait --for tui-idle` returns `result.satisfied: true` both while Grok is mid-turn between renders and when it is truly done — idle alone does not mean finished. Confirm completion by finding `EXECUTE_PLAN_COMPLETE` on the screen, not by idle.
 
 ### Automated Polling Script
 
-Execute this loop in `terminal` (set `timeout=600`):
+Run the bundled `scripts/poll_grok.py` with `terminal(background=true, notify=true)` and `timeout` unset (or the max foreground value as a fallback). A multi-PR plan routinely runs past the 600s foreground cap — a foreground invocation exits `124` and the loop dies before Grok finishes. Backgrounding with `notify_on_complete` delivers the result as a new message and keeps the session free.
 
-```bash
-ORCA="${ORCA_CLI_COMMAND:-$(command -v orca-ide || echo "$HOME/.local/bin/orca-ide")}"
-cursor=0
-deadline=$((SECONDS + 7200))  # 2 hour absolute deadline
-consecutive_errors=0
-while true; do
-  if (( SECONDS >= deadline )); then
-    echo "ERROR: polling deadline exceeded (2h)"
-    break 2
-  fi
-  wait_res=$("$ORCA" terminal wait --terminal "<handle>" --for tui-idle --timeout-ms 60000 --json 2>/dev/null || true)
-  satisfied=$(echo "$wait_res" | jq -r '.result.satisfied // false' 2>/dev/null || echo "false")
-  if [[ "$satisfied" == "true" ]]; then
-    read_res=$("$ORCA" terminal read --terminal "<handle>" --cursor "$cursor" --limit 1000 --json 2>/dev/null || echo "")
-    if echo "$read_res" | grep -q "EXECUTE_PLAN_COMPLETE"; then
-      echo "SENTINEL: EXECUTE_PLAN_COMPLETE"
-      break 2
-    fi
-    status=$(echo "$read_res" | jq -r '.result.terminal.status // "unknown"' 2>/dev/null || echo "unknown")
-    if [[ "$status" == "exited" ]]; then
-      echo "ERROR: terminal exited without sentinel — run failed"
-      break 2
-    fi
-    new_cursor=$(echo "$read_res" | jq -r '.result.terminal.nextCursor // empty' 2>/dev/null || echo "")
-    if [[ -n "$new_cursor" ]]; then
-      cursor="$new_cursor"
-    fi
-    consecutive_errors=0
-  else
-    consecutive_errors=$((consecutive_errors + 1))
-    if (( consecutive_errors >= 30 )); then
-      echo "ERROR: 30 consecutive wait failures — aborting"
-      break 2
-    fi
-  fi
-  sleep 5
-done
 ```
+python3 <skill-dir>/scripts/poll_grok.py <terminal_handle> --orca "$ORCA"
+```
+
+The script uses `terminal read --screen` (the only read mode that surfaces a TUI agent's rendered output) to detect the `EXECUTE_PLAN_COMPLETE` sentinel, `terminal wait --for tui-idle` to pace the loop, and `python3` JSON parsing (not `jq`, which is not guaranteed on every host). Resolve `$ORCA` the same way as Step 0 (including the AppImage mount probe) and pass it with `--orca`.
+
+If you must inline the loop instead, use `python3 -c 'import sys,json; ...'` for JSON extraction rather than `jq` — but prefer the script; inline `python3 -c` one-liners inside bash substitution can trip security scanners on some hosts.
 
 ## When Grok Is Done
 
@@ -64,7 +31,7 @@ Grok writes artifacts to its scratch dir (`~/.agents/develop/<repo-slug>/execute
 - **Per-PR merged reviews**: `exec-review-<PLAN_ID>-<pr-id>.md`.
 - **Final report**: Grok's terminal output ends with its final report (per `grok/step-13-final-report.md`).
 
-Read the state file first — it is the single authoritative record of what happened. If Grok reports failure or exits non-idle with an error, report it verbatim to the user and stop — do not retry, do not hand-assemble the final branch yourself.
+Do NOT trust the state file as proof of completion — it is written at the start and is frequently left at `status: "initializing"` with every PR `pending` even after a fully successful run. Confirm completion from the rendered screen (`terminal read --screen` shows Grok's final report block: PR URL, branch, CI results, `EXECUTE_PLAN_COMPLETE`) and from the actual `git` / `gh pr` state on `origin`, not from `exec-plan-<PLAN_ID>.json`. If Grok reports failure or the terminal exits non-idle with an error, report it verbatim to the user and stop — do not retry, do not hand-assemble the final branch yourself.
 
 Report to the user: "Grok Build finished the execution loop. <worktree_path> state: <N> completed, <M> failed, <K> skipped. Final branch: <final_branch>."
 

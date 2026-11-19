@@ -11,6 +11,10 @@ license: Apache-2.0
 One consolidated skill for the Orca agent environment. Each sub-scenario is a
 [reference file](references/); the shared rules live here once.
 
+This skill is the single entry point for every `$orca-cli` invocation. The former
+`skills/orca-cli/` stub has been merged here; its newer `runtime_unavailable` and
+`ORCA open` retry guidance lives in §"Load the version-matched guide" below.
+
 ## Resolve the CLI for this session
 
 Choose the executable once and reuse it for every later command:
@@ -35,9 +39,17 @@ to another executable, which could silently target a different Orca build.
 Each reference file names the guide its scenario loads. Prefer `ORCA skills get <skill-name> --json`.
 Use the selected executable's `--help` for commands or flags the guide does not cover.
 
-If a command reports that Orca is not running, start it with `ORCA open --json` and retry.
-If it fails with `runtime_access_denied`, your sandbox blocked the connection: re-run it with
-escalated permissions, and do not run `ORCA open` or restart Orca.
+A `runtime_unavailable` error is usually transient while Orca is busy or restarting: wait a few
+seconds and retry the command. Before retrying a command that changes something, check whether
+it already took effect, and reuse any request ID the error names.
+
+`ORCA open` can bring Orca's window to the front over the user's work. Never run it to retry a
+failed command. Run it only when the user asks, or when Orca is really not running:
+`ORCA status --json` reports `result.app.running: false`, or every command (`ORCA status`
+included) still cannot connect after about 30 seconds of retries.
+
+If a command fails with `runtime_access_denied`, your sandbox blocked the connection: re-run it
+with escalated permissions, and do not run `ORCA open` or restart Orca.
 If `skills get` is unknown, explain that updating Orca restores the guide; use `--help` for
 read-only discovery and do not guess unsupported commands.
 

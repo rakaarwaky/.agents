@@ -31,14 +31,14 @@ Grok has zero conversation context. Compose a brief covering:
 
 ## Create the Orca Worktree
 
-Resolve `$ORCA` (`$ORCA_CLI_COMMAND` if set, else resolve via `command -v orca-ide` with fallback to `$HOME/.local/bin/orca-ide` — never bare `orca`). `$ORCA` is not exported by the shell, so `${ORCA}` expands to empty and bash reports `command not found`. Always call by the absolute path unless `$ORCA_CLI_COMMAND` is set. Resolve the main clone.
+Resolve `$ORCA` (`$ORCA_CLI_COMMAND` if set, else resolve via `command -v orca-ide` with fallback to `$HOME/.local/bin/orca-ide` — never bare `orca`). On AppImage hosts the binary is not on PATH and not at `$HOME/.local/bin/orca-ide`; it runs from a mount dir such as `/tmp/.mount_orca.<suffix>/orca-ide` (the AppImage bundle also contains `AppRun`, `chrome-sandbox`, `resources.pak`). Probe `ls /tmp/.mount_orca.*/orca-ide` as a last-resort fallback before declaring the CLI unresolvable. `$ORCA` is not exported by the shell, so `${ORCA}` expands to empty and bash reports `command not found`. Always call by the absolute path unless `$ORCA_CLI_COMMAND` is set. Resolve the main clone.
 
 ```
 "$ORCA" worktree create --repo path:<main_clone_path> --name <PLAN_ID> --agent grok --no-parent --surface terminal --json
 ```
 
-- Parse JSON: `result.worktree.path` → `worktree_path`, `result.worktree.id` → `worktree_id`, `result.worktree.branch` → `worktree_branch` (strip `refs/heads/`).
-- **Failure:** if create fails or no Orca CLI resolves, report the error and stop. Never fall back to the main clone.
+- Parse JSON: `result.worktree.path` → `worktree_path`, `result.worktree.id` → `worktree_id`, `result.worktree.branch` → `worktree_branch` (strip `refs/heads/`). The launch terminal handle is at `result.launch.outcome.handle` (e.g. `term_<uuid>`); capture it for Step 1.
+- **Failure:** if create fails or no Orca CLI resolves (including the AppImage mount probe), report the error and stop. Never fall back to the main clone.
 
 If `--agent grok` is blocked (e.g. `agent_session_operation_unknown`), fall back to a plain `git worktree add` at `~/orca/workspaces/<repo-basename>/<PLAN_ID>` and drive Grok headless **inside that worktree** via `grok -p '<brief>' --cwd <worktree_path> --always-approve`. Never run bare `grok` / `grok -p` directly in the Hermes terminal session outside a worktree context.
 

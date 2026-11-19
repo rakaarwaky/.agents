@@ -165,7 +165,7 @@ export interface StudioCanvasProps {
     ↻
   </button>
 ) : null}
-<span className="pt-studio-canvas-divider" aria-hidden="true" />
+<span className="pt-studio-canvas-divider-v" aria-hidden="true" />
 ```
 
 **Canvas stage render logic** — conditionally render the empty state or preview frame in `.pt-studio-canvas-stage` (identified by `data-testid="studio-canvas-stage"`). Drag event handlers (`onDragOver`, `onDragLeave`, `onDrop`) are attached to the stage div regardless of state:
@@ -373,9 +373,10 @@ Key differences from current:
   background: #4f46e5;
 }
 
-/* ── Canvas toolbar divider ── */
+/* ── Canvas toolbar divider (vertical rule, distinct from .pt-studio-canvas-divider
+       which carries the ⌘ glyph and must not be reused for a structural separator) ── */
 
-.pt-studio-canvas-divider:empty {
+.pt-studio-canvas-divider-v {
   display: inline-block;
   width: 1px;
   height: 1rem;
@@ -640,7 +641,7 @@ This is a cosmetic/structural surface-layer change with no backend dependencies,
 **CI gates (per ci.yml)**:
 - `npm test -- --run` (working directory: `packages/`) — all vitest tests pass.
 - `tsc -p root_tsconfig_entry.json --noEmit` — type-checking passes.
-- `lint-arwaky-cli scan .` — AES architecture scan passes.
+- `lint-arwaky-cli scan .` — no NEW violations introduced; total count does not increase from baseline (78).
 
 ---
 
@@ -669,3 +670,158 @@ None.
 - **Files/components affected:** packages/studio/src/surface_studio_layer_panel_component.tsx, packages/studio/tests/unit_studio_layer_panel_component.test.tsx
 - **Dependencies:** PR 1
 - **Description:** Removes the SOURCE PSD DOCUMENT header, file metadata block, inline dropzone, and file input from StudioLayerPanel, removes onPickFile, fileMeta, and onReinspect from StudioLayerPanelProps, and updates layer panel unit tests to remove dropzone/file-meta/reinspect assertions.
+
+---
+
+## grill-me Interview Results
+
+**Interview ID:** `563108ea`
+**Date:** 2026-11-19
+**Summary file:** `~/.agents/develop/psd-timelapse/plan/interview-summary-563108ea.md`
+**Lint baseline:** 78 total violations (AES706=23, AES402=19, AES401=14, AES501=5, AES503=5, AES704=4, AES502=2, AES504=2, AES303/304/505/609=1 each)
+
+### D1 — BLOCKING DEFECT: CSS divider class collision
+
+**Branch:** CSS additions to `packages/shared/src/common/styles.css`
+**Source:** `packages/shared/src/common/styles.css:4808-4812`, `packages/studio/src/surface_studio_canvas_component.tsx:148`
+**Depends on:** none
+
+**Finding:** The plan reuses `.pt-studio-canvas-divider` for two incompatible purposes.
+
+The existing definition (`styles.css:4808-4812`) styles it as a mono-font metadata carrier:
+```css
+.pt-studio-canvas-divider {
+  font-family: var(--pt-font-mono);
+  font-size: 0.6875rem;
+  color: rgba(255, 255, 255, 0.35);
+  margin: 0 0.125rem;
+}
+```
+
+The existing JSX (`surface_studio_canvas_component.tsx:148`) uses it as the `⌘` glyph:
+```tsx
+<span className="pt-studio-canvas-divider">⌘</span>
+```
+
+The plan proposes adding a CSS override using `:empty` to create a vertical rule:
+```css
+.pt-studio-canvas-divider:empty {
+  width: 1px; height: 1rem; background: rgba(255, 255, 255, 0.15); ...
+}
+```
+
+This produces two failures:
+1. The `⌘` span has a text child (`⌘`), so `:empty` does not match it — the existing `.pt-studio-canvas-divider` rule still applies to the ⌘ glyph, which is fine. But the new empty divider span rendered in the toolbar with no children would be matched by the `:empty` rule, which is correct for the vertical rule.
+2. The visual problem: the plan places the new divider immediately after the upload/re-inspect buttons and before the zoom cluster, while the existing `⌘` divider is inside the zoom cluster. Two different visual elements share the same class name but represent different UI concepts. A future maintainer editing `.pt-studio-canvas-divider` styles will affect both the zoom glyph and the upload separator.
+
+**Resolution:** Use a distinct class name for the new toolbar separator: `.pt-studio-canvas-divider-v` (or `.pt-studio-canvas-rule`). Keep `.pt-studio-canvas-divider` for the `⌘` glyph. The new CSS rule becomes `.pt-studio-canvas-divider-v { ... }` and the JSX span uses `className="pt-studio-canvas-divider-v"`.
+
+**Impact:** Blocks PR 1. Fix before implementation begins.
+
+### D2 — Server-path input bar redundancy
+
+**Branch:** Placement of file ingestion entry point
+**Source:** `packages/root_web_smart_container.ts:322-355`, `packages/root_web_smart_container.ts:450-573`
+**Depends on:** none
+
+**Finding:** The canvas upload button provides a native file picker, but `handlePickFile` in the container (`root_web_smart_container.ts:322-355`) only uses `file.name` as a relative path to call `executeInspect(file.name)`. The actual PSD is read from a server-side filesystem via the API client's `inspectFull(path)` call. The browser file content is not uploaded or transmitted. The server-path bar (`.pt-studio-server-path-bar`, rendered at `root_web_smart_container.ts:450-573`) remains the canonical way to specify the absolute server-side path for inspection and rendering.
+
+**Resolution:** No plan change required. The plan already states the server-path bar stays in the container (Alternative 3 correctly rejected moving it). The canvas upload and the server-path bar serve different purposes: upload provides a quick file picker that sets the path by file name, while the server-path bar allows manual override for paths that differ from the file name or for re-inspecting a previously rendered document.
+
+**Impact:** Informational. No code change needed.
+
+### D3 — `onSelectLayer` not threaded from container
+
+**Branch:** Data flow from StudioContainer to StudioLayerPanel
+**Source:** `packages/root_web_smart_container.ts:573-580`
+**Depends on:** none
+
+**Finding:** The `createElement(StudioLanding, {...})` call at lines 573-580 does not pass `onSelectLayer` to `StudioLanding`. The prop exists in `StudioLandingProps` and `StudioLayerPanelProps` but is dead from the container's perspective. The container owns layer selection state implicitly — `layers` are derived from `inspectState.doc.layers`, and layer clicks on the sidebar are currently handled internally by `StudioLayerPanel` via `activeLayerId` state and the `onSelectLayer` callback being absent (no-op).
+
+**Resolution:** No plan change required. The plan does not claim to thread `onSelectLayer` through the canvas. The existing dead prop in `StudioLandingProps` and `StudioLayerPanelProps` remains untouched. The plan should not add `onSelectLayer` to `StudioCanvas` — it is not relevant to the upload affordance change.
+
+**Impact:** Informational. No code change needed.
+
+### D4 — `onSelectLayer` not forwarded from StudioLanding to StudioCanvas (plan omission in mermaid)
+
+**Branch:** Component architecture diagram
+**Source:** `packages/studio/src/surface_studio_landing_component.tsx:69-73`
+**Depends on:** D3
+
+**Finding:** The plan's mermaid diagram (lines 72-100) and the code snippet for `StudioLanding` (lines 309-350) show `StudioLanding` forwarding `onPickFile`, `onReinspect`, `hasDocument`, `fileMeta`, `onRender`, `runId`, `progress` to `StudioCanvas`, and `layers`, `onSelectLayer` to `StudioLayerPanel`. The existing code at `surface_studio_landing_component.tsx:69-73` already passes `onSelectLayer={onSelectLayer}` to `StudioLayerPanel`. The plan's code snippet (lines 336-340) shows the updated `StudioLayerPanel` call but does not explicitly show `onSelectLayer` being threaded — it is implied by the existing pattern but not shown in the snippet.
+
+**Resolution:** Already correct in the plan. The JSX snippet at plan lines 336-340 already shows `onSelectLayer={onSelectLayer}`. No change needed.
+
+**Impact:** No change. False alarm — the snippet was already correct.
+
+### D5 — Test file completeness: PR 1 leaves sidebar tests broken
+
+**Branch:** PR decomposition and rollout
+**Source:** `packages/studio/tests/unit_studio_layer_panel_component.test.tsx:37-42, 87-106, 128-135`
+**Depends on:** none
+
+**Finding:** The plan's PR 1 claims to update `unit_studio_canvas_upload.test.tsx` but leaves `unit_studio_layer_panel_component.test.tsx` for PR 2. However, PR 1 also removes `fileMeta`, `onPickFile`, and `onReinspect` from `StudioLayerPanelProps` (per the updated interface in PR 1's "After" block). After PR 1:
+- `unit_studio_layer_panel_component.test.tsx:37-42` passes `fileMeta: REAL_FILE_META` to `renderPanel`, which is no longer accepted by `StudioLayerPanelProps` — **TypeScript compilation fails** under `tsc -p root_tsconfig_entry.json --noEmit`.
+- The test group `"invokes onPickFile with the selected File on drop"` (line 87) calls `screen.getByRole("button", { name: "Drop PSD file or click to browse" })` — the dropzone DOM is removed in PR 2, so this still works in PR 1. But wait: PR 1 does NOT remove the sidebar DOM (that's PR 2). So the sidebar still renders the dropzone in PR 1. The test still passes at runtime. But TypeScript fails because `StudioLayerPanelProps` no longer accepts `fileMeta`/`onPickFile`/`onReinspect` as typed props. Actually, TypeScript allows passing extra props to a function component — JSX excess property checks do not apply to spread objects. So the type-check may pass, but the test assertion `screen.getByText("sycan-front-shirt.psd")` (line 65) fails because the sidebar still renders file metadata in PR 1 (DOM removal is PR 2). Wait — the sidebar DOM is removed in PR 2, not PR 1. So the test still passes in PR 1. But after PR 1, `StudioLayerPanelProps` no longer includes `fileMeta`, `onPickFile`, `onReinspect` — the test passes them as props but TypeScript JSX excess property checking does not flag spread props. The test would still compile and pass in PR 1. However, PR 1 claims "StudioLanding stops passing onPickFile/fileMeta/onReinspect to StudioLayerPanel" — so the canvas now owns file upload. The sidebar tests still pass in PR 1 because the sidebar DOM is unchanged. PR 2 then removes the sidebar DOM and updates the tests. So the rollout is actually correct. But there is a subtlety: PR 1 changes `StudioLayerPanelProps` to remove `fileMeta`, `onPickFile`, `onReinspect` — but the test file at lines 37-42 passes those as part of the `base` object spread into `<StudioLayerPanel {...base} />`. Since they are no longer in the interface, TypeScript's excess property checking is relaxed for JSX spread, so it compiles. The tests still pass. No breakage. **However**, the plan should clarify that PR 1 does NOT remove the sidebar DOM — only PR 2 does. The sidebar tests in PR 1 still pass because the sidebar is unchanged. PR 1's description says "StudioLanding is updated in the same PR to wire onPickFile/onReinspect/hasDocument/fileMeta to StudioCanvas. At this PR, the canvas takes over primary file ingestion and document metadata display, while StudioLanding stops passing onPickFile/fileMeta/onReinspect to StudioLayerPanel, decommissioned at the composition level." This is accurate — the sidebar DOM is untouched in PR 1, only the props threading from StudioLanding changes. The sidebar tests pass in PR 1 because the sidebar still renders the same DOM. The tests break in PR 2 when the DOM is removed, and PR 2 includes the test updates. So the rollout is correct.
+
+**Correction to earlier assessment:** After re-reading the plan's PR 1 description and the test file, the two-PR split is actually sound. PR 1 changes the composition wiring (StudioLanding → StudioCanvas) without touching sidebar DOM or sidebar tests. PR 2 removes the sidebar DOM and updates sidebar tests. The sidebar tests in PR 1 still pass because the sidebar DOM is unchanged. The only question is whether `StudioLayerPanelProps` removing `fileMeta`/`onPickFile`/`onReinspect` in PR 1 while the test file still passes them as spread props causes a TypeScript error. Since JSX spread does not trigger excess property checks, it does not.
+
+**Resolution:** The two-PR split is sound. No change required. The plan is internally consistent.
+
+**Impact:** No change needed. The earlier concern was based on a misreading of PR 1's scope — PR 1 does not remove the sidebar DOM, only the props threading from StudioLanding.
+
+### D6 — `lint-arwaky-cli scan` as a CI gate
+
+**Branch:** CI gates
+**Source:** lint-arwaky baseline scan (78 violations)
+**Depends on:** none
+
+**Finding:** The plan lists `lint-arwaky-cli scan .` as a CI gate, but the baseline shows 78 existing violations with no staged reduction. The CLI exits non-zero when violations are present.
+
+**Resolution:** The correct gate wording is: "no NEW violations introduced; total count does not increase from baseline (78)." The implementer must scope new code to avoid triggering AES violations:
+- Keep `StudioCanvas` passive (no domain logic, only callbacks).
+- Keep `StudioLayerPanel` passive.
+- Maintain the `unit_` prefix for new test files (AES103).
+- Keep file sizes under AES301 limits.
+
+**Impact:** No plan structure change. Add the gate clarification to the CI gates section before implementation.
+
+### D7 — CSS cleanup of dead sidebar selectors
+
+**Branch:** CSS scope
+**Source:** `packages/shared/src/common/styles.css:4905-5043`
+**Depends on:** none
+
+**Finding:** Leaving `.pt-studio-sidebar-header`, `.pt-studio-sidebar-file*`, `.pt-studio-sidebar-dropzone*` in `styles.css` after PR 2 removes the DOM leaves ~120 lines of dead CSS.
+
+**Resolution:** Accept as deliberate tech debt. Note in the plan that this is a follow-up cleanup, not a blocker. The plan already states this in Key Decision 7.
+
+**Impact:** No change. Already documented.
+
+### D8 — `StudioFileMeta` re-export chain preservation
+
+**Branch:** Type definition location
+**Source:** `packages/studio/src/surface_studio_layer_panel_component.tsx:29-33`, `packages/studio/src/surface_studio_landing_component.tsx:6-7, 39`, `packages/root_web_smart_container.ts:38, 412`
+**Depends on:** none
+
+**Finding:** The `StudioFileMeta` interface is defined in `surface_studio_layer_panel_component.tsx` and re-exported through `surface_studio_landing_component.tsx` to `root_web_smart_container.ts`. The plan correctly keeps this chain.
+
+**Resolution:** No change. The chain stays intact after both PRs.
+
+**Impact:** No change needed.
+
+### Summary of Required Plan Edits
+
+| # | Severity | Edit | Status |
+|---|----------|------|--------|
+| D1 | **BLOCKING** | Rename the new toolbar separator from `.pt-studio-canvas-divider` to `.pt-studio-canvas-divider-v` in both CSS and JSX. Keep `.pt-studio-canvas-divider` for the `⌘` glyph. | **Applied** — CSS rule and JSX span updated to `.pt-studio-canvas-divider-v` |
+| D4 | Documentation | Add explicit `onSelectLayer={onSelectLayer}` to the `StudioLayerPanel` JSX snippet. | **Already correct** — the snippet at line 340 already shows `onSelectLayer={onSelectLayer}` |
+| D6 | Clarification | Update CI gate wording: "no NEW violations introduced; total does not increase from baseline (78)." | **Applied** — CI gate wording updated |
+
+**User-confirmed decisions:**
+- **D1:** Rename to `.pt-studio-canvas-divider-v` (user-confirmed)
+- **D4:** Already correct in the plan (no change needed)
+- **D6:** "No new violations; total ≤ 78" (user-confirmed)
+- **PR split:** Two PRs as planned (user-confirmed)
+
+No other plan changes are required. The architecture, prop threading, two-PR split, and CSS scope are sound.
