@@ -12,6 +12,10 @@ When a test uses `multiprocessing.Process` on Linux with the `forkserver` start 
 
 When `tmp_path` lives under a directory that is itself inside a parent git repo (e.g. the pytest cache under `~/.hermes/cache/scratch/`), `git rev-parse --show-toplevel` walks up and finds the parent repo, so `repo_slug()` succeeds instead of raising `HostError`. The `not_a_git_repo` fixture must set `GIT_CEILING_DIRECTORIES` to `tmp_path.parent` (via `monkeypatch.setenv`) so git stops walking at the test directory boundary.
 
+## Dataclass field removal and phantom consumers
+
+Removing a field from a frozen dataclass (e.g. `snapshot: dict` from `MemoryResult`) does not cause an import or compile error — the `__init__` accepts only declared fields, but any code that constructs the dataclass with the removed field silently drops it. The failure surfaces only when something accesses `.<removed_field>` on the returned instance and fires `AttributeError` at runtime. Before removing a dataclass field, `search_files` for the field name across all source and test files to find every consumer. Update or remove each consumer in the same change.
+
 ## Stale test assertions after spec changes
 
 When an implementation change aligns code with the FRD spec (e.g. raising `PlanUsageError` for a missing file instead of returning a `PlanResult`), tests that assert the old behavior must be updated in the same PR — rename the test to reflect the new contract, change the assertion from `assertIsInstance(result, PlanResult)` to `assertRaises(PlanUsageError)`, and import the correct exception. Do not leave stale tests that pass on the base commit but fail after the fix lands; verify the test matches the FRD, not the old implementation.

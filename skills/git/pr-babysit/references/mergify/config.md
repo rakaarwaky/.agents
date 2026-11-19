@@ -192,9 +192,9 @@ validation happens on GitHub after the config PR merges.
 
 ## Per-repo examples
 
-### Rust repo (like lint-arwaky)
+### Rust repo 
 - Base branch: `main`
-- CI checks: `Clippy`, `Build`, `Tests`, `Self-Lint`
+- CI checks: `Clippy`, `Build`, `Tests`, `Lint`
 - Timeout: `15min`
 - Max parallel: `1`
 - Merge method: `squash`
@@ -214,7 +214,7 @@ validation happens on GitHub after the config PR merges.
 
 ### Python repo
 - Base branch: `main`
-- CI checks: `ruff`, `mypy`, `pytest`
+- CI checks: `lint`,`ruff`, `mypy`, `pytest`
 - Timeout: `10min`
 - Max parallel: `1`
 - Merge method: `squash`

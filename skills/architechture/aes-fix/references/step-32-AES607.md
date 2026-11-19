@@ -20,7 +20,8 @@ AES607 (rule code `AES607`, checker `capabilities_doc_backlog` in the `doc-rules
 1. Identify the violated rule code (AES607) and the specific defect subtype from the scan report.
 2. For `dt_backlog_id_not_dt` (a spec ID has no BACKLOG entry): add a BACKLOG `### <ID>` section after the related existing entry, with `State`, `Done`, `In Progress`, `Risk`, `Updated` rows.
 3. For a BACKLOG entry citing an undeclared ID: either remove the entry or add the matching ID to the paired spec document.
-4. Re-run `lint-arwaky-cli docs crates/shared/skills` or `lint-arwaky-cli scan .` and confirm AES607 no longer fires.
+4. After any FRD/DATA/DESIGN ID rename or removal, verify each ID appears exactly once as an H3 in both files: `search_files` for `### FR-` in the FRD and `### FR-` in the BACKLOG, then diff the two ID sets. A rename that edits only the FRD heading leaves the stale BACKLOG H3 behind and fires the reverse-direction defect.
+5. Re-run `lint-arwaky-cli docs crates/shared/skills` or `lint-arwaky-cli scan .` and confirm AES607 no longer fires.
 
 ## Verify
 

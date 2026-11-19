@@ -20,7 +20,7 @@ Relentlessly interview a plan, architectural design, or decision tree until ever
 | R5 | Update the target plan document preserving original structure and appending resolved decision outcomes. | Check git diff on original plan to confirm non-destructive append of findings. |
 | R6 | Limit interview scope to at most 5 interview rounds, at most 10 files touched, and never repeat a question. | Verify round counter <= 5 and no duplicated questions exist. |
 | R7 | If the target plan document is missing or unreadable, stop and report the error; if a question repeats, treat it as resolved. | Verify handling of missing file error and duplicate question resolution. |
-| R8 | Retrieve the workspace memory snapshot at Grok Step 0 and use its top patterns as probe seeds in the branch walk; flush the run's plan-weakness patterns back at Hermes Step 3. Degrade gracefully when memory is empty or unavailable. | Verify the snapshot step ran (or a degradation note was logged) and the flush reported stats or "no new patterns". |
+| R8 | Retrieve the workspace memory top-N patterns (`sdc memory top --n 10`) at Grok Step 0 and use its top patterns as probe seeds in the branch walk; flush the run's plan-weakness patterns back at Hermes Step 3. Degrade gracefully when memory is empty or unavailable. | Verify the snapshot step ran (or a degradation note was logged) and the flush reported stats or "no new patterns". |
 
 ## Routing
 

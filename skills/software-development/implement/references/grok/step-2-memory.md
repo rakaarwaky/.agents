@@ -13,7 +13,7 @@ The `sdc memory` capability (part of `sdc`) resolves the path and handles concur
 
 ### Resolve the helper command once
 
-All memory operations go through `sdc memory <path|read|snapshot|update>`. The `sdc` launcher is already on PATH after installation at `~/.local/bin/sdc`. Capture it once as orchestrator state:
+All memory operations go through `sdc memory <path|read|top|update>`. The `sdc` launcher is already on PATH after installation at `~/.local/bin/sdc`. Capture it once as orchestrator state:
 
 ```
 memory_cmd = "sdc memory"

@@ -17,7 +17,7 @@ Orchestrate a structured write-review-revise loop using specialized writer and r
 | R2 | Read only the winning lane's step files; never read or load files from the alternate lane. | Confirm references inspected match active execution lane. |
 | R3 | Structure planning as a multi-round write-review-revise loop until reviewer findings reach zero open issues. | Verify exit condition check records zero unresolved reviewer findings. |
 | R4 | Validate the final PR plan using the plan validator tool before completing the hand-off to `/execute-plan`. | Check plan validation tool returns clean validation report. |
-| R5 | Retrieve the workspace memory snapshot (`sdc memory snapshot`) at Grok Step 0 and inject the recurring-patterns briefing into the writer and reviewer prompts; degrade gracefully when the snapshot is empty or unavailable. | Verify the snapshot step ran (or a degradation note was logged) before the writer is spawned. |
+| R5 | Retrieve the workspace memory top-N patterns (`sdc memory top --n 10`) at Grok Step 0 and inject the recurring-patterns briefing into the writer and reviewer prompts; degrade gracefully when the snapshot is empty or unavailable. | Verify the snapshot step ran (or a degradation note was logged) before the writer is spawned. |
 | R6 | Flush this run's generalized issue patterns back to the workspace memory file via `sdc memory update` at Grok Step 7 (fallback: Hermes Step 3); never fail the run over a memory flush. | Verify the spec file was written and the helper exited 0, or a degradation note was logged. |
 
 ## Routing
