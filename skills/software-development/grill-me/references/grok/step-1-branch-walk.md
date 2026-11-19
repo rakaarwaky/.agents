@@ -12,6 +12,14 @@ Before asking the user any question, check whether the answer is already in the 
 
 Only after exhausting the codebase do you ask the user a question, and you record it in `open_questions`.
 
+## Memory-Aware Probing
+
+When `past_issues_briefing` is non-empty (captured at Step 0), treat its top patterns as first-class probe seeds:
+
+- If the plan document is silent on a recurring pattern (no decision, no branch, no out-of-scope note), make it a branch to walk: "does the design address <pattern>?"
+- The codebase-first rule still applies: probe the plan doc and code before asking the user.
+- The interview is **not** a review: patterns are probe seeds, not verdicts — a pattern the design already addresses is closed by the existing decision, never re-argued.
+
 ## Walk Each Branch
 
 For each branch of the design tree:

@@ -35,6 +35,10 @@ The document must end with these three exact sections, in this specific order:
 Every PR must include exactly these three bullets in this order. Use sequential PR numbers starting at 1. This section must be at the absolute bottom of the document.)
 ```
 
+## Injection
+
+If `past_issues_briefing` is non-empty (captured at Step 0), append the block to the writer prompt after the base prompt, then launch. When empty, omit the block entirely — do not send a placeholder.
+
 ## After Completion
 
 Report: "plan document drafted. Starting review..." and continue to Step 2.

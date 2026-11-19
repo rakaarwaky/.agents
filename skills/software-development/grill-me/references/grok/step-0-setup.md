@@ -49,6 +49,21 @@ Host setup (`sdc host setup --subdir plan`) must run from inside the owning git 
 2. For the first candidate that exists on disk, run `git -C <parent-dir> rev-parse --show-toplevel` to get `repo_path`.
 3. If no candidate exists on disk, run the same command from the current workspace cwd.
 
+## Memory Retrieval
+
+Before the branch walk, load the workspace's past issue patterns so the interview probes known recurring weaknesses. The briefing is **injected, not enforced**, and the run never fails over memory.
+
+All memory operations go through `sdc memory <path|read|snapshot|update>`; the launcher is on PATH at `~/.local/bin/sdc`. Capture it once as `memory_cmd = "sdc memory"`. The helper is cwd-sensitive only for workspace-id derivation (it runs `git config --get remote.origin.url` and `git rev-parse --git-common-dir` in the cwd), so invoke it from the owning repository — `cd <repo_path> && sdc memory snapshot` — never from the skill's own directory.
+
+1. Run `sdc memory snapshot` via `run_terminal_command` and parse the JSON on stdout. Store orchestrator state:
+   - `existing_patterns_snapshot` — the `common_issues` list (used in the Hermes Step 3 flush to harmonize phrasing and reuse category names).
+   - `memory_existed_before` — the `exists` boolean (report wording: "file created" vs "file updated").
+   - `past_issues_briefing` — the top-10 block of entries with `count >= 2` sorted by `count` descending, formatted as a "Known Recurring Issues in This Workspace" list (same shape as `planner/references/grok/step-0-setup.md` builds), or `""` when the snapshot is empty, does not exist, or the helper fails.
+
+   The `recent_runs` array is for debugging and forward compatibility; grill-me does not consume it.
+
+2. When non-empty, `past_issues_briefing` seeds the Step 1 branch walk (Memory-Aware Probing). If the snapshot is empty or the helper exits non-zero, set `past_issues_briefing` to `""` and proceed — a missing memory file is not an error.
+
 ## Report to the User
 
 After setup is complete, report:

@@ -23,6 +23,18 @@ Evaluate:
 - Detail: enough for implementation.
 ```
 
+## Known-Issues Checklist
+
+If `past_issues_briefing` is non-empty (from Step 0), append this block to the reviewer prompt after the base prompt; when empty, omit it:
+
+```text
+Known recurring issues for this workspace (from previous runs):
+1. <pattern 1> (seen N times)
+2. <pattern 2> (seen N times)
+
+For each pattern above, verify the plan addresses it, or explicitly declares it out of scope (an Open Question, or a Key Decisions entry with a reason). For any pattern the plan neither addresses nor declares out of scope, add an open issue (severity: suggestion, or bug when the pattern is security-relevant) whose Suggestion points at the plan section that should cover it.
+```
+
 ## After Completion
 
 Continue to Step 3.

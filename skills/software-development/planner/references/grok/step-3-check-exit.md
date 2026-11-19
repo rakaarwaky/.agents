@@ -10,6 +10,8 @@ Read `review_file` and route on issue statuses.
 
 Update `total_issues_by_severity` with the cumulative counts.
 
+Append a one-line description of every issue with `Status: open` in this review pass to `plan_issue_patterns` (orchestrator state, initialized at Step 0), deduped against entries already in the list. This list feeds the Step 7 memory flush.
+
 ## Stalemate Detection
 
 Compare `review_file` with `previous_review_snapshot`. If the reviewer re-opened an issue the writer previously marked `wontfix`, skip Step 4 and escalate directly to Step 3a (overrides the routing above).

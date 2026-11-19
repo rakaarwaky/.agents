@@ -20,13 +20,14 @@ Relentlessly interview a plan, architectural design, or decision tree until ever
 | R5 | Update the target plan document preserving original structure and appending resolved decision outcomes. | Check git diff on original plan to confirm non-destructive append of findings. |
 | R6 | Limit interview scope to at most 5 interview rounds, at most 10 files touched, and never repeat a question. | Verify round counter <= 5 and no duplicated questions exist. |
 | R7 | If the target plan document is missing or unreadable, stop and report the error; if a question repeats, treat it as resolved. | Verify handling of missing file error and duplicate question resolution. |
+| R8 | Retrieve the workspace memory snapshot at Grok Step 0 and use its top patterns as probe seeds in the branch walk; flush the run's plan-weakness patterns back at Hermes Step 3. Degrade gracefully when memory is empty or unavailable. | Verify the snapshot step ran (or a degradation note was logged) and the flush reported stats or "no new patterns". |
 
 ## Routing
 
 | Step | Reference | Purpose |
 | ----: | --------- | ------- |
 | Method | [`references/interview.md`](references/interview.md) | Core interview procedure: branch walk, dependency chains, and exit criteria |
-| Grok 0 | [`references/grok/step-0-setup.md`](references/grok/step-0-setup.md) | Host setup (`sdc host setup --subdir plan`), shared file paths, orchestrator state, owning repo |
+| Grok 0 | [`references/grok/step-0-setup.md`](references/grok/step-0-setup.md) | Host setup (`sdc host setup --subdir plan`), shared file paths, orchestrator state, owning repo, workspace memory retrieval |
 | Grok 1 | [`references/grok/step-1-branch-walk.md`](references/grok/step-1-branch-walk.md) | Walk every branch of the design tree; codebase-first probing before asking the user |
 | Grok 2 | [`references/grok/step-2-dependency-resolution.md`](references/grok/step-2-dependency-resolution.md) | Resolve dependencies between decisions one-by-one; stalemate detection |
 | Grok 3 | [`references/grok/step-3-exit-check.md`](references/grok/step-3-exit-check.md) | Exit condition: all branches walked, all dependencies resolved, no open questions |

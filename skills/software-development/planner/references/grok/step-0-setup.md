@@ -56,6 +56,48 @@ Load the `plan-doc-writer` and `plan-doc-reviewer` personas from `~/.agents/pers
 
 Injection timing: prepend the persona instructions on the initial launch only, never on resume.
 
+## Memory Retrieval
+
+Before spawning any subagent, load the workspace's past issue patterns. The briefing is **injected, not enforced**, and the run never fails over memory.
+
+All memory operations go through `sdc memory <path|read|snapshot|update>`. The `sdc` launcher is on PATH at `~/.local/bin/sdc`; capture it once as `memory_cmd = "sdc memory"`. The helper is cwd-sensitive only for workspace-id derivation (it runs `git config --get remote.origin.url` and `git rev-parse --git-common-dir` in the cwd), so invoke it from the session's cwd — the worktree or main clone that owns the task's repo. Never `cd` to the skill's own directory before invoking it.
+
+1. Run `sdc memory snapshot` via `run_terminal_command` and capture stdout. Use the `snapshot` subcommand for programmatic reads — the `read` subcommand is for human inspection only. The helper prints structured JSON:
+
+   ```json
+   {
+     "common_issues": [
+       {"category": "Error Handling", "description": "Missing null check", "count": 5}
+     ],
+     "recent_runs": [
+       {"date": "2026-04-23", "description": "\"Add retry logic\"", "body_lines": ["- **Rounds**: 2", "- **Key patterns**: ..."]}
+     ],
+     "exists": true
+   }
+   ```
+
+   Parse the JSON (no `jq`, no markdown re-parsing) and store orchestrator state:
+   - `existing_patterns_snapshot` — the `common_issues` list (used in the Step 7 flush to harmonize phrasing and reuse category names).
+   - `memory_existed_before` — the `exists` boolean (report wording: "file created" vs "file updated").
+   - `past_issues_briefing` — the briefing block (built below), or `""` when the snapshot is empty, does not exist, or the helper fails.
+   - `plan_issue_patterns` — `[]`. One-line descriptions of distinct issues observed open in any review pass; appended at Step 3, flushed at Step 7.
+
+   The `recent_runs` array is for debugging and forward compatibility; the planner does not consume it.
+2. If `existing_patterns_snapshot` is non-empty, build `past_issues_briefing`:
+   1. Filter to entries with `count >= 2` (one-off issues are excluded — they may not be real patterns).
+   2. Sort by `count` descending; take the top 10.
+   3. Format into the briefing block (the filter makes `count >= 2`, so always "times"):
+
+   ```text
+   ## Known Recurring Issues in This Workspace
+   From previous runs in this repo (implement/execute-plan/plan), the following patterns recur:
+   1. Missing tests for error/edge case paths (seen 8 times)
+   2. Functions exceeding reasonable length without decomposition (seen 4 times)
+   ...
+   When drafting the plan: for each pattern above, the plan must either (a) address it, or (b) explicitly declare it out of scope (an Open Question, or a Key Decisions entry with a reason). Do not silently ignore a listed pattern.
+   ```
+3. If the snapshot is empty, does not exist (`exists: false`), or the helper exits non-zero (very rare — workspace id undeterminable, cwd unreadable), set `past_issues_briefing` to `""`, `existing_patterns_snapshot` to `[]`, `memory_existed_before` to `false`, log a brief note, and proceed to Step 1. Never fail the run due to memory retrieval issues.
+
 ## Invocation Input
 
 The user ran `/planner <description>` (or `/plan <description>`). Treat `<description>` as the plan task: feature plan, system architecture, migration plan, technical spec, or another plan deliverable. Capture any file paths, links, constraints, or extra context the user provided — Step 1 must include all of it in the writer prompt.

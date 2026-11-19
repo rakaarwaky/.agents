@@ -1,57 +1,37 @@
 ---
 name: issue-worker
-description: "issue → PR: analyzes open GitHub issues (latest or oldest N issues), verifies claims at HEAD, asks user decisions via quiz, isolates work in Orca worktrees, delegates implementation to Grok Build, verifies fixes, and pushes branches to open draft PRs. Never merges."
-when-to-use: "Use when taking open GitHub issues to PRs (/issue-worker <latest|oldest> <N>), triaging the N latest or oldest open issues, verifying issue reproduction at HEAD, running isolated Orca worktrees for issue fixes, or opening draft PRs from existing issues. Never creates issues (handled by /issue-maker) and never auto-merges."
-argument-hint: "<latest|oldest> <N>"
+description: "issue → PR: analyzes and groups open GitHub issues, verifies claims at HEAD, asks user decisions via quiz, isolates work in Orca worktrees, delegates implementation to new Grok Build session(s) via /implement, verifies fixes, and pushes draft PRs. Unified flow for Hermes and Grok."
+when-to-use: "Use when resolving open GitHub issues into PRs (/issue-worker <latest|oldest> <N> or /issue-worker <issue-numbers>), triaging and grouping issues by subsystem, verifying bug reproduction at HEAD, delegating fixes to Grok Build via /implement in Orca worktrees, or opening draft PRs. Never creates issues (handled by /issue-maker) and never auto-merges."
+argument-hint: "<latest|oldest> <N> | <issue-numbers>"
 ---
 
 # Issue Worker — issue → PR
 
-End-to-end workflow for resolving GitHub issues: analyze issues to create PRs. The spine is resolve <latest|oldest> <N> → verify at HEAD → decide → 1 issue → 1 Orca worktree → Grok Build implements → Hermes verifies → Hermes pushes branch + opens a draft PR to main → close/reopen issue per result. Never merges. Lane identification directs execution to `references/hermes/` or `references/grok/`.
+End-to-end workflow for resolving GitHub issues: parse issue hints, verify claims at HEAD, group related issues into cohesive cohorts while separating disjoint tasks, delegate implementation to new Grok Build session(s) via `/implement` in isolated Orca worktrees, independently verify fixes, and push branches to open draft PRs. The orchestrator workflow is completely unified whether invoked from Hermes or Grok. Never merges.
 
 ## Rules
 
 | ID | Rule | Check |
 |----|------|-------|
-| R1 | **Lane attribution.** Lane is determined from physical env vars: `HERMES_AGENT=true` -> Hermes lane (Steps 0–3); `GROK_AGENT=1` -> Grok lane (Steps 4–10, run by Grok Build per issue). If neither is set, halt and report `UNSET`. Never guess the lane. | `[[ -n "${HERMES_AGENT:-}" ]]` enters Hermes; `[[ -n "${GROK_AGENT:-}" ]]` enters Grok. |
-| R2 | **Verify at HEAD before deciding.** Never trust issue labels, audit dates, or commit message claims alone. Verify the cited file:line at HEAD and check `git log --oneline --since <issue-date> -- <path>` for existing fixes before spawning implementation. | Verified reproduction output or fix evidence documented before action. |
-| R3 | **One issue, one worktree, one PR.** Each `still-broken` issue gets its own isolated Orca worktree (`issue-<N>`) and produces exactly one draft PR to `main`. Never mix multiple issues into a single worktree or PR. | Exactly 1 worktree and 1 branch per active issue. |
-| R4 | **Orchestrator-implementer separation.** Hermes coordinates triage, decision quiz, verification, push, PR creation, and issue closing. Grok Build implements and runs local checks in its assigned worktree. Grok never pushes, never opens PRs, and never writes tracker updates. Hermes never edits code directly. | Grok commits stay local; Hermes alone runs `git push` and `gh pr create`. |
-| R5 | **Safe push and draft PRs.** Hermes pushes verified branches with `git push --force-with-lease origin <branch>` (never bare `--force`) and opens draft PRs via `gh pr create --draft`. `Closes #N` is included only upon PR merge; this skill never merges. | Push uses `--force-with-lease`; PR is created in draft mode. |
-| R6 | **Independent verification.** Grok's summary is a self-report, not verified fact. Hermes independently verifies code changes at file:line, verifies clean worktree status, and re-executes the symptom repro command before marking an issue verified. | Verification command re-run and passing output confirmed in worktree. |
-| R7 | **Completion criteria.** All N resolved issue numbers processed to terminal state: `fixed-on-main` issues closed with live evidence comments (`gh issue close <N> --reason completed --comment "..."`); `still-broken` issues have clean verified branches pushed and draft PRs opened (`gh pr create --draft`); worktrees marked `in-review`. | Every issue resolved to a draft PR or closed with evidence comment. |
-| R8 | **Scope and iteration ceilings.** Maximum N issues per batch (capped by wave limit of 10 concurrent Orca worktrees). Edits strictly confined to the assigned worktree and artifact directories. Max 1 Grok implementation pass per issue (no looping retry on failure). Forbidden: auto-merging PRs, editing main branch directly, using shared repo build caches. | Concurrent worktrees ≤ 10; zero direct commits on main branch. |
-| R9 | **Audience and tone.** Coordinates operations between Hermes orchestrator and Grok Build agents. Output in English, imperative mood, concrete paths and SHAs; no conversational filler or unverified claims. | Factual summaries with exact file:line references and command outputs. |
-| R10 | **From where / Preconditions.** Requires git checkout on `origin`, authenticated `gh` CLI (`gh auth status`), and `$ORCA` (`orca-ide`) available. Resolves issue numbers from `<latest|oldest> <N>` via `gh issue list` (latest: default created-desc; oldest: `sort:created-asc`). Reads issue body/comments via `gh issue view` and repo state at HEAD. | `gh auth status` exits 0; target issue numbers resolved; `$ORCA` binary resolves. |
-| R11 | **Branching logic.** IF issue already fixed at HEAD -> mark `fixed-on-main`, close with evidence comment, skip Grok. IF issue still broken -> spawn Grok worktree. IF open questions exist -> aggregate into single interactive quiz before implementation. IF Grok fix fails -> leave issue open, report failure verbatim, and tear down worktree. IF non-GitHub remote -> output compare URL and draft PR command. | Branch decisions match issue triage state and execution results. |
-| R12 | **Failure fallback.** If `gh` unauthenticated -> halt and prompt `gh auth login`. If Orca worktree creation fails -> verify repo clean status and retry once. If push rejected -> fetch and rebase worktree branch onto origin before `--force-with-lease`. If Grok session fails/exits non-idle -> report error verbatim, keep issue open, and clean up worktree via `ORCA worktree rm`. | Named failure causes with exact recovery commands. |
+| R1 | **Unified orchestrator flow.** Orchestration logic is identical whether executed by Hermes or Grok: the orchestrator coordinates issue resolution, triage, grouping, worktree management, verification, and PR creation; all implementation is delegated to new Grok Build session(s) via `/implement`. | Confirm caller orchestrates and spawns new Grok sessions in Orca worktrees without lane divergence. |
+| R2 | **Verify at HEAD before deciding.** Never trust issue labels, audit dates, or commit message claims alone. Inspect the cited file:line at HEAD and check git log for existing fixes before planning fixes. Close `fixed-on-main` issues immediately with concrete evidence comments. | Verified code inspection or reproduction output documented prior to scheduling implementation. |
+| R3 | **Interactive decision quiz.** If open ambiguities or architectural decisions exist across issues, collect all questions into a single interactive quiz with recommended options first before implementation. | All unresolved questions presented in a single quiz; user choices recorded as brief constraints. |
+| R4 | **Issue grouping and isolation.** Actionable issues are grouped into cohorts based on shared files, subsystems, or root causes for a single `/implement` pass. Disjoint or conflicting issues are strictly isolated into separate worktrees. | Cohort groupings documented with shared file justification; disjoint issues assigned distinct worktrees. |
+| R5 | **Orchestrator-implementer separation.** The orchestrator (Hermes or Grok) drives coordination and never edits repo code directly. Each implementation group is delegated to a new Grok session running `/implement` in an isolated Orca worktree. | Zero direct code commits on orchestrator branch; implementation confined to child Grok sessions in worktrees. |
+| R6 | **Build isolation per worktree.** Each worktree maintains dedicated build artifact and cache directories (e.g. `CARGO_TARGET_DIR`, `.venv`, isolated cache dirs) to avoid concurrency locks and cache corruption. | Worktree configuration verifies dedicated isolated target/cache paths. |
+| R7 | **Independent verification.** A child Grok session's summary is a self-report. The orchestrator independently verifies file:line changes, confirms clean git status, and re-executes reproduction and test commands in the worktree. | Reproduction command re-executed and exit code 0 confirmed inside worktree before marking verified. |
+| R8 | **Safe push and draft PRs.** Pushes use `git push --force-with-lease origin <branch>` and open draft PRs via `gh pr create --draft`. PR descriptions explicitly cite all grouped issues. Auto-merge is forbidden. | Push uses `--force-with-lease`; PR is created in draft mode referencing all cohort issues. |
+| R9 | **Concurrency and wave ceilings.** Maximum concurrent worktrees ≤ 10. Groups beyond the wave limit execute in subsequent waves after active worktrees complete. | Active concurrent worktrees do not exceed 10. |
+| R10 | **Worktree teardown & final report.** Verified worktrees are marked `in-review` during inspection, then retired via `orca worktree rm` after push and PR creation. Orchestrator synthesizes a comprehensive final report. | Worktrees cleaned up via `orca worktree rm`; final summary reports all issues, groups, and PRs. |
+| R11 | **Zero-issue graceful halt.** If the repository has issues disabled, contains zero open issues, or no issues match the query, report the exact status cleanly, spawn zero worktrees, and halt without error. Suggest `/issue-maker` when spec docs exist. | Query returns zero matching issues or issues disabled; run halts immediately with clean status. |
 
 ## Routing
 
-The lane is determined from physical environment variables:
-
-```bash
-if [[ -n "${HERMES_AGENT:-}" ]]; then echo HERMES
-elif [[ -n "${GROK_AGENT:-}" ]]; then echo GROK
-else echo UNSET; fi
-```
-
-Read only the winning lane's references. Do not read the other lane's.
-
-| Lane | Step | Reference | Purpose |
-|------|------|-----------|---------|
-| Hermes | 0 | [`references/hermes/step-0-triage-and-spawn.md`](references/hermes/step-0-triage-and-spawn.md) | Resolve `<latest|oldest> <N>` into issue numbers via `gh`; verify claims at HEAD per issue; ask decision quiz; spawn Grok worktrees |
-| Hermes | 1 | [`references/hermes/step-1-wait-and-verify.md`](references/hermes/step-1-wait-and-verify.md) | Wait for each Grok session; verify commits, code, and re-run the symptom repro in that worktree |
-| Hermes | 2 | [`references/hermes/step-2-ship-and-close.md`](references/hermes/step-2-ship-and-close.md) | Push each verified branch, open one draft PR per issue; close verified-on-main issues with evidence; rebase still-open branches |
-| Hermes | 3 | [`references/hermes/step-3-final-report.md`](references/hermes/step-3-final-report.md) | Final report: verdicts, evidence, PRs, closed issues, failed items, worktree teardown |
-| Grok | 0 | [`references/grok/step-0-setup.md`](references/grok/step-0-setup.md) | Prerequisites, auth detection, `gh-env.sh` helper sourcing |
-| Grok | 1 | [`references/grok/step-1-viewing.md`](references/grok/step-1-viewing.md) | Auxiliary: list, search, view issues (gh + curl) |
-| Grok | 2 | [`references/grok/step-2-managing.md`](references/grok/step-2-managing.md) | Auxiliary: label, assign, comment, close/reopen, link to PRs, branch from issue |
-| Grok | 3 | [`references/grok/step-3-triage-bulk.md`](references/grok/step-3-triage-bulk.md) | Auxiliary: issue triage workflow and bulk label/close operations |
-| Grok | 4 | [`references/grok/step-4-verify-triage.md`](references/grok/step-4-verify-triage.md) | Load and triage: verify every claim at HEAD before closing |
-| Grok | 5 | [`references/grok/step-5-validate.md`](references/grok/step-5-validate.md) | Validate issue state before deciding — rejects stale/fake/duplicate/already-fixed issues |
-| Grok | 6 | [`references/grok/step-6-decision-quiz.md`](references/grok/step-6-decision-quiz.md) | Decision quiz before implementation: collect all open questions, ask in one interactive quiz with concrete recommended options first |
-| Grok | 7 | [`references/grok/step-7-fanout.md`](references/grok/step-7-fanout.md) | Fan-out setup: 1 issue → 1 Orca worktree → 1 owner; child brief contract |
-| Grok | 8 | [`references/grok/step-8-build-isolation.md`](references/grok/step-8-build-isolation.md) | Build isolation per worktree |
-| Grok | 9 | [`references/grok/step-9-waves-verify.md`](references/grok/step-9-waves-verify.md) | Run waves, verify children (report files changed, mechanism, verification output, commit SHA) |
-| Grok | 10 | [`references/grok/step-10-rebase.md`](references/grok/step-10-rebase.md) | Rebase still-open worktree branches onto the default tip after PRs land |
+| Step | Reference | Purpose |
+| ---- | --------- | ------- |
+| Step 0 | [`references/step-0-resolve-issues.md`](references/step-0-resolve-issues.md) | Parse issue hints, verify GitHub auth, query issues, and fetch live metadata |
+| Step 1 | [`references/step-1-triage-and-verify.md`](references/step-1-triage-and-verify.md) | Verify issues against HEAD, close fixed-on-main issues with evidence, run decision quiz |
+| Step 2 | [`references/step-2-grouping-and-planning.md`](references/step-2-grouping-and-planning.md) | Cluster related issues into cohesive /implement groups, separate conflicting issues, formulate briefs |
+| Step 3 | [`references/step-3-spawn-grok-implement.md`](references/step-3-spawn-grok-implement.md) | Create Orca worktree per group, wait for TUI idle, dispatch /implement to new Grok session |
+| Step 4 | [`references/step-4-wait-and-verify.md`](references/step-4-wait-and-verify.md) | Poll Grok sessions to completion, independently verify code changes and test runs in worktrees |
+| Step 5 | [`references/step-5-ship-and-report.md`](references/step-5-ship-and-report.md) | Push verified branches, open draft PRs, tear down worktrees, and synthesize final report |

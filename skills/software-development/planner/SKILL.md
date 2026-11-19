@@ -17,6 +17,8 @@ Orchestrate a structured write-review-revise loop using specialized writer and r
 | R2 | Read only the winning lane's step files; never read or load files from the alternate lane. | Confirm references inspected match active execution lane. |
 | R3 | Structure planning as a multi-round write-review-revise loop until reviewer findings reach zero open issues. | Verify exit condition check records zero unresolved reviewer findings. |
 | R4 | Validate the final PR plan using the plan validator tool before completing the hand-off to `/execute-plan`. | Check plan validation tool returns clean validation report. |
+| R5 | Retrieve the workspace memory snapshot (`sdc memory snapshot`) at Grok Step 0 and inject the recurring-patterns briefing into the writer and reviewer prompts; degrade gracefully when the snapshot is empty or unavailable. | Verify the snapshot step ran (or a degradation note was logged) before the writer is spawned. |
+| R6 | Flush this run's generalized issue patterns back to the workspace memory file via `sdc memory update` at Grok Step 7 (fallback: Hermes Step 3); never fail the run over a memory flush. | Verify the spec file was written and the helper exited 0, or a degradation note was logged. |
 
 ## Routing
 
@@ -26,11 +28,11 @@ Orchestrate a structured write-review-revise loop using specialized writer and r
 | Hermes 1 | [`references/hermes/step-1-wait-grok.md`](references/hermes/step-1-wait-grok.md) | Wait for Grok to finish write-review-revise loop, read plan doc and artifacts |
 | Hermes 2 | [`references/hermes/step-2-verify-and-ship.md`](references/hermes/step-2-verify-and-ship.md) | Verify 0 open issues, validate PR plan as `/execute-plan` hand-off gate |
 | Hermes 3 | [`references/hermes/step-3-final-report.md`](references/hermes/step-3-final-report.md) | Final report to user with key decisions, stats, and next-step command |
-| Grok 0 | [`references/grok/step-0-setup.md`](references/grok/step-0-setup.md) | Host setup, shared file paths, orchestrator state, personas |
+| Grok 0 | [`references/grok/step-0-setup.md`](references/grok/step-0-setup.md) | Host setup, shared file paths, orchestrator state, personas, workspace memory retrieval |
 | Grok 1 | [`references/grok/step-1-write.md`](references/grok/step-1-write.md) | Spawn writer to draft the plan document |
 | Grok 2 | [`references/grok/step-2-review.md`](references/grok/step-2-review.md) | Spawn reviewer to produce structured findings |
 | Grok 3 | [`references/grok/step-3-check-exit.md`](references/grok/step-3-check-exit.md) | Exit check, stalemate detection, escalation to user |
 | Grok 4 | [`references/grok/step-4-revise.md`](references/grok/step-4-revise.md) | Resume writer to address open issues |
 | Grok 5 | [`references/grok/step-5-rereview.md`](references/grok/step-5-rereview.md) | Resume reviewer to re-review revisions |
 | Grok 6 | [`references/grok/step-6-summarize.md`](references/grok/step-6-summarize.md) | Synthesize key decisions, open questions, and PR plan |
-| Grok 7 | [`references/grok/step-7-cleanup-final-report.md`](references/grok/step-7-cleanup-final-report.md) | Final report and cleanup of temporary artifacts |
+| Grok 7 | [`references/grok/step-7-cleanup-final-report.md`](references/grok/step-7-cleanup-final-report.md) | Memory flush, final report, and cleanup of temporary artifacts |

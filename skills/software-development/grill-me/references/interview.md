@@ -17,7 +17,7 @@ Lane selection is determined by the physical attribution signal (`HERMES_AGENT` 
 
 | Step | Reference | Purpose |
 | ----: | --- | --- |
-| 0 | [`references/grok/step-0-setup.md`](references/grok/step-0-setup.md) | Host setup (`sdc host setup --subdir plan`), shared file paths, orchestrator state, owning repo |
+| 0 | [`references/grok/step-0-setup.md`](references/grok/step-0-setup.md) | Host setup (`sdc host setup --subdir plan`), shared file paths, orchestrator state, owning repo, workspace memory retrieval |
 | 1 | [`references/grok/step-1-branch-walk.md`](references/grok/step-1-branch-walk.md) | Walk every branch of the design tree; codebase-first probing before asking the user |
 | 2 | [`references/grok/step-2-dependency-resolution.md`](references/grok/step-2-dependency-resolution.md) | Resolve dependencies between decisions one-by-one; stalemate detection |
 | 3 | [`references/grok/step-3-exit-check.md`](references/grok/step-3-exit-check.md) | Exit condition: all branches walked, all dependencies resolved, no open questions, shared understanding reached |

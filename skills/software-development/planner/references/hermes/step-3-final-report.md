@@ -1,5 +1,15 @@
 # Step 3: Final Report
 
+## Memory Flush (if applicable)
+
+Grok Step 7 is the primary flush point. If new issue patterns surfaced in Grok's plan-review passes but were not flushed (e.g. the Grok run ended early, or the Step 7 flush failed with exit 3/4 and was not retried), flush them the same way `implement/references/hermes/step-3-final-report.md` describes — run `sdc memory update` from the worktree:
+
+```
+cd <worktree_path> && sdc memory update --file <spec-json>
+```
+
+Build the JSON spec from the issues observed in `plan-review-<PLAN_ID>.md`, generalizing patterns first (same rules as `implement/references/grok/step-8-memory-flush.md`). If the helper fails, log a warning and continue — never fail the run over memory.
+
 Report to the user:
 
 1. **What was planned** — the task restated, and the key decisions from `plan-summary-<PLAN_ID>.md`.

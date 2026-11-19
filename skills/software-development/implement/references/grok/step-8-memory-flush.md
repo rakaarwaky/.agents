@@ -53,7 +53,7 @@ Construct a JSON object with this shape (omit `run` only if you want to record p
   ],
   "run": {
     "date": "2026-04-23",
-    "description": "Add retry logic to blackbox client",
+    "description": "impl: Add retry logic to blackbox client",
     "rounds": 2,
     "issues_by_severity": {"bug": 1, "suggestion": 1, "nit": 5},
     "key_patterns": ["Missing entries in error-type allowlists", "Incomplete configuration validation"],
@@ -67,7 +67,7 @@ Field notes (the helper rejects wrong-typed input with exit code 4 and a clear e
 - `patterns[].description`: one-line, harmonised in Step 8b. Newlines/tabs are collapsed to single spaces; internal multi-space runs are preserved.
 - `run` must be an object (not a list, not a string). Send `null` or omit it entirely to skip the Recent Runs entry.
 - `run.date`: a string in `YYYY-MM-DD` format. Calendar-invalid dates like `2026-13-99` are rejected. Pass `null`, empty string, or whitespace-only string and the helper fills in today's UTC date.
-- `run.description`: the user's implementation request, trimmed to a short label. Must be a string (or `null`/omitted to fall back to `"(no description)"`). The helper strips ALL double-quote characters from the description and then wraps it in exactly one outer pair, so internal quotes never produce broken nested-quote markup. (`Add retry "logic" to client` becomes `"Add retry logic to client"`.) If you need to preserve quotes verbatim, escape them yourself before submission — the helper assumes the description is a free-form label, not a structured string.
+- `run.description`: the user's implementation request, trimmed to a short label, prefixed with the `impl: ` workflow tag — provenance convention shared by all four memory workflows (`impl: ` implement, `exec: ` execute-plan, `plan: ` planner, `grill: ` grill-me) — so the store's Recent Runs log records which workflow produced each entry. Must be a string (or `null`/omitted to fall back to `"(no description)"`). The helper strips ALL double-quote characters from the description and then wraps it in exactly one outer pair, so internal quotes never produce broken nested-quote markup. (`impl: Add retry "logic" to client` becomes `"impl: Add retry logic to client"`.) If you need to preserve quotes verbatim, escape them yourself before submission — the helper assumes the description is a free-form label, not a structured string.
 - `run.rounds`: `round_count` as an integer. Booleans, floats, strings, and lists are rejected. Zero is accepted as-is (structurally unreachable in the actual /implement loop, but not enforced).
 - `run.issues_by_severity`: derived from `total_issues_by_severity`. Must be an object with string keys and integer values (or `null`/omitted to skip the `**Issues**` body line entirely). Zero-count severities are silently dropped from the rendered summary; if all severities are zero (or the object is empty) the helper omits the `**Issues**` body line entirely.
 - `run.key_patterns`: must be a list of strings (or `null`/omitted to skip the `**Key patterns**` body line). Pick the 2-3 most-significant patterns from this run. **Apply the same generalization rules as Step 8a** — strip task-specific names and rewrite as reusable principles. Two implementable options, pick consistently across runs:

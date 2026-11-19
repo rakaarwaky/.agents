@@ -37,7 +37,7 @@ Construct a JSON object:
   ],
   "run": {
     "date": null,
-    "description": "Execute plan: <plan doc title or short description>",
+    "description": "exec: <plan doc title or short description>",
     "rounds": <sum of review_rounds across all completed PRs>,
     "issues_by_severity": {"bug": <total>, "suggestion": <total>, "nit": <total>},
     "key_patterns": ["<2-3 most significant patterns from this run>"],
@@ -48,6 +48,7 @@ Construct a JSON object:
 
 Field notes:
 - `run.date`: pass `null` and the helper fills in today's UTC date.
+- `run.description`: the plan doc title or short description, prefixed with the `exec: ` workflow tag — provenance convention shared by all four memory workflows (`impl: ` implement, `exec: ` execute-plan, `plan: ` planner, `grill: ` grill-me) — so the store's Recent Runs log records which workflow produced each entry.
 - `run.rounds`: sum of `review_rounds` across all completed PRs.
 - `run.issues_by_severity`: derived from `total_issues_by_severity` (accumulated in Step 7b and Step 7c re-reviews across all PRs).
 - `run.key_patterns`: pick 2-3 most-significant patterns (severity-ranked: bugs > suggestions > nits). **Apply the same generalization rules as Step 12a** — strip task-specific names and rewrite as reusable principles.
