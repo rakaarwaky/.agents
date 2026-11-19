@@ -1,71 +1,149 @@
 # Step 1 — Configure Mergify Merge Rules (setup lane)
 
-When the user runs `/pr-babysit setup <number>`:
+After step 0 detects (or bootstraps) Mergify, write `.mergify.yml` from the lint-arwaky
+role model template, customized for this repo's facts and user answers.
 
-After step 0 detects (or bootstraps) Mergify, configure the merge-queue rules so that
-every green, non-draft PR is merged automatically.
+## Role model: lint-arwaky `.mergify.yml`
 
-## 1. Read existing `.mergify.yml` (if any)
+The lint-arwaky repo at `/home/raka/.agents/skills/architechture/tools/.mergify.yml` is the
+role model. Its structure:
 
-```bash
-MERGIFY_CONFIG=""
-for f in .mergify.yml .mergify.yaml .mergify/config.yml .mergify/config.yaml .github/mergify.yml .github/mergify.yaml; do
-  if [ -f "$f" ]; then
-    MERGIFY_CONFIG="$f"
-    break
-  fi
-done
 ```
+defaults:
+  queue_rule:
+    update_method: <merge|rebase>       # how queue updates PR before testing
+    merge_method: <squash|merge|rebase>  # how queue merges into base branch
+    checks_timeout: <duration>           # max queue wait per PR
+    merge_conditions:                    # checks that must pass before merge
+      - check-success = <check-name>     # one per CI check
 
-If none exists and step 0 did not bootstrap one, stop and report that no config is available.
+merge_queue:
+  max_parallel_checks: <N>               # 1 = serial (recommended)
+  status_comments: outcomes
+  queue_controls_comment: true
 
-## 2. Detect the repo's CI check names
+merge_protections_settings:
+  auto_merge_conditions:                 # conditions to auto-enter queue
+    - base = <BASE_BRANCH>
+    - -draft
+    - -conflict
+  post_comment: true
+  reporting_method: check-runs
 
-Fetch live check names from the PR's latest commit so the config references real checks:
-
-```bash
-SHA=$(gh pr view <number> --json headRefOid -q .headRefOid)
-gh api "repos/$OWNER_REPO/commits/$SHA/check-runs" \
-  -q '.check_runs[].name' 2>/dev/null | sort -u
-```
-
-Combine these into `check-success-or-neutral=~ci` glob patterns plus any other required
-checks (lint, type-check, build). If no checks are found, fall back to `check-success-or-neutral=~ci`.
-
-## 3. Write merge rules
-
-Replace or create `.mergify.yml` with rules that match:
-
-- CI green (`check-success-or-neutral` patterns)
-- At least one approved review
-- Not a draft (`-draft`)
-- Not closed (`-closed`)
-
-Example config:
-
-```yaml
-# .mergify.yml — configured by pr-babysit setup
 queue_rules:
   - name: default
-    merge_method: squash
-    merge_bot_account: null
-    check_confidence: high
+
+priority_rules:                          # optional, if include_priority_rules=yes
+  - name: hotfixes-first
+    conditions:
+      - label = hotfix
+    priority: high
+    allow_checks_interruption: true
+  - name: refactors-last
+    conditions:
+      - label = refactor
+    priority: low
 
 pull_request_rules:
-  - name: auto-merge when CI passes and approved
+  - name: keep-prs-up-to-date            # optional, if include_keep_up_to_date=yes
     conditions:
-      - check-success-or-neutral=~ci
-      - "#approved-reviews-by>=1"
+      - base = <BASE_BRANCH>
       - -draft
+      - -merged
+      - -closed
+      - -conflict
+    actions:
+      update: {}
+
+  - name: warn-on-conflicts
+    conditions:
+      - conflict
+      - -merged
       - -closed
     actions:
-      queue:
-        name: default
+      label:
+        add:
+          - conflict
+
+  - name: stale-cleanup                  # optional, if include_stale_cleanup=yes
+    conditions:
+      - base = <BASE_BRANCH>
+      - -merged
+      - -closed
+      - -label = stale
+      - updated-at < 14 days ago
+      - created-at < 30 days ago
+    actions:
+      comment:
+        message: >
+          This PR has been open for 30 days with no commits for 14. If you're still working on it, push a commit or leave a comment. Otherwise, this PR will auto-close in 7 days.
+      label:
+        add:
+          - stale
+
+  - name: close-abandoned-stale          # optional, if include_stale_cleanup=yes
+    conditions:
+      - base = <BASE_BRANCH>
+      - -merged
+      - -closed
+      - label = stale
+      - updated-at < 7 days ago
+    actions:
+      close:
+        message: 'Closed automatically — no activity for 7+ days after a stale warning.'
+      label:
+        remove:
+          - stale
+
+  - name: welcome-new-pr                 # optional, if include_welcome_comment=yes
+    conditions:
+      - base = <BASE_BRANCH>
+      - -merged
+      - -closed
+      - -label = stale
+      - created-at < 5 minutes ago
+    actions:
+      comment:
+        message: >
+          Thanks for the PR! CI is running — the merge queue will pick it up automatically once all checks pass.
+
+  - name: merged-notification
+    conditions:
+      - merged
+      - base = <BASE_BRANCH>
+    actions:
+      comment:
+        message: Merged via the merge queue. Thanks for the contribution!
+
+scopes:
+  source:
+    files: {}
 ```
 
-If step 0 already wrote this config (bootstrapping), skip writing and proceed to validate.
+## 1. Write `.mergify.yml` from template
 
-## 4. Validate
+Substitute all `<...>` placeholders with values collected in step 0:
+
+| Placeholder | Source | Default |
+|-------------|--------|---------|
+| `<BASE_BRANCH>` | step 0 `BASE_BRANCH` | detected default branch |
+| `<check-name>` | step 0 `CI_CHECKS` | one `check-success = <name>` per check |
+| `<duration>` | step 0 checks timeout | `15min` |
+| `<N>` | step 0 max parallel checks | `1` |
+| `<merge|rebase>` | step 0 merge method | `squash` |
+| `<merge|rebase>` (update_method) | step 0 update method | `merge` |
+
+Approval gating (optional):
+- If `required_approvals >= 1`, add to the auto-merge pull_request_rule:
+  - `"#approved-reviews-by>=<N>"`
+- Otherwise omit the approval condition.
+
+Priority rules: include only if `include_priority_rules=yes`.
+Stale cleanup: include only if `include_stale_cleanup=yes`.
+Welcome comment: include only if `include_welcome_comment=yes`.
+Keep PRs up to date: include only if `include_keep_up_to_date=yes` (recommended).
+
+## 2. Validate
 
 ```bash
 mergify config validate
@@ -73,19 +151,35 @@ mergify config validate
 
 If it fails, fix and retry (max 2 attempts). If still failing, report the error and stop.
 
-## 5. Open a configuration PR
+Note: `mergify` CLI may not be installed on this host. If so, validate YAML syntax locally
+and note that live validation happens on GitHub after the config PR merges.
+
+## 3. Open a configuration PR
 
 Do NOT commit to the PR's branch. Create a separate branch:
 
 ```bash
-git checkout -b chore/configure-mergify-rules <base_ref>
+git checkout -b chore/configure-mergify-rules <BASE_BRANCH>
 git add .mergify.yml
 git commit -m "ci: configure Mergify auto-merge rules"
 git push origin chore/configure-mergify-rules
 gh pr create \
   --title "ci: configure Mergify auto-merge rules" \
-  --body "Auto-merge every green, non-draft PR via Mergify merge queue. Auto-generated by pr-babysit setup." \
-  --base <base_ref>
+  --body "Auto-merge every green, non-draft PR via Mergify merge queue. Auto-generated by pr-babysit setup.
+
+Config customizations:
+- Base branch: <BASE_BRANCH>
+- CI checks: <comma-separated>
+- Checks timeout: <duration>
+- Max parallel checks: <N>
+- Merge method: <method>
+- Update method: <method>
+- Required approvals: <N>
+- Priority rules: <yes|no>
+- Stale cleanup: <yes|no>
+- Welcome comment: <yes|no>
+- Keep PRs up to date: <yes|no>" \
+  --base <BASE_BRANCH>
 ```
 
 Report: "Created PR #<N> to configure Mergify merge rules. Once merged, green non-draft PRs will auto-merge via the Mergify merge queue."
@@ -95,9 +189,11 @@ Report: "Created PR #<N> to configure Mergify merge rules. Once merged, green no
 Include the configuration PR number and rule summary:
 
 > Mergify: configured
-> Config file: <path>
+> Config file: .mergify.yml
 > Config PR: #<N> (if opened)
-> Rules: CI green + ≥1 approval + non-draft → merge queue
+> Base branch: <BASE_BRANCH>
+> CI checks: <comma-separated>
+> Rules: CI green + [approvals] + non-draft → merge queue
 
 ## Done
 
