@@ -33,6 +33,17 @@ Assign each issue one of three verdicts:
 | `duplicate` | Identical root cause to an existing earlier open issue. | Close referencing the canonical issue number. |
 | `still-broken` | Symptom reproduces at HEAD or the cited faulty pattern is actively present. | Formulate reproduction command and advance to Step 2. |
 | `needs-decision` | Requires architectural trade-offs, scope choices, or user preference. | Add to the decision quiz in 1d. |
+| `false-positive-incomplete-source` | The report's own "missing material" note lists files that exist at HEAD, and the claim depends on that absent material. | Re-verify against the real file; if the defect is not present, discard the claim. Report the discard reason as "reviewer worked from an incomplete upload". |
+
+## 1a-bis: Detect reports generated against incomplete source
+
+A review or audit report produced from a partial upload (missing modules, omitted helper files, no line numbers) yields two classes of claim. Separate them before acting:
+
+1. **Read the report's own material/missing-material section first.** Any claim that hinges on an artifact the report lists as "not supplied" is suspect — the reviewer could not have verified it. Confirm the artifact exists at HEAD (`ls <path>`, `rg -n '<symbol>' <path>`) before trusting the claim.
+2. **A claim that cites a symbol the real code already validates is stale.** Example: a report says "`run.workflow` is never type-checked" while `merge_run` raises `SpecError` on a non-string — the reviewer missed the helper. Grep the named symbol and read the real implementation before accepting the claim.
+3. **A claim that two in-repo artifacts disagree is usually real even from a partial upload.** Contradictions visible within supplied material (FRD Business Logic vs FRD Test row, FRD vs a supplied capability file) do not require the missing files — trust these.
+
+Report the triage split explicitly: which claims are real-and-present, which are real-but-stale (fixed after the upload), and which are false-positives caused by the incomplete source. This is the "is this valid?" answer — a verdict per claim, not a single yes/no.
 
 ## 1c: Close Verified-on-Main Issues
 

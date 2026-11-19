@@ -39,9 +39,12 @@ Detailed step-by-step checklist for removing an AES capability across all layers
 - Skill SKILL.md rules: update command references
 - Skill step files: update CLI command calls
 
+For pipe-escaped table rows (`\|`) in README/BACKLOG/FRD, `patch` matching rejects the escapes repeatedly — edit the exact line with `sed -i '<N>s|.*|new row|' <file>` and re-read to confirm.
+
 ## Verify
 
 - `PYTHONPATH=modules .venv/bin/python -m pytest modules/ -q -m "not dogfood"` passes
 - `lint-arwaky-cli scan modules` reports 0 violations
 - `grep -rn "<removed-name>" modules/` returns empty
 - `grep -rn "sdc memory <removed-subcommand>"` across skill files returns empty
+- `git add -A` then `git status --short` — source edits auto-stage but doc edits do not; stage everything so no doc change is left out of the commit.

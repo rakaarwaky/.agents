@@ -52,6 +52,9 @@ Manage the full lifecycle of an AES capability. A capability change is never iso
 - **Import blocks break silently when removing one name from a multi-line import.** Removing a name from a parenthesised `from x import (...)` block can leave a dangling `(` or orphaned continuation lines. Re-read the full block after the edit.
 - **Tests that assert removed fields still compile but fail at runtime.** A dataclass field removal does not cause a compile error in test files that construct the dataclass with the removed field — the `__init__` silently ignores it until an attribute access fires `AttributeError`. Grep for `.<removed_field>` in tests, not just the constructor call.
 - **Skill step files reference the CLI command in prose.** Removing a CLI subcommand is not enough — skill step files that say `sdc memory <path|read|snapshot|update>` must be updated to the new command list, or agents will call a nonexistent subcommand at runtime.
+- **A `read_file` reporting "file is empty (0 bytes)" is not proof the file has no content.** The reader can report empty on a stale or race-y view; when a user-supplied file is expected to have a body, re-read it once before concluding "nothing to analyze" — an empty read is a retry signal, not a finding.
+- **Pipe-escaped markdown tables (`\|`) defeat `patch` matching — edit them with `sed -i` on the line number.** Tables in README/BACKLOG/FRD use `\|` to escape pipes; the patch tool's escape-drift guard rejects the old/new strings repeatedly. Target the exact line with `sed -i '<N>s|.*|new row|' <file>` from the terminal, then re-read to confirm.
+- **Docs and code split across the git index during a removal — stage everything with `git add -A` before committing.** After editing source (auto-staged) and docs (unstaged), `git status` shows a mix of `M ` and ` M` states; run `git add -A` and re-check `git status --short` so no doc edit is silently left out of the commit.
 
 ## References
 
