@@ -3,25 +3,21 @@ name: xdg-spec-compliance
 description: "Audit and fix XDG Base Directory compliance in a repo (data/config/cache/state paths, 0700 dirs, 0600 secrets, precedence). Use when the app resolves paths with `expanduser`/`Path.home`, writes logs outside `$XDG_STATE_HOME`, or ships world-readable secrets."
 when-to-use: "Use when auditing a repo's path resolution against the XDG Base Directory spec: relative/tilde rejection, precedence (shell env > XDG file > .env), dir and file permissions, and vendor subdirs."
 argument-hint: "[<repo-root>]"
-metadata:
-  tags:
-    - linux
-    - xdg
-    - packaging
-    - security
-    - python
-    - bash
 ---
 
 # XDG Base Directory Compliance
 
-Audit and fix a repo's path resolution against the XDG Base Directory spec: run the four-step audit order, check the seven rules projects break, and fix the installer, tests, and provisioner where each rule fails.
+Audit and fix repository path resolution against the XDG Base Directory specification, enforcing directory permissions, secret security, environment variable precedence, and clean test sandboxing.
 
-## Global Rules
+## Rules
 
-- **Quote the spec, don't reason from memory.** The authoritative text is v0.8 at https://specifications.freedesktop.org/basedir/latest/ — three rules are routinely guessed wrong; the rules reference is the single home.
-- **Reproduce before claiming.** Relative/tilde env values and mkdir umask inheritance are invisible to reading alone; the audit order reference ends in a repro step, and no claim rests on reading alone.
-- **Clean up probe junk.** Any file the repro dumps into the repo is removed before the run is done; `git status` must be clean at the end.
+| ID | Rule | Check |
+|----|------|-------|
+| R1 | Quote the authoritative XDG v0.8 specification directly rather than relying on ungrounded path assumptions. | Verify rules and path mappings adhere to the official Freedesktop specification. |
+| R2 | Reproduce path resolution and permission inheritance issues before asserting violations or making code changes. | Run verification probes testing relative path rejections and umask inheritance. |
+| R3 | Clean up all test probe artifacts and temporary files, leaving `git status` clean after audit runs. | Check repository git status to ensure zero residual probe files. |
+| R4 | Enforce strict file and directory permissions: 0700 for private XDG directories and 0600 for secrets. | Inspect created paths with `stat` to confirm mode permissions. |
+| R5 | Preserve precedence order: shell environment variables override XDG default locations, which override `.env`. | Verify resolution fallback order in path resolution tests. |
 
 ## Routing
 

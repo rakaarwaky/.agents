@@ -7,9 +7,18 @@ and classify.py are pure and do not import this module in PR 1.
 from __future__ import annotations
 
 import subprocess
+from pathlib import Path
 
 # gh CLI invocations never block a run longer than this.
 GH_TIMEOUT = 30
+
+
+def artifact_dir(repo_root: str | Path) -> Path:
+    """Return ~/.agents/develop/<namarepo>/issue-maker/, creating it if needed."""
+    repo_name = Path(repo_root).resolve().name.lower()
+    base = Path.home() / ".agents" / "develop" / repo_name / "issue-maker"
+    base.mkdir(parents=True, exist_ok=True)
+    return base
 
 # The gh CLI reports HTTP failures only through its stderr text (it exits 1
 # for both API errors and local failures); these patterns classify the

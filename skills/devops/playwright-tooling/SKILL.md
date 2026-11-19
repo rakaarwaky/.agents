@@ -3,32 +3,20 @@ name: playwright-tooling
 description: Recover Playwright browser cache on restricted hosts.
 when-to-use: "Use when playwright install times out on a network-restricted host, manually placed browser dirs are wiped every run, or headless-shell/FFmpeg is missing from the Playwright cache."
 argument-hint: "[<browser>]"
-version: 1.0.0
-author: Hermes Agent
-license: MIT
-metadata:
-  hermes:
-    tags: [playwright, chromium, cache, network, browser-automation]
-    related_skills: [qwen-web]
 ---
 
 # Playwright Tooling
 
 Playwright browser infrastructure: cache recovery, headless Chromium setup, and mirror routing for network-restricted hosts.
 
-## When to Use
+## Rules
 
-- `playwright install` times out or fails on GFW/corporate proxy/data-cap hosts.
-- `curl` reaches the CDN but Playwright's Node fetch cannot.
-- Browser dirs are wiped on each `playwright install` run.
-- headless-shell or FFmpeg is missing from `~/.cache/ms-playwright/`.
-
-## Global Rules
-
-- **Verify dir names before placing files.** Dashes in browser names normalize to underscores on disk; placing in the dashed dir makes Playwright wipe it on every install.
-- **Create both marker files after every manual placement.** Without `INSTALLATION_COMPLETE`, Playwright re-downloads.
-- **Prefer the mirror path over raw CDN** when the CDN is reachable by `curl` but not by Playwright's Node fetch client.
-- **Cache dir naming is the single source of truth** for exact directory names — see the layout table in `references/cache-layout.md`.
+| ID | Rule | Check |
+|----|------|-------|
+| R1 | Normalize browser directory names on disk: dashes normalize to underscores to prevent install wipes. | Check directory names under `~/.cache/ms-playwright/` use underscore format. |
+| R2 | Create both marker files (`INSTALLATION_COMPLETE`) after every manual browser directory placement. | Verify existence of `INSTALLATION_COMPLETE` marker inside placed browser directory. |
+| R3 | Route downloads through mirror paths when CDN is reachable via curl but blocked for Node fetch. | Test curl reachability versus Node client and configure mirror environment variables. |
+| R4 | Use cache layout specification as single source of truth for exact directory naming and structure. | Validate cache layout against reference directory tables. |
 
 ## Routing
 

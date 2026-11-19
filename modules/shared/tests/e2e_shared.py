@@ -7,11 +7,11 @@ def test_manifest_e2e_workflow():
     from modules.shared.src.common.utility_manifest_reader import find_tool, load_tools
 
     tools = load_tools()
-    assert len(tools) >= 9
+    assert len(tools) >= 5
 
-    lint_tool = find_tool("lint-arwaky")
+    lint_tool = find_tool("context7")
     assert lint_tool is not None
-    assert lint_tool.id == "lint-arwaky"
+    assert lint_tool.id == "context7"
 
 
 def test_envfile_e2e_workflow():

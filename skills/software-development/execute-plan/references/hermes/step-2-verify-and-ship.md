@@ -4,12 +4,13 @@ Hermes owns the final git and PR operations. Read Grok's state file and artifact
 
 ## 2a: Read the State File & Artifacts
 
-Read `exec-plan-<PLAN_ID>.json` and cross-check:
+The state file `exec-plan-<PLAN_ID>.json` is written at the start of the run and is frequently NOT updated — it commonly still reads `status: "initializing"` with every PR `pending` and `final_review_passed: false` even after Grok completed the whole loop and opened the PR. Do not gate on its `status` / `final_review_passed` fields; treat them as advisory only. The authoritative record of what happened is Grok's final rendered screen (`orca terminal read --terminal <handle> --screen`) plus the real `git` and `gh pr` state on `origin`. Read the state file only for the static inputs (`linearized_order`, `dag`, `max_concurrent`) and the per-PR `exec-summary-*` / `exec-review-*` markdown artifacts, which Grok does write reliably.
 
-- `status` — must be `completed` (or `failed`/`skipped` if some PRs failed; see 2c).
-- `final_review_passed` — must be `true`. If `false`, stop and report to the user with `deferred_issues` — do not push a review that Grok itself could not close.
-- `pr_urls` — the final PR/compare URL Grok recorded.
-- `final_commit_sha` — the final branch HEAD.
+Cross-check the real outcome from origin, not the state file:
+
+- `git fetch origin <final_branch>` then `git log --oneline origin/<final_branch> -<N>` — the branch and its commits are the truth.
+- `gh pr list --head <final_branch> --json url,isDraft,state` or `gh pr view <n>` — confirms the PR Grok opened.
+- Grok's final screen block names the PR URL, final branch, and CI results — use it as the human-readable summary.
 
 ## 2b: Verify the Final Branch
 
@@ -26,9 +27,9 @@ git -C <path> log --oneline <final_branch> -<N>   # N = completed PR count + 1
 
 ## 2c: Handle Partial Failures
 
-If `status` is not `completed` (some PRs failed or were cascade-skipped):
+If the run is incomplete (Grok's screen shows failure, or the branch/PR is absent on origin):
 
-- Read `deferred_issues` and the failed PR ids from the state file.
+- Read `deferred_issues` and any failed PR ids from Grok's per-PR `exec-review-*` artifacts and final screen.
 - Report to the user which PRs did not make it into the final branch and why, and suggest `/execute-plan --resume <PLAN_ID>` for a Grok-driven retry of just the failed/skipped PRs.
 - Do NOT hand-assemble the missing PRs into the final branch yourself.
 

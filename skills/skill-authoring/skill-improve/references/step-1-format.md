@@ -15,12 +15,18 @@ Every skill being improved must use this exact body shape in `SKILL.md`:
 ```
 
 - **Title** — one `#` heading with the skill name.
-- **Rules** — one table row per rule, columns `ID | Rule | Covers | Check`. Cross-step policy, invariants, record formats, and any fact read by more than one step. A stop condition is a row, not a fourth heading.
+- **Rules** — one table row per rule, columns `ID | Rule | Check`. Cross-step policy, invariants, record formats, and any fact read by more than one step. A stop condition is a row, not a fourth heading.
 - **Routing** — a table of contents mapping each step/reference to its purpose.
 
-All task data, commands, field shapes, examples, stop conditions, and worked examples belong in `references/*.md` or `scripts/*`. If the body contains anything beyond the three sections above, move it to a reference file before publishing.
+All task data, commands, field shapes, examples, stop conditions, and worked examples belong in `references/*.md` or `scripts/*`. If the body contains anything beyond the three sections above, classify it before moving it — do not reflexively extract it into a standalone reference file.
 
-Verified mechanically: `grep -n '^#' <SKILL.md>` returns only the `#` title and exactly two `##` headings — `## Rules`, `## Routing`. `sac lint` does not check this (body shape is convention-enforced); the grep is the check. Case matters: the heading is `## Rules`.
+Apply the information-distribution test from [`step-3-publish.md`](step-3-publish.md) before the move:
+
+- A fact read by more than one step (cross-step policy, invariants, lessons that govern the whole pipeline) becomes a row in `## Rules` — never a standalone `references/pitfalls.md`. A generic `references/pitfalls.md` is the failure shape: lessons read by every step belong in `## Rules` as always-on content.
+- A fact read by exactly one step becomes a section in that step's `references/step-<N>-<name>.md`.
+- A section heading alone (e.g. `## Pitfalls and Lessons`) is not a fact — its bullets are. Convert the bullets to Rules rows or step-file sections; do not copy the heading into a new file verbatim.
+
+Verified mechanically: `grep -n '^#' <SKILL.md>` returns only the `#` title and exactly two `##` headings — `## Rules`, `## Routing`. `sac lint` does not check this (body shape is convention-enforced); the grep is the check. Case matters: the heading is `## Rules`. Zero `###` subheadings are allowed anywhere in `SKILL.md` — subheadings match `^#` and fail the probe. For multi-lane skills (such as Hermes and Grok lanes), unify routing entries into a single table with a `Lane` column or use bold headers (`**Hermes lane**`), never `###` headings.
 
 A stop-condition is never its own `## Completion` section in the body — it is one row in `## Rules` (e.g. "**Completion.** <criterion>"), because a fourth heading breaks the three-section shape.
 

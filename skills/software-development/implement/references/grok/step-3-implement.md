@@ -55,7 +55,7 @@ Be proactive about avoiding these patterns in your implementation.
 <end if>
 
 When you are done, write an implementation summary to: <summary_file>
-The summary must include: what files were changed, what was added/modified, and any design decisions made.
+The summary must include: what files were changed, what was added/modified, and any plan decisions made.
 ```
 
 Wait for the subagent to complete. If it fails, report the error to the user and stop.

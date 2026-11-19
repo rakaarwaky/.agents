@@ -1,27 +1,28 @@
 # Step 3: Memory Flush (if applicable) & Final Report
 
-If Grok's run produced new issue patterns (visible in `review-<run_id>.md` or in Grok's terminal output), flush them to the workspace memory file the same way `grok/step-8-memory-flush.md` describes — run the memory helper from the worktree:
+If Grok's run produced new issue patterns (visible in `review-<run_id>.md` or in Grok's terminal output), flush them to the workspace memory file the same way `grok/step-8-memory-flush.md` describes — run `sdc memory update` from the worktree:
 
 ```
-cd <worktree_path> && "${PYTHON}" "<memory_helper_path>" update --file <spec-json>
+cd <worktree_path> && sdc memory update --file <spec-json>
 ```
 
 Build the JSON spec from the issues Grok raised. Generalize patterns before writing (same rules as `grok/step-8-memory-flush.md`). If the helper fails, log a warning and continue — never fail the run over memory.
 
 ## End-Turn Gate: Lint Verification
 
-Run `lint-arwaky-cli report .` from the worktree or owning repo (absolute path: `/home/raka/.local/bin/lint-arwaky-cli`). Compare the output against the start-turn baseline. The Delta column must be zero or negative (no new violations introduced by the run). Any positive delta is a regression: stop, report the offending file(s), and do not open the PR until it is fixed. Include the final report output in the report to the user.
+Run `lint-arwaky-cli report .` from the worktree or owning repo (absolute path: `$HOME/.local/bin/lint-arwaky-cli`). Compare the output against the start-turn baseline. The Delta column must be zero or negative (no new violations introduced by the run). Any positive delta is a regression: stop, report the offending file(s), and do not open the PR until it is fixed. Include the final report output in the report to the user.
 
 ## Final Report
 
 Report to the user:
 
-1. What was implemented (from `impl-summary-<run_id>.md`).
-2. Review panel outcome (issues found, all resolved).
+1. What was implemented (from the worktree diff, or `impl-summary-<run_id>.md` if Grok wrote one).
+2. Review panel outcome (issues found, all resolved — or "headless run; verified via worktree diff and gates").
 3. PR URL and branch name.
 4. Worktree path and the post-merge retirement command:
 
    ```
+   # Resolve $ORCA (via command -v orca-ide or $ORCA_CLI_COMMAND)
    "$ORCA" worktree rm --worktree <worktree_id> --force --json
    ```
 

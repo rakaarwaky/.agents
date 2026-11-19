@@ -27,7 +27,16 @@
 	url = https://github.com/rakaarwaky/skill-authoring.git
 	ignore = dirty
 
-[submodule "skills/brave-automation/tools"]
-	path = skills/brave-automation/tools
+[submodule "skills/automation/brave-automation/tools"]
+	path = skills/automation/brave-automation/tools
 	url = https://github.com/rakaarwaky/brave-automation-arwaky.git
 	ignore = dirty
+[submodule "skills/automation/qwen-web/tools"]
+	path = skills/automation/qwen-web/tools
+	url = https://github.com/rakaarwaky/qwen-web-arwaky.git
+[submodule "skills/content-creation/vision-arwaky/tools"]
+	path = skills/content-creation/vision-arwaky/tools
+	url = https://github.com/rakaarwaky/vision-arwaky
+[submodule "skills/software-development/tools"]
+	path = skills/software-development/tools
+	url = https://github.com/rakaarwaky/software-development-cli.git

@@ -209,3 +209,23 @@ def test_main_writes_report_to_out(tmp_path: Path) -> None:
     written = json.loads(out.read_text(encoding="utf-8"))
     assert written["checks"]["invariant_count"] == "ok"
     assert written["violations_count"] == 0
+
+
+def test_main_resolves_default_artifact_dir(tmp_path: Path, monkeypatch: Any) -> None:
+    repo = tmp_path / "mock-repo"
+    repo.mkdir()
+    fake_home = tmp_path / "home"
+    monkeypatch.setattr(Path, "home", lambda: fake_home)
+    art_dir = fake_home / ".agents" / "develop" / "mock-repo" / "issue-maker"
+    art_dir.mkdir(parents=True)
+    (art_dir / "task-tracker-ledger.jsonl").write_text(LEDGER.read_text(encoding="utf-8"), encoding="utf-8")
+
+    code = validate.main(["--repo-root", str(repo)])
+    assert code == 0
+
+    # Also test defaulting to cwd when --repo-root is omitted
+    monkeypatch.chdir(repo)
+    code_cwd = validate.main([])
+    assert code_cwd == 0
+
+

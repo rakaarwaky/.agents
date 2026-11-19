@@ -7,33 +7,22 @@ argument-hint: "<init|launch|close|get-scene-info|create-primitive|set-object-tr
 
 # BlenderArwaky
 
-You script Blender through the BlenderArwaky toolkit: CLI sub-commands or the
-MCP `execute_command(action=..., args=...)` surface, which dispatches every
-action (scene, object, viewport, render, io, job, config, code).
+Script Blender through the BlenderArwaky toolkit via CLI sub-commands or the unified MCP execute_command surface for scene assembly, transformations, rendering, and asset placements.
 
-## Global Rules
+## Rules
 
-- **Two entry surfaces.** CLI exposes every action as a direct sub-command;
-  MCP routes all actions through one `execute_command` tool — the `action`
-  parameter selects the feature. Five MCP tools: `execute_command`,
-  `list_commands`, `health_check`, `get_config`, `help`.
-- **Commands.** The full CLI↔MCP mapping, parameter tables, and screenshot
-  parameters: [`references/commands.md`](references/commands.md).
-- **Add-on.** TCP server on port 9876; auto-starts on Blender load (30
-  retries × 2s); headless mode requires an active camera for screenshots.
-- **Workflows.** Scene discovery, object creation/transform, viewport
-  analysis, asset import/place, render + task status, and custom bpy code:
-  [`references/workflows.md`](references/workflows.md).
-- **Troubleshooting.** Connection refused, missing active camera, MCP
-  server won't start, tools not showing up:
-  [`references/troubleshooting.md`](references/troubleshooting.md).
-- **Completion.** `health_check` reports a live Blender connection and the
-  requested action returned the expected result.
+| ID | Rule | Check |
+|----|------|-------|
+| R1 | Access functionality via direct CLI sub-commands or MCP `execute_command` routing with specific action names. | Verify CLI sub-command or MCP action name exists in supported command set. |
+| R2 | Connect to Blender add-on TCP server on port 9876 with retry budget (30 retries x 2s). | Verify TCP listener is responsive on port 9876. |
+| R3 | Ensure an active camera is present in the scene before taking viewport screenshots in headless mode. | Confirm scene contains an active camera object prior to screenshot capture. |
+| R4 | Follow structured workflows for scene discovery, object manipulation, rendering, and custom bpy execution. | Check that output artifacts match expected JSON payloads or rendered frames. |
+| R5 | Verify live connection via `health_check` before declaring operations complete. | Run health check and verify successful connection response. |
 
 ## Routing
 
-| Step                     | Reference                                                     | Purpose                                                                                          |
-| ------------------------ | --------------------------------------------------------------- | ------------------------------------------------------------------------------------------------- |
-| Commands                 | [`references/commands.md`](references/commands.md)           | Every CLI sub-command and MCP action, with parameter tables, screenshot parameters, and the five MCP tools. |
-| Workflows                | [`references/workflows.md`](references/workflows.md)        | Scene discovery, object creation/position, viewport analysis, asset import, render/status, custom code. |
-| Add-on & Troubleshooting | [`references/troubleshooting.md`](references/troubleshooting.md) | Blender add-on architecture, port/timeout details, and fixes for the common failure modes.        |
+| Step | Reference | Purpose |
+| ---- | --------- | ------- |
+| Commands | [`references/commands.md`](references/commands.md) | Every CLI sub-command and MCP action, with parameter tables, screenshot parameters, and the five MCP tools. |
+| Workflows | [`references/workflows.md`](references/workflows.md) | Scene discovery, object creation/position, viewport analysis, asset import, render/status, custom code. |
+| Add-on & Troubleshooting | [`references/troubleshooting.md`](references/troubleshooting.md) | Blender add-on architecture, port/timeout details, and fixes for the common failure modes. |

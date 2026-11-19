@@ -12,7 +12,7 @@ With `--dry-run`, skip this step entirely. Nothing is written to the real skills
 mkdir -p <SKILL_DIR>
 ```
 
-Create `<SKILL_DIR>/scripts/` if the skill ships helper scripts and `<SKILL_DIR>/references/` if it needs reference docs. The file fails to save without the directory. If the category folder is new, create its `DESCRIPTION.md` — the pack audit requires one.
+Create `<SKILL_DIR>/scripts/` if the skill ships helper scripts, `<SKILL_DIR>/references/` if it needs reference docs, and `<SKILL_DIR>/template/` if it ships one skeleton file per artifact it produces. The file fails to save without the directory. If the category folder is new, create its `DESCRIPTION.md` — the pack audit requires one.
 
 ```bash
 # Create the skill directory
@@ -35,18 +35,18 @@ Pick by description length:
 - **`skill_manage(action=create)`** — safe default; creates the directory and `SKILL.md` in one call. Enforces the ~60-char `description:` budget and rolls back the whole batch on any violation. If it succeeds, skip Part C and go to step 5 (`step-5-verify.md`).
 - **Write the files directly** (`write_file`) — continue with Part C. Use this when the description needs more than ~60 chars, when building a richer multi-file skill, or when `sac create skill` keeps rejecting frontmatter. After writing, run `sac catalog --build` to register the skill.
 
-The ~60-char index budget and the 1,024-char parser limit (see `../../skill-improve/references/step-3-frontmatter-keys.md`) are different ceilings: the parser accepts long descriptions, the index display clips them.
+The ~60-char index budget and the 1,024-char parser limit are different ceilings: the parser accepts long descriptions, the index display clips them.
 
 ## Part C: Write SKILL.md and supporting files
 
 Frontmatter first, then the standard body. The shape of every template lives in `template/`, and `template/template.md` is the single entry point that routes to the right one — read that index, then copy the template it names rather than restating any shape here.
 
 1. Open [`../template/skill.md`](../template/skill.md), fill the placeholders, and write the result to `<SKILL_DIR>/SKILL.md`. Any reference docs the skill ships use [`../template/reference.md`](../template/reference.md) as their shape (both chosen via [`../template/template.md`](../template/template.md)).
-2. Place each answer at the home the placement map assigns (`../../skill-improve/references/step-14-tenq-standard.md`): the success metric, audience and tone, tools, ceilings, and report shape as Rules rows; activation and precondition in the trigger fields; the read-inputs, steps, branches, and fallback in the step files that own them.
+2. Place each answer at its single home: the success metric, audience and tone, tools, ceilings, and report shape as Rules rows; activation and precondition in the trigger fields; the read-inputs, steps, branches, and fallback in the step files that own them.
 3. Ship at least one concrete Input → Output example in the step file that owns the output shape: the user request verbatim, then the exact files or text it produces.
 4. Write supporting scripts and references as needed, using absolute paths so nothing lands in the wrong place.
 
-Mandatory keys, YAML hygiene, and which optional keys are safe to add are Rules; the full key table and the parser ceilings are in `../../skill-improve/references/step-3-frontmatter-keys.md`.
+Mandatory keys, YAML hygiene, and which optional keys are safe to add are Rules in `SKILL.md`; nothing else gates them.
 
 ## Completion
 

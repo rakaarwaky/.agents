@@ -20,5 +20,9 @@ Domain: General knowledge base — interlinked markdown notes.
 | [[git-submodule-topology]] | entity | agents-arwaky submodule map: internal/*, vendor/*, skills app; pin commits; ignore=dirty | 2026-11-07 |
 | [[repo-git-state]] | summary | Point-in-time snapshot 2026-11-07: branches, pin drift, open qwen-web-arwaky decision | 2026-11-07 |
 | [[figcraft-save-file]] | concept | FigCraft save_file headless vs disk file — save_file stores in internal doc store, not a host file; use file.saveAs {data: true} + base64 decode to write real .figcraft to disk | 2026-11-08 |
+| [[codebase-inspection-routing]] | comparison | Two codebase lenses: pygount (LOC) vs CodeGraph (symbols); routing by question | 2026-11-18 |
+| [[codegraph]] | concept | Symbol & call-graph engine: index requirement, 8 MCP tools, CLI direct queries | 2026-11-18 |
+| [[pygount]] | concept | LOC metrics tool: install, summary command, language filters, pitfalls | 2026-11-18 |
+| [[codegraph-skill-architecture]] | summary | How the codegraph skill is structured: SKILL.md router + two references | 2026-11-18 |
 
-*14 pages. No pages are orphaned — every page links to at least 2 others.*
+*18 pages. No pages are orphaned — every page links to at least 2 others.*

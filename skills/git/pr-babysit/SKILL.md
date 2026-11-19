@@ -1,58 +1,43 @@
 ---
 name: pr-babysit
-description: "Watch a GitHub PR end to end. Two lanes: Hermes orchestrates and ships; Grok Build fixes. Run Step R0 to identify the lane, then read only that lane's references."
-when-to-use: "Triggers on \"/pr-babysit\". Phrasing: \"watch PR 123 until green\", \"babysit PR 123 and merge when ready\", \"fix issue #123 and open a PR\", \"keep fixing PR 123 until it can merge\", \"pr-babysit add --ship 123\"."
-argument-hint: "add [--ship] <number> | check <number> | ship on <number> | fix <number>"
-disable-model-invocation: true
-created_by: curator
+description: "Watch a PR, fix CI, merge via Mergify queue."
+when-to-use: "Triggers on \"/pr-babysit\". Phrasing: \"watch PR 123 until green\", \"babysit PR 123 and merge when ready\", \"fix issue #123 and open a PR\", \"keep fixing PR 123 until it can merge\", \"pr-babysit add 123\", \"pr-babysit ship 123\", \"pr-babysit setup 123\"."
+argument-hint: "<add|ship|setup> <pr link|number>"
 ---
+
 # PR Babysitter
 
-Watch a standalone GitHub PR end to end: register it, keep it green, merge it when `--ship` is active. The pipeline is event-driven — CI re-runs and new review threads each trigger a fresh pass.
+Watch pull requests, parse failing CI logs, push incremental fixes, configure Mergify merge queues, and safely merge pull requests through coordinated agent lanes.
 
-## Global Rules
+## Rules
 
-This file is the lane identification step only. The lane is determined from physical signals, in this order. Each is observable without asking the agent to name itself. Each agent's launcher stamps a fixed attribution env var into every command it runs. The model cannot set these; only the launcher can.
-
-```bash
-if [[ -n "${HERMES_AGENT:-}" ]]; then echo HERMES
-elif [[ -n "${GROK_AGENT:-}" ]]; then echo GROK
-else echo UNSET; fi
-```
-
-- `HERMES` → **Hermes lane.** Stop.
-- `GROK` → **Grok lane.** Stop.
-- `UNSET` → stop and report. Do not guess the lane.
-
-Marker provenance:
-
-- **Hermes** re-exports `AI_AGENT=hermes-agent` and `HERMES_AGENT=true` on every command.
-- **Grok Build** runs with `GROK_AGENT=1`.
-
-Read only the winning lane's references. Do not read the other lane's.
+| ID | Rule | Check |
+|----|------|-------|
+| R1 | Determine execution lane strictly from physical environment variables (`HERMES_AGENT=1` or `GROK_AGENT=1`); stop if unset. | Verify agent attribution environment variable before loading lane references. |
+| R2 | Read only the winning lane's references; never inspect or load the alternate lane's files. | Confirm reference file accesses match detected lane. |
+| R3 | Enforce scope ceilings: maximum 3 fix commits per pass, no subagent dispatch inside a single worktree. | Count fix commits and verify single-agent execution in worktree. |
+| R4 | Never modify skills outside `skills/git/pr-babysit/` during babysitting runs. | Check modified files match babysit skill path. |
+| R5 | Verify live CI status and merge state directly on GitHub before declaring PR babysitting complete. | Run `gh pr view` to verify CI check runs and merge status. |
 
 ## Routing
 
-Read **only** the winning lane's references:
-
-### Hermes lane 
-
-
-| Step | Reference                                                                                        | Purpose                                                                                                                                                  |
-| ----: | ------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 0    | [`references/hermes/step-0-watch-and-spawn.md`](references/hermes/step-0-watch-and-spawn.md)     | Verify auth, fetch PR, register in the watchlist, check CI once; if red or open threads, spawn a Grok worktree on the head branch and drop the fix brief |
-| 1    | [`references/hermes/step-1-wait-and-reverify.md`](references/hermes/step-1-wait-and-reverify.md) | Wait for the fix pass; re-run the CI check on the live head SHA; update `last_status`                                                                    |
-| 2    | [`references/hermes/step-2-merge.md`](references/hermes/step-2-merge.md)                         | Merge (only when `ship` is `true` and the ship-ready gates pass on a live re-query); retire the worktree                                                 |
-| 3    | [`references/hermes/step-3-final-report.md`](references/hermes/step-3-final-report.md)           | Final report to the user (fix passes, outcome, open items, watchlist state)                                                                              |
-
-
-### Grok lane 
-
-
-| Step | Reference                                                                            | When it runs                                                                                                                                                            |
-| ----: | ------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 0    | [`references/grok/step-0-add-pr.md`](references/grok/step-0-add-pr.md)               | PR details, repo, head/base refs for the pass                                                                                                                           |
-| 1    | [`references/grok/step-1-watch-ci.md`](references/grok/step-1-watch-ci.md)           | Always, at the start of the pass                                                                                                                                        |
-| 2    | [`references/grok/step-2-auto-fix.md`](references/grok/step-2-auto-fix.md)           | CI reports a red check; loops back to step 1 after each push. Commit title grammar: Conventional Commits inline                                                         |
-| 3    | [`references/grok/step-3-decision-tree.md`](references/grok/step-3-decision-tree.md) | After each step 2 push and always before declaring the PR green; CI logs ambiguous → [`references/grok/step-3-troubleshoot.md`](references/grok/step-3-troubleshoot.md) |
-| 4    | [`references/grok/step-4-merge.md`](references/grok/step-4-merge.md)                 | Ship-ready gate checks; Grok reports merge-ready (Hermes performs the merge)                                                                                            |
+| Step | Reference | Purpose |
+| ----: | --------- | ------- |
+| Hermes 0 | [`references/hermes/step-0-watch-and-spawn.md`](references/hermes/step-0-watch-and-spawn.md) | Verify auth, register PR in watchlist, compose detailed brief for Grok, spawn Grok worktree |
+| Hermes 1 | [`references/hermes/step-1-wait-and-reverify.md`](references/hermes/step-1-wait-and-reverify.md) | Wait for Grok pass, read report, reverify CI on live head |
+| Hermes 2 | [`references/hermes/step-2-merge.md`](references/hermes/step-2-merge.md) | Verify merge landed live on GitHub, retire Grok worktree |
+| Hermes 3 | [`references/hermes/step-3-final-report.md`](references/hermes/step-3-final-report.md) | Final report to user with fixes, outcome, and watchlist state |
+| Grok Ship 0 | [`references/grok/ship/step-0-add-pr.md`](references/grok/ship/step-0-add-pr.md) | PR details, repo, head/base refs, set ship: true |
+| Grok Ship 1 | [`references/grok/ship/step-1-watch-ci.md`](references/grok/ship/step-1-watch-ci.md) | Watch CI until green |
+| Grok Ship 2 | [`references/grok/ship/step-2-auto-fix.md`](references/grok/ship/step-2-auto-fix.md) | CI red: parse logs, fix code, Conventional Commits, push |
+| Grok Ship 3 | [`references/grok/ship/step-3-decision-tree.md`](references/grok/ship/step-3-decision-tree.md) | Conflict resolution, review threads; troubleshooter: [`references/grok/ship/step-3-troubleshoot.md`](references/grok/ship/step-3-troubleshoot.md) |
+| Grok Ship 4 | [`references/grok/ship/step-4-mergify-detect.md`](references/grok/ship/step-4-mergify-detect.md) | Detect Mergify on repo; bootstrap `.mergify.yml` setup PR if missing |
+| Grok Ship 5 | [`references/grok/ship/step-5-mergify-diagnostics.md`](references/grok/ship/step-5-mergify-diagnostics.md) | Check `mergify events`, quarantine flaky tests, upload JUnit |
+| Grok Ship 6 | [`references/grok/ship/step-6-merge-protections.md`](references/grok/ship/step-6-merge-protections.md) | Check active freezes (`mergify freeze`), dependencies, stacked PRs |
+| Grok Ship 7 | [`references/grok/ship/step-7-merge.md`](references/grok/ship/step-7-merge.md) | Merge via Mergify queue, monitor queue, fallback to direct merge |
+| Grok Add 0 | [`references/grok/add/step-0-add-pr.md`](references/grok/add/step-0-add-pr.md) | PR details, repo, head/base refs, set ship: false |
+| Grok Add 1 | [`references/grok/add/step-1-watch-ci.md`](references/grok/add/step-1-watch-ci.md) | Watch CI until green |
+| Grok Add 2 | [`references/grok/add/step-2-auto-fix.md`](references/grok/add/step-2-auto-fix.md) | CI red: parse logs, fix code, Conventional Commits, push |
+| Grok Add 3 | [`references/grok/add/step-3-decision-tree.md`](references/grok/add/step-3-decision-tree.md) | Conflict resolution, review threads; troubleshooter: [`references/grok/add/step-3-troubleshoot.md`](references/grok/add/step-3-troubleshoot.md) |
+| Grok Setup 0 | [`references/grok/setup/step-0-detect.md`](references/grok/setup/step-0-detect.md) | Detect Mergify config; bootstrap `.mergify.yml` if missing |
+| Grok Setup 1 | [`references/grok/setup/step-1-configure.md`](references/grok/setup/step-1-configure.md) | Write merge rules, validate, open configuration PR |

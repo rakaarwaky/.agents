@@ -4,17 +4,17 @@ Everything the run needs before any subagent can spawn: host helpers, shared fil
 
 ## Start-Turn Gate: Lint Baseline
 
-Run `lint-arwaky-cli report .` from the owning repo or worktree (absolute path: `/home/raka/.local/bin/lint-arwaky-cli`) before any subagent spawns. This records the scan baseline in `$XDG_DATA_HOME/lint-arwaky/snapshots.json` keyed by target path. Paste the report output verbatim into the orchestrator's run log. The baseline is the starting violation count for this run. If the CLI is unavailable, note the failure and continue without the gate.
+Run `lint-arwaky-cli report .` from the owning repo or worktree (absolute path: `$HOME/.local/bin/lint-arwaky-cli`) before any subagent spawns. This records the scan baseline in `$XDG_DATA_HOME/lint-arwaky/snapshots.json` keyed by target path. Paste the report output verbatim into the orchestrator's run log. The baseline is the starting violation count for this run. If the CLI is unavailable, note the failure and continue without the gate.
 
 ## Host Setup
 
-Resolve `HOST_PY` as `<dirname of this SKILL.md>/scripts/host.py`. Run `<python> <HOST_PY> setup` via `run_terminal_command` and parse the JSON stdout. Store `python` as `PYTHON`, `scratch_dir` as `scratch_dir`, and `run_id` as `IMPL_ID`. `scratch_dir` is `~/.agents/develop/<repo-slug>/implement/` (per-repo, created by `host.py`); every artifact path in later steps is derived from it.
+Run `sdc host setup --subdir implement` via `run_terminal_command` and parse the JSON stdout. Store `python` as `PYTHON`, `scratch_dir` as `scratch_dir`, and `run_id` as `IMPL_ID`. `scratch_dir` is `~/.agents/develop/<repo-slug>/implement/` (per-repo, created by `sdc`); every artifact path in later steps is derived from it.
 
-The helper is Linux-only and requires the current directory to be inside a git repository — it exits with a clear error on either condition. If it exits non-zero, report the error and stop.
+The helper requires the current directory to be inside a git repository — it exits with a clear error on either condition. If it exits non-zero, report the error and stop.
 
 **Validate** that `IMPL_ID` is 8 hex characters.
 
-**Inline the resolved absolute `scratch_dir` and `PYTHON`** into every later command and subagent prompt. Do not rely on a shell variable surviving across `run_terminal_command` calls (the same reason this skill inlines `${MEMORY_HELPER}`).
+**Inline the resolved absolute `scratch_dir` and `PYTHON`** into every later command and subagent prompt. Do not rely on a shell variable surviving across `run_terminal_command` calls.
 
 ### Shared File Paths
 
@@ -46,7 +46,7 @@ The entire run runs inside a single dedicated Orca worktree whose path is `~/orc
 
 | Phase | When |
 |-------|------|
-| Resolve the owning repo | Right after `host.py setup`, before worktree creation |
+| Resolve the owning repo | Right after `sdc host setup`, before worktree creation |
 | Reuse or create the worktree | Once per run |
 
 ## Scope Disambiguation (before the implementer launches)
@@ -61,7 +61,7 @@ A task description that names a path can be ambiguous when the repo has two tree
 ### Resolve the owning repo
 
 1. Collect candidate paths: every file or directory path named in `<description>` and in the conversation context.
-2. For the first candidate that exists on disk, run `git -C <parent-dir> rev-parse --show-toplevel` to get `repo_path`. Inside a submodule checkout this returns the submodule root (e.g. `/home/raka/.agents/internal/lint-arwaky`) — accept it as-is. The outer superproject is the wrong repo whenever the target files live in a submodule or a sibling clone.
+2. For the first candidate that exists on disk, run `git -C <parent-dir> rev-parse --show-toplevel` to get `repo_path`. Inside a submodule checkout this returns the submodule root (e.g. `$HOME/.agents/internal/lint-arwaky`) — accept it as-is. The outer superproject is the wrong repo whenever the target files live in a submodule or a sibling clone.
 3. If no candidate exists on disk, run the same command from the current workspace cwd.
 4. **Tie-break when multiple candidates exist:** if both a standalone clone and an internal/submodule checkout of the same repo are on disk (e.g. a superproject's `internal/lint-arwaky/` submodule next to a standalone `~/orca/workspaces/lint-arwaky/` clone), prefer the standalone clone whose `git remote -v` resolves to the repo named in the task — the submodule path inside a superproject is not the owning repo just because it contains the target files. Verify with `git -C <candidate> rev-parse --git-common-dir` returning `.git` (self-contained) rather than a path nested under another repo's `.git/modules/`.
 5. Resolve the Orca CLI once per run: `$ORCA_CLI_COMMAND` if set, else `orca-ide` on Linux (outside an Orca-managed terminal). Never bare `orca` on Linux — it can resolve to the GNOME screen reader. Inline the resolved executable as `$ORCA` into every later command; do not rely on a shell variable surviving across `run_terminal_command` calls.
@@ -108,7 +108,7 @@ the worktree lifecycle and all commits.
 
 ### Memory helper runs from a worktree
 
-Step 2 (Memory Retrieval) and Step 8 (Memory Flush) invoke `${MEMORY_HELPER}` with cwd inside `<worktree_path>` (`cd <worktree_path> && "${PYTHON}" "${MEMORY_HELPER}" ...`). The worktree shares the owning repo's remote, so the workspace id follows the project that owns the task even when the session sits in a superproject workspace. Never run the helper from the helper's own directory (see Step 2).
+Step 2 (Memory Retrieval) and Step 8 (Memory Flush) invoke `sdc memory` with cwd inside `<worktree_path>` (`cd <worktree_path> && sdc memory ...`). The worktree shares the owning repo's remote, so the workspace id follows the project that owns the task even when the session sits in a superproject workspace.
 
 ## Safety Rules (Worktree)
 

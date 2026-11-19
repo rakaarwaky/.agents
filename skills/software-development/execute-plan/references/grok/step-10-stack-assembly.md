@@ -6,15 +6,23 @@ Set `final_assembly_started = true` in the state file.
 
 ## Step 10.1: Build the Final Branch (Sequential Merges)
 
-Create one new branch off `main` and sequentially merge each completed modular branch onto it in `linearized_order`.
+Resolve the main clone path correctly (do not use `git rev-parse --show-toplevel` which returns the worktree path):
 
 ```bash
-git fetch origin main
-git checkout main
-git reset --hard origin/main
+main_clone_path=$(git rev-parse --path-format=absolute --git-common-dir | sed 's|/.git$||')
+```
+
+Create a dedicated raw temp worktree for assembly. Never check out `main` or run `git reset --hard` in the orchestrator's own worktree:
+
+```bash
+ASSEMBLY_DIR=$(mktemp -d)
+git worktree add "$ASSEMBLY_DIR" --detach
+cd "$ASSEMBLY_DIR"
+git fetch origin <default_branch>
+git reset --hard origin/<default_branch>
 
 FINAL_BRANCH="execute-plan/<PLAN_ID>-final"
-git checkout -B "$FINAL_BRANCH" main
+git checkout -B "$FINAL_BRANCH" origin/<default_branch>
 
 for pr in <completed PRs in linearized_order>:
     # Tear down this PR's Orca worktree first (Rule 3).
@@ -22,12 +30,23 @@ for pr in <completed PRs in linearized_order>:
         orca-ide worktree rm --worktree "<pr.orca_worktree_id>" --force --json || true
         pr.worktree_cleaned = true
     fi
-    git merge <pr.branch> --no-edit
+    git merge <pr.commit_sha> --no-edit
 ```
 
 **Conflict handling:** if a `git merge` produces a conflict, resolve it directly (read files, combine intent, remove markers, `git add`, `git commit`). If truly unresolvable, abort, mark PR `"failed"`, and continue merging remaining completed PRs.
 
-Record `final_branch` and `final_commit_sha` in the state file.
+After all merges, push the final branch:
+```bash
+git push --force-with-lease origin "$FINAL_BRANCH"
+```
+
+Then remove the assembly worktree:
+```bash
+cd <main_clone_path>
+git worktree remove "$ASSEMBLY_DIR" --force
+```
+
+Record `final_branch` and `final_commit_sha` in the state file. `final_commit_sha` is the commit SHA at the tip of `$FINAL_BRANCH` after all merges.
 
 ## Step 10.2: Final Review
 
@@ -39,7 +58,7 @@ orca-ide worktree create --repo path:<main_clone_path> --name <PLAN_ID>-final --
 ```
 
 Launch the 3-reviewer panel (General, Tests, Simplicity) in parallel. Merge their findings.
-If open issues exist, spawn a fixer subagent in the final worktree. The loop has no round cap: run until 0 open issues or until all remaining issues are explicitly deferred (recorded with a reason). If the loop stalls and a decision is needed, stop and ask the user for input.
+If open issues exist, spawn a fixer subagent in the final worktree. The loop has a round cap of 3: run up to 3 rounds. If the loop stalls (same issues reappear in identical snapshots) or the cap is reached with unresolved issues, stop and ask the user for input. If the loop reaches 0 open issues, record `final_review_passed = true`.
 
 If 0 open issues: record `final_review_passed = true`.
 If the loop cannot close every open issue without the user's input, or the user's input does not resolve the remaining issues: record `final_review_passed = false`. Stop and report to the user (do not push).
@@ -61,13 +80,45 @@ Update state: `modular_branches_deleted = true`.
 git push --force-with-lease origin <final_branch>
 ```
 
-**Auto-PR (default on):** If `gh` is available and remote is GitHub:
+**Auto-PR (default on):** If `gh` is available and remote is GitHub, compose a PR body file that lists the PRs in the final branch, their deferred issues, and the test plan:
 ```bash
-gh pr create --base main --head <final_branch> --fill
+cat > <scratch>/pr-body.md <<EOF
+## Summary
+
+Implements <N> PRs from the plan document at <plan_doc_path>.
+
+## PRs Included
+
+$(for pr in <completed PRs in linearized_order>; do
+  echo "- **PR ${pr.id}**: ${pr.title} (commit ${pr.commit_sha})"
+done)
+
+## Deferred Issues
+
+$(if [ -n "<deferred_issues>" ]; then
+  echo "<deferred_issues>"
+else
+  echo "None."
+fi)
+
+## Test Plan
+
+- [ ] All modular PRs reviewed and approved (3-reviewer panel at 0 open issues each)
+- [ ] Final branch assembled with all conflicts resolved
+- [ ] Final review passed (0 open issues)
+EOF
 ```
+
+Then create the PR as a draft:
+```bash
+gh pr create --base <default_branch> --head <final_branch> --draft \
+  --title "Execute Plan: <PLAN_ID>" \
+  --body-file <scratch>/pr-body.md
+```
+
 Capture URL. Store in `pr_urls`.
 
-**Fallback:** Derive compare URL `https://<host>/<owner>/<repo>/compare/main...<final_branch>?expand=1`. Store in `pr_urls`.
+**Fallback:** Derive compare URL `https://<host>/<owner>/<repo>/compare/<default_branch>...<final_branch>?expand=1`. Store in `pr_urls`.
 
 Set `final_branch_pushed = true`.
 

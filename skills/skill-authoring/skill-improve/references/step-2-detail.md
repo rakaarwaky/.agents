@@ -16,7 +16,8 @@ sac read <new-name>
 sac catalog --build
 ```
 
-`sac read` confirms the directory and frontmatter match; `sac catalog --build` refreshes the catalog rows that carry the old path. If `sac lint` reports `name-mismatch`, the frontmatter `name:` was not updated to match the new directory name — fix the frontmatter, not the directory.
+- `sac read` confirms the directory and frontmatter match; `sac catalog --build` refreshes the catalog rows that carry the old path. If `sac lint` reports `name-mismatch`, the frontmatter `name:` was not updated to match the new directory name — fix the frontmatter, not the directory.
+- **Check the new name against built-in slash commands before renaming.** A skill whose `name:` matches a Hermes built-in command (or alias) never gets its own `/<name>` slash command — the built-in wins and the skill stays loadable only via `/skill <name>`. Built-ins are hardcoded in `hermes_cli/commands.py` (`COMMAND_REGISTRY`); there is no config flag to disable one, so a colliding name permanently shadows the skill's slash command. Before any rename or new skill, verify the slug against the registry (frequent built-ins: `plan`, `learn`, `init`); if it collides, pick a non-colliding name rather than expecting the skill command to take over.
 
 ## Description detail
 
@@ -36,6 +37,7 @@ Judge and fix body content so examples are concrete, defaults replace menus, and
 - Prefer referencing existing CLI tools over writing custom scripts.
 - MCP tools named fully qualified (`ServerName:tool_name`).
 - Forward slashes in paths (`scripts/helper.py`); no time-sensitive content in the body.
+- **Per-repo artifact isolation**: Tool and skill scratch artifacts (ledgers, run reports, intermediate dumps) belong in `~/.agents/develop/<namarepo>/<skill>/` (where `<namarepo>` is derived from `<repo-root>`), never in the target repository's working tree or `docs/` folder unless the skill deliverable is user-facing documentation. Keep `argument-hint` clean by omitting path override flags when the artifact location is deterministic.
 - **Safety-model consistency**: when the user re-specifies which mode control flag governs the run (e.g. `--dry-run` vs `--headless` vs no flag), the single source of truth is the Safety model bullet in `SKILL.md` Rules. Sync that bullet, the `argument-hint` in frontmatter, and every step-file line describing mode behavior — all three must agree on default-vs-flag semantics.
 
 ## Completion

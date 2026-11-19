@@ -2,7 +2,7 @@
 
 ## Step 12: Memory Flush
 
-After cleanup, update the workspace memory file with patterns from this run. The orchestrator performs this directly using its own tools -- no subagent is needed. This step follows the same protocol as the `/implement` skill's Step 6 (see `.agents/skills/implement/SKILL.md` for full helper documentation, exit codes, and file format details).
+After cleanup, update the workspace memory file with patterns from this run. The orchestrator performs this directly using its own tools -- no subagent is needed. This step follows the same protocol as the `/implement` skill's Step 8 (memory flush). See `implement/references/grok/step-8-memory-flush.md` for full helper documentation, exit codes, and file format details.
 
 ### Step 12a: Collect & Categorize This Run's Patterns
 
@@ -37,7 +37,7 @@ Construct a JSON object:
   ],
   "run": {
     "date": null,
-    "description": "Execute plan: <design doc title or short description>",
+    "description": "Execute plan: <plan doc title or short description>",
     "rounds": <sum of review_rounds across all completed PRs>,
     "issues_by_severity": {"bug": <total>, "suggestion": <total>, "nit": <total>},
     "key_patterns": ["<2-3 most significant patterns from this run>"],
@@ -55,10 +55,10 @@ Field notes:
 
 ### Step 12d: Invoke the Helper
 
-Resolve `<MEMORY_HELPER>` exactly as in Step 1 (*Resolve the helper path*) — absolute path, inlined. Use the `write` tool to create `${scratch_dir}/exec-mem-${PLAN_ID}.json` with the JSON spec above, then invoke:
+Use the `write` tool to create `${scratch_dir}/exec-mem-${PLAN_ID}.json` with the JSON spec above, then invoke:
 
 ```
-<PYTHON> <MEMORY_HELPER> update --file <scratch_dir>/exec-mem-<PLAN_ID>.json
+sdc memory update --file <scratch_dir>/exec-mem-<PLAN_ID>.json
 ```
 
 The helper acquires the lock, merges, compacts, writes atomically, and prints a JSON stats summary on stdout:
@@ -84,7 +84,7 @@ Map the `stats` output onto the report strings in *In-Progress Reporting* below 
 If the helper exits non-zero, log a warning with stderr and skip the memory update. The implementation is already complete and reviewed -- never fail the run due to memory flush issues. Clean up the temp JSON file regardless:
 
 ```
-<PYTHON> <HOST_PY> cleanup <scratch_dir>/exec-mem-<PLAN_ID>.json
+sdc host cleanup <scratch_dir>/exec-mem-<PLAN_ID>.json
 ```
 
 ## In-Progress Reporting

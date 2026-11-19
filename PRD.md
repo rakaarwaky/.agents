@@ -1,103 +1,203 @@
-# PRD — <PROJECT-NAME>
+# PRD — agents-arwaky
 
 ## Project Overview
 
-<One diagram and one paragraph: what the project is, who it is for, why it matters, and what happens if it is not solved.>
+The unified tool orchestrator and agent workspace.
 
 ## Goals
 
-- <Primary business goal>
-- <Primary user goal>
-- <Strategic objective>
+- Unify tool lifecycle behind a single `aa` CLI.
 
 ## Non-Goals
 
-- <Explicitly excluded scope for this project>
-- <Related problems not being solved in this release>
-- <Future considerations not included now>
+- Cloud provisioning.
 
 ## Target Users
 
 | Persona | Need | Current Pain | Desired Outcome |
 |---------|------|--------------|-----------------|
-| <persona> | <need> | <pain> | <outcome> |
+| Operator | one-command toolchain | scattered installers | reproducible setup |
 
 ## Scope
 
 ### In Scope
 
-- <Major capability or module included in this project>
-- <User journey included>
-- <Integration included>
+- `aa` CLI tool lifecycle verbs.
 
 ### Out of Scope
 
-- <Major capability excluded from this project>
-- <User journey excluded>
-- <Future enhancement>
+- Windows/macOS support.
 
 ---
 
 ## Project Requirements
-
-### PR-<PROJECT-NAME-ID>-001: <Short imperative name>
-<!-- Tier P0: entry -001 is always P0. -->
+### PR-ARWAKY-001: backup
 
 #### User Stories
 
 | As a | I want | So that | Priority |
 |------|--------|---------|----------|
-| <role> | <capability> | <benefit> | P0 |
+| User | do backup | get value | P0 |
 
 #### Proposed Solution
 
-<Describe the proposed solution. Focus on what the user experiences and what the system should achieve.>
+The backup feature.
 
 #### Main User Flow
 
-1. <Step 1>
-2. <Step 2>
-3. <Step 3>
+1. Open `aa`.
+2. Run backup.
+3. Observe result.
 
-### PR-<PROJECT-NAME-ID>-002: <Short imperative name>
-<!-- Tier P1: the first P1 entry. -->
+### PR-ARWAKY-002: cli
 
 #### User Stories
 
 | As a | I want | So that | Priority |
 |------|--------|---------|----------|
-| <role> | <capability> | <benefit> | P1 |
+| User | do cli | get value | P0 |
 
 #### Proposed Solution
 
-<Describe the proposed solution.>
+The cli feature.
 
 #### Main User Flow
 
-1. <Step 1>
+1. Open `aa`.
+2. Run cli.
+3. Observe result.
 
-### PR-<PROJECT-NAME-ID>-003: <Short imperative name>
-<!-- Tier P2: the first P2 entry. -->
+### PR-ARWAKY-003: config
 
 #### User Stories
 
 | As a | I want | So that | Priority |
 |------|--------|---------|----------|
-| <role> | <capability> | <benefit> | P2 |
+| User | do config | get value | P0 |
 
 #### Proposed Solution
 
-<Describe the proposed solution.>
+The config feature.
 
 #### Main User Flow
 
-1. <Step 1>
+1. Open `aa`.
+2. Run config.
+3. Observe result.
+
+### PR-ARWAKY-004: daemon
+
+#### User Stories
+
+| As a | I want | So that | Priority |
+|------|--------|---------|----------|
+| User | do daemon | get value | P0 |
+
+#### Proposed Solution
+
+The daemon feature.
+
+#### Main User Flow
+
+1. Open `aa`.
+2. Run daemon.
+3. Observe result.
+
+### PR-ARWAKY-005: doctor
+
+#### User Stories
+
+| As a | I want | So that | Priority |
+|------|--------|---------|----------|
+| User | do doctor | get value | P0 |
+
+#### Proposed Solution
+
+The doctor feature.
+
+#### Main User Flow
+
+1. Open `aa`.
+2. Run doctor.
+3. Observe result.
+
+### PR-ARWAKY-006: harness
+
+#### User Stories
+
+| As a | I want | So that | Priority |
+|------|--------|---------|----------|
+| User | do harness | get value | P0 |
+
+#### Proposed Solution
+
+The harness feature.
+
+#### Main User Flow
+
+1. Open `aa`.
+2. Run harness.
+3. Observe result.
+
+### PR-ARWAKY-007: mcp
+
+#### User Stories
+
+| As a | I want | So that | Priority |
+|------|--------|---------|----------|
+| User | do mcp | get value | P0 |
+
+#### Proposed Solution
+
+The mcp feature.
+
+#### Main User Flow
+
+1. Open `aa`.
+2. Run mcp.
+3. Observe result.
+
+### PR-ARWAKY-008: service
+
+#### User Stories
+
+| As a | I want | So that | Priority |
+|------|--------|---------|----------|
+| User | do service | get value | P0 |
+
+#### Proposed Solution
+
+The service feature.
+
+#### Main User Flow
+
+1. Open `aa`.
+2. Run service.
+3. Observe result.
+
+### PR-ARWAKY-009: tools
+
+#### User Stories
+
+| As a | I want | So that | Priority |
+|------|--------|---------|----------|
+| User | do tools | get value | P0 |
+
+#### Proposed Solution
+
+The tools feature.
+
+#### Main User Flow
+
+1. Open `aa`.
+2. Run tools.
+3. Observe result.
 
 ## Reference
 
-| Artifact     | Purpose                                          | Link |
-|--------------|--------------------------------------------------|------|
-| PRD          | <Business goals and scope>                       | [PRD.md](PRD.md) |
-| Backlog      | <What is true now, with evidence>                | [BACKLOG.md](BACKLOG.md) |
-| Roadmap      | <Timeline, phasing, and dependencies>            | [ROADMAP.md](ROADMAP.md) |
-| Architecture | <System boundaries, tech stack, and infra>       | [ARCHITECTURE.md](ARCHITECTURE.md) |
+| Artifact     | Purpose | Link |
+|--------------|---------|------|
+| PRD          | scope   | [PRD.md](PRD.md) |
+| Backlog      | tasks   | [BACKLOG.md](BACKLOG.md) |
+| Roadmap      | timeline| [ROADMAP.md](ROADMAP.md) |
+| Architecture | bounds  | [ARCHITECTURE.md](ARCHITECTURE.md) |

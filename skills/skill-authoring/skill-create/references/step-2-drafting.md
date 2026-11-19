@@ -1,12 +1,22 @@
 # Create — Step 2: Draft the answers
 
-**Goal:** the agent answers all ten core questions itself from the invocation's job description and the repo, and writes a draft `SKILL.md` + `references/` (+ `templates/` if needed) under `tmp/`. Nothing is written to the real skills directory yet.
+**Goal:** the agent answers all ten core questions itself from the invocation's job description and the repo, and writes a draft `SKILL.md` + `references/` (+ `template/` if needed) under the system temp directory. Nothing is written to the real skills directory yet.
 
-The questions, the 0–2 rubric, and the gate live in `../../skill-improve/references/step-14-tenq-standard.md`. Read it once here; do not restate it in the answer sheet.
+## Draft location
 
-## The ten questions (agent's own inquiry)
+Resolve the draft directory from the environment, never the repo tree:
+
+```bash
+DRAFT_DIR="${TMPDIR:-/tmp}/skill-create-draft-<skill-name>"
+mkdir -p "$DRAFT_DIR"
+```
+
+`${TMPDIR:-/tmp}` is the Linux temp root (`/tmp` on this host). A repo-root `tmp/` pollutes the git tree, shows up in `git status`, and risks being committed by a later `git add -A` — so the draft lives outside the repository for the whole create run. Clean it up when the run ends (`rm -rf "$DRAFT_DIR"`).
+
+## The ten questions 
 
 The agent answers each one autonomously from the job description and the repo. The user is not asked unless a forcing condition below applies.
+
 
 | #   | Question      | Asks                                                                     | Derived from                                              |
 | --- | ------------- | ------------------------------------------------------------------------ | --------------------------------------------------------- |
@@ -21,6 +31,7 @@ The agent answers each one autonomously from the job description and the repo. T
 | Q9  | WHAT KIND     | Deliverable format + where it is saved/sent                              | Deliverable format + destination path                     |
 | Q10 | HOW COME      | How the agent diagnoses failure + recovery plan (self-healing)           | Job description; otherwise stop-and-report on failure     |
 
+
 ## Forcing conditions — ask the user only when
 
 The agent asks the user exactly one question, naming the missing fact and the question, only when one of these holds:
@@ -33,11 +44,11 @@ This is the only user prompt in the create run; every other step is autonomous (
 
 ## Drafting procedure
 
-Follow the implement → review → fix loop pattern from `skills/software-development/implement/references/grok/`, but split into two steps: this step (drafting) and step 3 (review).
+Split the work across two steps: this step (drafting) and step 3 (review), with the reviewer sending issues back to this step until it reports 0.
 
 ### Spawn drafter subagent
 
-Spawn a drafter subagent with `spawn_subagent`. The drafter writes **only** to `tmp/` — never directly into the `skills/` folder yet.
+Spawn a drafter subagent with `spawn_subagent`. The drafter writes **only** to `$DRAFT_DIR` — never directly into the `skills/` folder yet.
 
 Drafter prompt must include:
 
@@ -50,12 +61,12 @@ Skill name: <resolved name from step 1>
 
 Answer the ten core questions (Q1–Q10) autonomously from the job description and the repo. Each answer names paths, commands, numbers, or steps — no prose, no restated questions, no vague terms like "relevant", "appropriate", or "properly".
 
-Write the draft artifacts to a working directory under tmp/ (e.g. tmp/draft-<skill-name>/):
+Write the draft artifacts to the draft directory resolved above (`$DRAFT_DIR`, e.g. `/tmp/skill-create-draft-<skill-name>/`):
 - SKILL.md — body shape: # <Skill Name> / ## Rules / ## Routing, including frontmatter description: and when-to-use:
 - references/ — supporting reference files, each linked from SKILL.md
-- templates/ — only if the skill needs one
+- templates/ — only if the skill needs one, one file per skeleton the skill ships
 
-Every answer must land in its assigned home per the placement map in step-14-tenq-standard.md:
+Every answer lands at exactly one home:
 - What & why → Rules row (success metric)
 - When & where → frontmatter description:/when-to-use: + precondition Rules row
 - Who → Rules row (audience & tone)
@@ -68,8 +79,8 @@ Every answer must land in its assigned home per the placement map in step-14-ten
 - How come → failing step's fallback table
 
 Log every defaulted fact as `assumed` in a scratch sheet.
-Do NOT write to the skills/ folder. Write only under tmp/.
-When done, report the files written under tmp/ and the scratch sheet with assumed defaults.
+Do NOT write to the skills/ folder. Write only under $DRAFT_DIR.
+When done, report the files written under $DRAFT_DIR and the scratch sheet with assumed defaults.
 ```
 
 Then proceed to step 3 (`step-3-review.md`) for the reviewer loop.
@@ -84,7 +95,7 @@ Anything the job description does not state is decided by the agent and logged a
 
 ## Completion
 
-- The tmp/ draft holds ten answers, each at its assigned home, every default logged as `assumed`.
+- The draft under `$DRAFT_DIR` holds ten answers, each at its assigned home, every default logged as `assumed`.
 - `description:` names artifact + action in third person; `when-to-use:` carries every trigger phrase, synonym, and negative scope; the two fields share no phrase.
-- The drafter reported the files written under `tmp/`.
+- The drafter reported the files written under `$DRAFT_DIR`.
 - The run continues to step 3 (`step-3-review.md`).

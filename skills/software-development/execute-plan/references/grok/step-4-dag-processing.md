@@ -27,7 +27,7 @@ def linearize(dag):
     return result
 ```
 
-Within each level, sort by the numeric PR number (extracted from the id string via `int(n.id.split('-')[1])`) to produce a deterministic, reviewable order. Do NOT use lexicographic string sort on the id -- `"pr-10"` would sort before `"pr-2"` lexicographically. This mirrors `_pr_sort_key` in `scripts/validate-plan.py`, which falls back to lexicographic order for non-numeric suffixes (`pr-0a`, `pr-0b`); the validator's `linearized_order` is authoritative.
+Within each level, sort by the numeric PR number (extracted from the id string via `int(n.id.split('-')[1])`) to produce a deterministic, reviewable order. Do NOT use lexicographic string sort on the id -- `"pr-10"` would sort before `"pr-2"` lexicographically. This mirrors `_pr_sort_key` in `sdc validate-plan`, which falls back to lexicographic order for non-numeric suffixes (`pr-0a`, `pr-0b`); the validator's `linearized_order` is authoritative.
 
 Store the result in `linearized_order` and update the state file.
 

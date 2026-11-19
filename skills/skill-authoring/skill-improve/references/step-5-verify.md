@@ -2,9 +2,11 @@
 
 **Goal:** mechanically verify the improved skill and end with one report carrying the gate verdict.
 
-## SAC lint fallback
+## SAC lint invocation
 
-When `sac lint` is unavailable (missing `modules/` → `ModuleNotFoundError: No module named 'cli'`, skills-root path error, or broken install), do not block the improve run. Run the equivalent grep-class checks directly: body shape (`grep -n '^#' <SKILL.md>`), frontmatter scan for four mandatory keys, description/when-to-use char-count against 1,024, unlinked-refs probe (`ls references/ | while read f; do grep -q "$f" SKILL.md || echo "unlinked: $f"; done`), and dangling-ref sweep (`grep -r "old-name"`). Report the fallback explicitly — a broken lint gate is an infra defect, not a blocker.
+Invoke `sac` as a bare command (`sac lint`, `sac catalog --build`), never `python -m sac` — the CLI is a bash launcher at `~/.local/bin/sac` that activates its own venv and sets `PYTHONPATH`; `python -m sac` bypasses that setup and fails with `ModuleNotFoundError`.
+
+When `sac lint` is genuinely unavailable (missing `modules/`, skills-root path error, or broken install), do not block the improve run. Run the equivalent grep-class checks directly: body shape (`grep -n '^#' <SKILL.md>`), frontmatter scan for four mandatory keys, description/when-to-use char-count against 1,024, unlinked-refs probe (`ls references/ | while read f; do grep -q "$f" SKILL.md || echo "unlinked: $f"; done`), and dangling-ref sweep (`grep -r "old-name"`). Report the fallback explicitly — a broken lint gate is an infra defect, not a blocker.
 
 A broken `sac` CLI blocks both `sac lint` and `sac catalog --build`; the catalog rebuild falls back to `git add skills/catalog.json && git commit` if stale — state the missing rebuild in the report; do not block the run.
 
@@ -13,7 +15,7 @@ A broken `sac` CLI blocks both `sac lint` and `sac catalog --build`; the catalog
 1. `sac lint` passes (whole pack or scoped: `sac lint --category <name>`).
 2. Pre-publish checklist (`step-3-publish.md`) fully checked.
 3. `sac read <name>` — confirm frontmatter and body landed correctly.
-4. Body shape verified mechanically: `grep -n '^#' <SKILL.md>` returns only `# Title` and exactly `## Rules`, `## Routing`.
+4. Body shape verified mechanically: `grep -n '^#' <SKILL.md>` returns only `# Title` and exactly `## Rules`, `## Routing` (zero `###` subheadings).
 5. Every sibling mention and cross-skill link names a skill that exists in the tree.
 6. `sac catalog --build` run so `skills/catalog.json` reflects current frontmatter — a stale catalog is a publish defect.
 7. `git log --oneline -4` and `git status` checked for parallel agent commits; staged set contains only this run's files plus `catalog.json`.
@@ -54,9 +56,9 @@ Cycles used: <0-2> · Remaining gaps: <none or list>
 - **FAIL** → run patch cycle (below), re-score. Cycle budget is 2 per skill per invocation.
 - Budget exhausted and still below gate → emit score block with `Gate: FAIL` and remaining gap list; stop. Keep edits applied, keep catalog consistent, never report skill as done/production-ready/published.
 
-**Mechanical probes:**
+**Mechanical probe (body shape):**
 ```bash
-grep -rnE 'what & why|when & where|who|from where|by what means|how far|whether|what kind|how come' SKILL.md references/ || echo "coverage gaps"
+grep -n '^#' SKILL.md   # must return exactly the title, ## Rules, and ## Routing
 ```
 
 ## TenQ diagnosis and patch cycle
@@ -85,7 +87,7 @@ Symptom → gap map:
 1. **OBSERVE** — record symptom verbatim and the invocation that produced it. No symptom, no patch.
 2. **MAP** — pick the row; write down the question and owning home before opening an editor.
 3. **PATCH** — edit only that home. Step file owner → never edit body; Rules owner → never restate in step.
-4. **REGRESS** — re-run happy path, edge case, deliberate error (missing precondition or failing check command). Re-run `sac lint` and coverage probe.
+4. **REGRESS** — re-run happy path, edge case, deliberate error (missing precondition or failing check command). Re-run `sac lint` and the body-shape probe.
 5. **RE-SCORE** — score patched questions with evidence, recompute gate. No `version:` key (parser ignores it; version record is commit message + report change list).
 
 **Stop conditions:**

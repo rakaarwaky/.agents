@@ -1,12 +1,6 @@
 {
   "skills": [
     {
-      "name": "aes",
-      "description": "AES docs, layers, rule fixes, and legacy migration.",
-      "when_to_use": "Use for any AES task: create or improve project documents (PRD, ROADMAP, FRD, BACKLOG, README, AGENTS, ARCHITECTURE, CONTRIBUTING, DESIGN, DATA), scaffold or audit AES layer files across Python/Rust/TypeScript, fix AES lint violations (AES1xx-AES7xx), or migrate a legacy codebase into the AES 7-layer architecture.",
-      "category": "architechture"
-    },
-    {
       "name": "aes-docs",
       "description": "Adds PRD/ROADMAP/FRD/README/BACKLOG/DESIGN/AGENTS/DATA docs for Python, Rust, and TypeScript modules. Use when creating or improving a PRD, ROADMAP, FRD, BACKLOG, README, AGENTS, DESIGN, or DATA document, or to split spec from status.",
       "when_to_use": "create, improve, or audit a project document (PRD, ROADMAP, FRD, BACKLOG, README, AGENTS, ARCHITECTURE, CONTRIBUTING, DESIGN, DATA); split spec from status; verify docs with lint-arwaky-cli docs.",
@@ -37,15 +31,9 @@
       "category": "automation"
     },
     {
-      "name": "computer-use",
-      "description": "Drive the user's desktop in the background without stealing focus, via the Hermes computer_use tool backed by cua-driver, including a typed browser-page rung. Use when a task needs the user's actual desktop apps rather than headless browser or shell tools.",
-      "when_to_use": "Use when driving a native desktop app (browser GUI, mail client, editor, game, Figma, OS dialogs) in the background, when the user wants mouse/keyboard automation that must not steal focus, or when an input rung must be verified or escalated through the computer_use ladder. Not for headless web automation, plain file edits, or shell commands.",
-      "category": "automation"
-    },
-    {
-      "name": "flatpak-chromium-automation",
-      "description": "Drive Flatpak Chromium CDP, install unpacked extensions, manage profiles.",
-      "when_to_use": "Use when CDP debugging of a Flatpak browser fails to bind its port, when orphan Flatpak instances hijack a debug launch, when pkill/pgrep patterns threaten the agent shell, when adding a Web Store extension that cannot be clicked through, or when a tool must see or create browser profiles deterministically, when editing Local State or Preferences with a closed browser, when probing user-data dirs under native, Flatpak, Snap, or macOS installs, or when wiring NAME|user|pass|url envs into vault items plus browser profiles. Not for driving non-Flatpak browsers.",
+      "name": "brave-automation",
+      "description": "Install the baa CLI, manage Brave browser profiles and Google sessions, and import/export Chromium credentials as CSVs via the baa CLI on Linux.",
+      "when_to_use": "Use when the user wants to install or repair the baa CLI and its XDG workspace, provision or verify isolated Brave profiles from profile.csv, script Google login or logout per profile, check a saved Google session, import credentials from a CSV into Login Data DBs, export saved passwords back to a CSV, enroll profiles in a Brave Sync Chain, or automate AI provider sign-in (Kilo Code, Cline, Antigravity) across Brave profiles. Not for headless scraping without profiles, non-Chromium browsers, cloud password managers, or non-Linux hosts.",
       "category": "automation"
     },
     {
@@ -55,15 +43,9 @@
       "category": "automation"
     },
     {
-      "name": "computer-use",
-      "description": "Drive the desktop background-first; escalate on signal.",
-      "when_to_use": "",
-      "category": "autonomous-ai-agents"
-    },
-    {
       "name": "grok-build",
       "description": "Delegates coding and multi-agent orchestration to the local Grok Build CLI over the OmniRoute gateway (model myomniroute, not an xAI subscription) via Orca CLI worktrees. Hermes delegates exclusively through Orca CLI (`orca worktree create ... --agent grok` and `orca terminal send`) — never running grok directly in a headless terminal. Use when a coding task should go to Grok instead of being implemented inline, or when authoring Rhai workflows. Sibling of the orca skill: orca owns the worktrees and terminals; this defines the Grok agent surface inside them.",
-      "when_to_use": "Use when the user asks to build a feature, refactor, review a PR, or fix issues via Grok Build; when a coding task should be delegated to Grok instead of implemented inline; or when the user wants to author a Rhai workflow, automate a multi-agent pipeline, or runs /create-workflow, /implement, /design, /execute-plan. Observed user phrasing: '/implement paths cek dpc rules', '/implement ... buat pr untuk perbaiki template dari PRD', '/design file palse redesign rules aes ... remove all legacy', 'fix doc violations in crate', 'find any segfault error in my environment and clean it', 'we need to spawn sub agent to make all FRD becoming real FRD'.",
+      "when_to_use": "Use when the user asks to build a feature, refactor, review a PR, or fix issues via Grok Build; when a coding task should be delegated to Grok instead of implemented inline; or when the user wants to author a Rhai workflow, automate a multi-agent pipeline, or runs /create-workflow, /implement, /planner, /execute-plan. Observed user phrasing: '/implement paths cek dpc rules', '/implement ... buat pr untuk perbaiki template dari PRD', '/planner file palse redesign rules aes ... remove all legacy', 'fix doc violations in crate', 'find any segfault error in my environment and clean it', 'we need to spawn sub agent to make all FRD becoming real FRD'.",
       "category": "autonomous-ai-agents"
     },
     {
@@ -85,45 +67,9 @@
       "category": "autonomous-ai-agents"
     },
     {
-      "name": "account-manager",
-      "description": "Manage Brave browser profiles and Google sessions via the baa CLI: create, list, verify, and reset isolated accounts, plus scripted Google login, logout, and session checks.",
-      "when_to_use": "Use when the user wants to create or manage local Brave/Chromium accounts, provision or verify isolated browser profiles from profile.csv, script Google login or logout in a named profile, or check a saved Google session. Not for headless scraping without profiles, non-Chromium browsers, or cloud password managers. Setup, credential import/export, and troubleshooting belong to the sibling brave-setup and password-manager skills.",
-      "category": "brave-automation"
-    },
-    {
-      "name": "brave-automation",
-      "description": "baa CLI: Brave profiles, Google sessions, credentials.",
-      "when_to_use": "Use for any baa CLI task: install or repair baa, initialize the XDG workspace, create or list profiles, script Google login/logout/session checks, import or export Chromium Password Manager CSVs, or troubleshoot CDP/Local State/Safe Storage failures.",
-      "category": "brave-automation"
-    },
-    {
-      "name": "brave-provider-auth",
-      "description": "Use when authenticating AI providers across Brave profiles.",
-      "when_to_use": "Use when automating provider sign-in (Kilo Code, Antigravity, or other OAuth/device-auth providers) across multiple Brave browser profiles, handling passkey bypass, Google OAuth selection, and security challenge coordination.",
-      "category": "brave-automation"
-    },
-    {
-      "name": "brave-setup",
-      "description": "Install the baa CLI, initialize its XDG workspace, verify prerequisites, and troubleshoot common Brave automation failures on Linux.",
-      "when_to_use": "Use when the user wants to install or repair the baa CLI and its prerequisites, initialize the XDG state/data workspace, resolve XDG path issues, or debug CDP connection failures, Local State locks, and Safe Storage key errors. Not for provisioning profiles (account-manager), importing credentials (password-manager), or Google session scripting.",
-      "category": "brave-automation"
-    },
-    {
-      "name": "brave-sync-management",
-      "description": "Manage Brave Sync chains and profile enrollment.",
-      "when_to_use": "Use when synchronizing Brave profiles to a single Brave Sync Chain, extracting sync mnemonic codes, joining profiles, or troubleshooting sync enrollment and stale chain errors.",
-      "category": "brave-automation"
-    },
-    {
-      "name": "password-manager",
-      "description": "Import and export browser credentials as Chromium Password Manager CSVs via the baa CLI: import a CSV into the Login Data DBs, or export saved passwords back to CSV.",
-      "when_to_use": "Use when the user wants to import credentials from a CSV into local Brave/Chromium Login Data databases, or export saved browser passwords back to a CSV file. Not for headless scraping without profiles, non-Chromium browsers, or cloud password managers. Profile provisioning and Google session scripting belong to the sibling account-manager skill; setup and troubleshooting belong to brave-setup.",
-      "category": "brave-automation"
-    },
-    {
-      "name": "codegraph",
-      "description": "Inspect codebases: LOC, languages, ratios via pygount, plus symbol/call graphs and blast radius via CodeGraph.",
-      "when_to_use": "Repository LOC counts, language breakdowns, file counts, and code-vs-comment ratios (pygount — general 'how big is this repo' questions); or symbol lookup, callers/callees, cross-file impact, and test selection for a set of changed files (CodeGraph — use before grep/Read when asking 'what breaks if I change this').",
+      "name": "code-review",
+      "description": "Reviews a commit, uncommitted changes, a PR, or a file/directory in place with parallel reviewer subagents. The orchestrator auto-selects 1–3 relevant lens personas from a roster of 10 based on the target's content. Each reviewer subagent reads the diff (diff modes) or the current files (path mode) and writes a per-persona review file to the host scratch directory. The orchestrator aggregates per-persona issue counts and writes a module summary file to disk.",
+      "when_to_use": "Use when asked to 'review the last commit', 'review my uncommitted changes', 'review PR 48', 'review modules/skills', 'review this folder', '/code-review commit', '/code-review uncommit', '/code-review pr 48', '/code-review path <dir>', or when the user drops a commit, PR number, or directory path and wants a code review. Persona selection is automatic — no flags needed.",
       "category": "code-quality"
     },
     {
@@ -139,12 +85,6 @@
       "category": "code-quality"
     },
     {
-      "name": "review",
-      "description": "Reviews a commit, uncommitted changes, a PR, or a file/directory in place with parallel reviewer subagents. The orchestrator auto-selects 1–3 relevant lens personas from a roster of 10 based on the target's content. Each reviewer subagent reads the diff (diff modes) or the current files (path mode) and writes a per-persona review file to the host scratch directory. The orchestrator aggregates per-persona issue counts and writes a module summary file to disk.",
-      "when_to_use": "Use when asked to 'review the last commit', 'review my uncommitted changes', 'review PR 48', 'review modules/skills', 'review this folder', '/review commit', '/review uncommit', '/review pr 48', '/review path <dir>', or when the user drops a commit, PR number, or directory path and wants a code review. Persona selection is automatic — no flags needed.",
-      "category": "code-quality"
-    },
-    {
       "name": "systematic-debugging",
       "description": "Systematic root-cause debugging in 7 step files (0–6) covering TypeScript/Node, Python, and Rust: read errors and build a red-capable feedback loop, trace data flow, analyze patterns, form ranked falsifiable hypotheses, implement one fix via TDD (RED-GREEN-REFACTOR), verify, and guard against rationalizations. Includes language-variant debugger/verify steps (3a/3b/3c, 5a/5b/5c). Observed phrasing: /systematic-debugging, fix this bug, test is failing, performance regression.",
       "when_to_use": "Use for any technical issue — test failures, production bugs, build or performance problems, integration issues. Also for Python (pdb, debugpy), TypeScript/Node (node inspect, CDP, heap/CPU profiles), and Rust (dbg!, RUST_BACKTRACE, rust-gdb/lldb) debugging. Invoke directly as /systematic-debugging. Do not skip when the issue seems simple, you are in a hurry, or someone wants it fixed NOW — rushing guarantees rework.",
@@ -157,14 +97,8 @@
       "category": "content-creation"
     },
     {
-      "name": "comfyui",
-      "description": "Generate images, video, and audio via ComfyUI diffusion workflows.",
-      "when_to_use": "Use when the user wants to generate images, video, or audio via ComfyUI diffusion workflows — Stable Diffusion, SDXL, Flux, SD3, AnimateDiff, Hunyuan, Wan, or ControlNet/inpainting/img2img pipelines; also to install, launch, or health-check ComfyUI.",
-      "category": "content-creation"
-    },
-    {
       "name": "llm-writing",
-      "description": "Create or improve docs: minimum tokens, exact names, zero AI slop.",
+      "description": "Create or improve docs: minimum tokens, exact names, zero AI slop. Use for new docs (--create) or editing existing text (--improve).",
       "when_to_use": "Use ONLY for concise document creation (--create) or for improving existing text (--improve).",
       "category": "content-creation"
     },
@@ -193,93 +127,135 @@
       "category": "devops"
     },
     {
-      "name": "systemd-headless-service",
-      "description": "Background a TTY/tray app as a 24/7 user systemd service that survives reboot. Use when an app exits under `systemd --user` with no TTY, auto-exits because `!process.stdin.isTTY`, or must run headless with linger after PC restart.",
-      "when_to_use": "Use when an app works in a terminal but dies under systemd --user (no TTY), drops to tray/background mode, or must survive reboot via `systemctl --user enable` with `loginctl linger`.",
-      "category": "devops"
-    },
-    {
       "name": "xdg-spec-compliance",
       "description": "Audit and fix XDG Base Directory compliance in a repo (data/config/cache/state paths, 0700 dirs, 0600 secrets, precedence). Use when the app resolves paths with `expanduser`/`Path.home`, writes logs outside `$XDG_STATE_HOME`, or ships world-readable secrets.",
       "when_to_use": "Use when auditing a repo's path resolution against the XDG Base Directory spec: relative/tilde rejection, precedence (shell env > XDG file > .env), dir and file permissions, and vendor subdirs.",
       "category": "devops"
     },
     {
+      "name": "codex-figure-workflow",
+      "description": "使用 Codex 从项目源码或参考图完成架构图、流程图与结构图，串联 figcraft 的参数化 SVG、浏览器导出和视觉验收，并保留可重生成的源文件与案例证据。",
+      "when_to_use": "当用户要求基于真实项目源码或参考图绘制架构图、流程图、结构图，或要求用 Codex 完成 figcraft 全套结构图工作（参数化 SVG、浏览器导出、视觉验收、保留可重生成的源文件与案例证据）时使用。",
+      "category": "figcraft"
+    },
+    {
+      "name": "data-figures-rerender",
+      "description": "Faithfully replicate or vectorize data figures (scatter/bar/slope charts) — re-render from the same frozen tables with encodings kept item-by-item; outputs SVG + 600 dpi PNG; full pitfall list.",
+      "when_to_use": "Use when faithfully replicating or vectorizing data figures (scatter/bar/slope charts) from the same frozen tables with encodings kept item-by-item, producing SVG + 600 dpi PNG and a full pitfall list.",
+      "category": "figcraft"
+    },
+    {
+      "name": "declarative-engine",
+      "description": "Grid-based block diagrams, network overview figures and deployment/phase flowcharts via a declarative layout engine — config syntax with real manuscript configs, and a no-download SVG extraction path.",
+      "when_to_use": "Use when the figure fits a row×column grid: network overview figures, deployment/phase flowcharts, or method framework diagrams that benefit from a declarative layout engine with config syntax and no-download SVG extraction.",
+      "category": "figcraft"
+    },
+    {
       "name": "figcraft",
       "description": "Coordinates end-to-end FigCraft work from one or more visual references or written requirements through native design construction, interactive prototyping, verification, review, and save. Use for any request to create, reconstruct, prototype, or audit a .figcraft interface.",
-      "when_to_use": "",
+      "when_to_use": "Use for any request to create, reconstruct, prototype, or audit a .figcraft interface.",
       "category": "figcraft"
     },
     {
       "name": "figcraft-builder",
       "description": "Builds native FigCraft UI designs and screens from one or more reference images or written specifications. Applies reference mapping, reusable components, auto layout, visual fidelity, and strict scope control without inventing screens or content.",
-      "when_to_use": "",
+      "when_to_use": "Use when building native FigCraft UI designs and screens from one or more reference images or written specifications with reference mapping, reusable components, auto layout, visual fidelity, and strict scope control.",
       "category": "figcraft"
     },
     {
       "name": "figcraft-icons",
       "description": "Maps interface icons to a real icon set through the Iconify API and imports them into FigCraft as editable vectors. Use whenever a reference or specification calls for interface icons instead of hand-drawn glyphs.",
-      "when_to_use": "",
+      "when_to_use": "Use whenever a reference or specification calls for interface icons instead of hand-drawn glyphs.",
       "category": "figcraft"
     },
     {
       "name": "figcraft-motion",
       "description": "Adds transition and animation polish to a FigCraft prototype after its flows already work, using verified transition types, easings, springs, and delayed triggers. Use as the final pass, never as a substitute for correct wiring.",
-      "when_to_use": "",
+      "when_to_use": "Use as the final pass on a FigCraft prototype whose flows already work, to add transition and animation polish using verified transition types, easings, springs, and delayed triggers.",
       "category": "figcraft"
     },
     {
       "name": "figcraft-prototyper",
       "description": "Wires and verifies native FigCraft prototypes for sliders, navigation, buttons, overlays, alerts, component states, variables, and conditional flows. Keeps interactions synchronized with the final design and never claims unsupported editable input.",
-      "when_to_use": "",
+      "when_to_use": "Use when wiring and verifying native FigCraft prototypes for sliders, navigation, buttons, overlays, alerts, component states, variables, and conditional flows, keeping interactions synchronized with the final design.",
       "category": "figcraft"
     },
     {
       "name": "figcraft-review",
       "description": "Reviews native FigCraft files for structure, auto layout, visual consistency, accessibility, reference coverage, and prototype correctness. Produces a concise scorecard plus a pass/fail interaction gate grounded in inspected layers and preview evidence.",
-      "when_to_use": "",
+      "when_to_use": "Use when reviewing native FigCraft files for structure, auto layout, visual consistency, accessibility, reference coverage, and prototype correctness, producing a concise scorecard plus a pass/fail interaction gate.",
       "category": "figcraft"
     },
     {
       "name": "figcraft-svg",
       "description": "Builds illustrations, characters, logos, and decorative artwork for FigCraft by authoring SVG and importing it as editable native vectors. Use when a reference image contains artwork that primitive shapes cannot reproduce faithfully.",
-      "when_to_use": "",
+      "when_to_use": "Use when a reference image contains artwork (mascots, characters, illustrations, hand-drawn doodles, logos, badges, decorative scenery, organic shapes) that primitive shapes cannot reproduce faithfully.",
       "category": "figcraft"
     },
     {
       "name": "figcraft-typography",
       "description": "Chooses and installs the right typeface for a FigCraft document, including downloading free families from the Google Fonts store through font.download, and verifies that no text renders in a silent fallback.",
-      "when_to_use": "",
+      "when_to_use": "Use when choosing and installing the right typeface for a FigCraft document, including downloading free families from the Google Fonts store through font.download, and verifying that no text renders in a silent fallback.",
+      "category": "figcraft"
+    },
+    {
+      "name": "game-arch-diagram",
+      "description": "Software/game architecture diagrams as a parametric script — layered bands, rider-chip band titles, semantic tints with accent bars, update-order badges, white-halo edge labels, and the six real collision defects found by vision-judge rounds.",
+      "when_to_use": "Use when drawing a software/game architecture figure with layered bands (input → state machine → core loop → meta systems → platform), scene/state machine with chips, cross-band feedback loops, and side build/CI chain that must pass an independent vision judge.",
+      "category": "figcraft"
+    },
+    {
+      "name": "hand-svg-structure",
+      "description": "Replicate a bitmap/screenshot structure diagram (block diagram, flowchart, network, schematic) as a hand-authored static SVG — programmatic geometry/color probing, live-page export, full pitfall list.",
+      "when_to_use": "Use when replicating a bitmap/screenshot structure diagram (block diagram, flowchart, network, schematic) as a hand-authored static SVG with programmatic geometry/color probing, live-page export, and a full pitfall list.",
+      "category": "figcraft"
+    },
+    {
+      "name": "paper-figure",
+      "description": "绘制或重绘论文中的结构图、流程图和科研统计图；按 65 类图型选择布局或可运行模板，保留真实数据、可编辑矢量源、打印尺寸与验收记录。适用于论文配图及参考图复刻，不用于无精确标签要求的场景插画。",
+      "when_to_use": "当绘制或重绘论文中的结构图、流程图和科研统计图（65 类图型布局/可运行模板），或从参考图复刻论文配图时使用。",
+      "category": "figcraft"
+    },
+    {
+      "name": "parametric-diagram",
+      "description": "Draw editable structure diagrams from scratch as a parametric Python script — geometry/topology/style declared in three blocks; re-run to regenerate the SVG. The script is the single source of truth.",
+      "when_to_use": "Use when drawing an editable structure diagram from scratch (not replicating a bitmap) that you expect to revise — add nodes, recolor, reword, reuse in the next paper — using a parametric Python script with geometry/topology/style declared in three blocks.",
+      "category": "figcraft"
+    },
+    {
+      "name": "style-presets",
+      "description": "Style presets for structure figures — three token dictionaries (academic default / web / tech). Same geometry and content declaration, swap skins with zero figure-code changes. Includes a worked GPU-pipeline example that regenerates all three finishes.",
+      "when_to_use": "Use when the same structural figure must ship in several looks (paper, slide deck, promo screen) and you do not want to re-draw it per style — using three token dictionaries (academic default / web / tech) with zero figure-code changes.",
+      "category": "figcraft"
+    },
+    {
+      "name": "visual-acceptance",
+      "description": "Pre-delivery acceptance recipe for paper figures — live-page screenshots, tiling self-check, vision-judge dispatch templates, and evidence-driven fix discipline.",
+      "when_to_use": "Use as the pre-delivery acceptance recipe for paper figures, including live-page screenshots, tiling self-check, vision-judge dispatch templates, and evidence-driven fix discipline.",
       "category": "figcraft"
     },
     {
       "name": "github-workflow",
-      "description": "Umbrella for GitHub auth, repo management, issues, PRs, Mergify, and releases. Subsumes github-auth and repo-manager.",
-      "when_to_use": "Use for any GitHub task: auth setup (gh CLI or git-only), repo clone/create/fork/configure, issue-to-PR pipeline, PR watch/fix/merge, Mergify stacked PRs and merge queue, release prep and publish, recovery of failed release runs. This skill now includes the auth helper scripts (gh-env.sh, git-credential-token.py) formerly in github-auth.",
+      "description": "Umbrella for GitHub auth, repo management, issues, PRs, and releases.",
+      "when_to_use": "Use for GitHub auth setup (gh CLI or git-only), repo clone/create/fork/configure, repo settings and Actions, gitignore audit.",
       "category": "git"
     },
     {
       "name": "issue-maker",
-      "description": "repo → issues: zero-trust issue maker that maps AES spec documents (PRD, ROADMAP, BACKLOG, FRD, DESIGN, plus module and package feature docs) into modular GitHub tracking issues. Done rows are re-verified against live source and test evidence. Every issue carries a closing-condition that advances its ROW and all FR IDs to Done. Never opens a PR — issues only. Hermes runs the audit driver via terminal (stdlib scripts, no subagent); no source edits, no branches, no PRs — nothing to delegate to Grok.",
-      "when_to_use": "/issue-maker — map incomplete tasks to GitHub issues (repo → issues), create tracking issues from ROADMAP or BACKLOG, verify Done claims against code, ensure every issue carries a closing-condition that advances the roadmap state to Done. Outputs GitHub issues only; never edits source, never creates a branch, never opens a PR.",
+      "description": "repo → issues: zero-trust spec audit mapping AES spec documents (PRD, ROADMAP, BACKLOG, FRD, DESIGN) into modular GitHub tracking issues with closing conditions. Done rows are re-verified against live source and test evidence. Never opens a PR — issues only.",
+      "when_to_use": "Use when mapping incomplete tasks from spec documents to GitHub issues (repo → issues), creating tracking issues from ROADMAP or BACKLOG, verifying Done claims against code, or auditing task completion with validate.py. Outputs GitHub issues only; never edits source or creates PRs.",
       "category": "git"
     },
     {
       "name": "issue-worker",
-      "description": "issue worker: analyze open GitHub issues and take each one from backlog to a PR opened to main — Hermes verifies at HEAD and runs the decision quiz, then 1 issue → 1 Orca worktree → Grok Build implements → Hermes verifies → Hermes pushes branch + opens a (draft) PR to main → close/reopen the issue per result. Never merges. Takes EXISTING issues to PRs; does not create issues (that is /issue-maker's domain). CRUD recipes stay as reference only; the spine is verify → decide → isolate → delegate → verify → PR.",
-      "when_to_use": "",
-      "category": "git"
-    },
-    {
-      "name": "mergify",
-      "description": "Mergify CLI surface — stacked PRs, merge queue, CI insights, config validation, mergify events.",
-      "when_to_use": "Run any Mergify workflow — push or stack commits/PRs, diagnose merge-queue PRs, Depends-On/Merge-After/scheduled freezes, JUnit upload and quarantine, scopes detection, write or validate .mergify.yml, browse Mergify events.",
+      "description": "issue → PR: analyzes open GitHub issues (latest or oldest N issues), verifies claims at HEAD, asks user decisions via quiz, isolates work in Orca worktrees, delegates implementation to Grok Build, verifies fixes, and pushes branches to open draft PRs. Never merges.",
+      "when_to_use": "Use when taking open GitHub issues to PRs (/issue-worker <latest|oldest> <N>), triaging the N latest or oldest open issues, verifying issue reproduction at HEAD, running isolated Orca worktrees for issue fixes, or opening draft PRs from existing issues. Never creates issues (handled by /issue-maker) and never auto-merges.",
       "category": "git"
     },
     {
       "name": "pr-babysit",
-      "description": "Watch a GitHub PR end to end. Two lanes: Hermes orchestrates and ships; Grok Build fixes. Run Step R0 to identify the lane, then read only that lane's references.",
-      "when_to_use": "Triggers on \"/pr-babysit\". Phrasing: \"watch PR 123 until green\", \"babysit PR 123 and merge when ready\", \"fix issue #123 and open a PR\", \"keep fixing PR 123 until it can merge\", \"pr-babysit add --ship 123\".",
+      "description": "Watch a PR, fix CI, merge via Mergify queue.",
+      "when_to_use": "Triggers on \\\"/pr-babysit\\\". Phrasing: \\\"watch PR 123 until green\\\", \\\"babysit PR 123 and merge when ready\\\", \\\"fix issue #123 and open a PR\\\", \\\"keep fixing PR 123 until it can merge\\\", \\\"pr-babysit add 123\\\", \\\"pr-babysit ship 123\\\", \\\"pr-babysit setup 123\\\".",
       "category": "git"
     },
     {
@@ -301,13 +277,7 @@
       "category": "media-content"
     },
     {
-      "name": "gif-search",
-      "description": "Searches and downloads GIFs from Tenor via curl + jq using the Tenor API.",
-      "when_to_use": "Use when the user wants to search or download GIFs from Tenor — reaction GIFs, visual content for chat, or GIF metadata via the Tenor API with curl + jq.",
-      "category": "media-content"
-    },
-    {
-      "name": "music-downloader",
+      "name": "media-acquisition",
       "description": "Download music lists to a local MP3 library via mdl.",
       "when_to_use": "Use when the user wants to download songs to a local MP3 music library, build/replenish a music library from a named list, or acquire media assets from external sources.",
       "category": "media-content"
@@ -349,48 +319,6 @@
       "category": "office"
     },
     {
-      "name": "xlsx",
-      "description": "Create, read, edit Excel .xlsx workbooks and CSVs.",
-      "when_to_use": "Use when creating, reading, editing, or recalculating Excel .xlsx workbooks and CSVs — styled multi-sheet reports, formulas, tables, charts, data validation, and CSV interop — with openpyxl.",
-      "category": "office"
-    },
-    {
-      "name": "competitor-news-monitor",
-      "description": "Watch named companies for material news; cited digests. Use when monitoring a competitor set, tracking company launches, pricing, funding, partnerships, executive moves, or incidents, scheduling a recurring competitor-intelligence digest, or running the scheduled competitor-watch tick.",
-      "when_to_use": "Use when the user asks to monitor competitors, tell them when a named company changes pricing or launches a product, create a competitor intelligence digest, track funding/partnerships/executive moves/incidents, or when a cron tick fires for an existing competitor watch. Not for one-off company research (use web_search/web_extract) or plain feed reading (blogwatcher).",
-      "category": "productivity"
-    },
-    {
-      "name": "product-price-monitor",
-      "description": "Watch product, flight, or listing prices; alert on target. Use when tracking a product/listing/flight/hotel price, setting a price or availability alert, handling currency and all-in totals across variants, or running the scheduled price-watch tick.",
-      "when_to_use": "Use when the user wants an alert when a price drops below a target, wants to watch flights, hotel rooms, tickets, or listings for a fare or availability condition, track inventory or booking windows, or when a cron tick fires for an existing price watch. Not for one-off price lookups (use web_search/web_extract).",
-      "category": "productivity"
-    },
-    {
-      "name": "weekly-review-planning",
-      "description": "Weekly reset: commitments, stalled work, next-week plan. Use when running a weekly review of completed work and commitments, finding stalled projects and waiting items, or planning next week across calendar, tasks, and notes.",
-      "when_to_use": "Use when the user asks to run their weekly review, asks what they committed to and what is slipping, wants next week planned from calendar/tasks/notes, wants stale projects and waiting items found, or when a cron tick fires for a scheduled weekly review. Not for daily briefs or single-inbox triage.",
-      "category": "productivity"
-    },
-    {
-      "name": "arxiv",
-      "description": "Search arXiv papers by keyword, author, category, or ID.",
-      "when_to_use": "",
-      "category": "research"
-    },
-    {
-      "name": "competitor-news-monitor",
-      "description": "Watch named companies for material news; cited digests.",
-      "when_to_use": "",
-      "category": "research"
-    },
-    {
-      "name": "grounded-citations",
-      "description": "Ground answers and documents in cited, verifiable sources.",
-      "when_to_use": "",
-      "category": "research"
-    },
-    {
       "name": "arxiv",
       "description": "Search arXiv papers by keyword, author, category, or ID.",
       "when_to_use": "Use when the user asks to search arXiv papers by keyword, author, category, or ID, or to fetch a paper's metadata, abstract, or PDF.",
@@ -415,10 +343,10 @@
       "category": "research-study"
     },
     {
-      "name": "study-roadmap-builder",
-      "description": "Build folder-structured quarterly study/learning roadmaps.",
-      "when_to_use": "Use when the user wants to build a folder-structured quarterly study/learning roadmap with specific sub-fields per quarter, or to teach a section from an existing roadmap.",
-      "category": "research-study"
+      "name": "skill-audit",
+      "description": "Repairs all sac findings across the skill library, then commits and pushes the result.",
+      "when_to_use": "Run when the user asks to clear every sac lint violation of the skills pack, make sac lint exit 0, fix all pack lint issues, or repair lint findings and push. Trigger terms: skill audit, lint the pack, fix lint violations, audit skills. Authoring one new skill belongs to skill-create; repairing one skill's body against the ten-question quality gate belongs to skill-improve; consolidating duplicate skill folders into one belongs to skill-prune. This skill audits the skills pack through to a clean lint, a rebuilt catalog, and a push.",
+      "category": "skill-authoring"
     },
     {
       "name": "skill-create",
@@ -439,32 +367,32 @@
       "category": "skill-authoring"
     },
     {
+      "name": "skill-rename",
+      "description": "Use to rename a Hermes skill and propagate every reference.",
+      "when_to_use": "Use when asked to rename a skill, re-slug its folder, or diagnose why a skill's slash command is missing. A skill's frontmatter name IS its slash command, so a rename touches more than the folder.",
+      "category": "skill-authoring"
+    },
+    {
       "name": "skill-research",
       "description": "Helps users discover and install agent skills from the open skills ecosystem: searches by keyword, checks the skills.sh leaderboard, verifies quality before recommending, and presents install options. --improve audits and repairs an existing skill; --prune merges duplicate skills.",
-      "when_to_use": "Use when the user asks \"how do I do X\" where X might be a common task with an existing skill, says \"find a skill for X\" or \"is there a skill that can...\", asks \"can you do X\" for a specialized capability, or expresses interest in extending agent capabilities.",
+      "when_to_use": "Use when the user asks \\\"how do I do X\\\" where X might be a common task with an existing skill, says \\\"find a skill for X\\\" or \\\"is there a skill that can...\\\", asks \\\"can you do X\\\" for a specialized capability, or expresses interest in extending agent capabilities.",
       "category": "skill-authoring"
     },
     {
       "name": "skill-traces",
-      "description": "Learns from, evolves, and unlearns skills from Grok Build session traces in one pass. --learn creates skills for repeated hand-typed instructions and open gaps; --evolve fixes stale lines in loaded skills; --unlearn retires skills the traces show are never used. Deterministic counts and repeated-phrase material come from the trace pipeline (usage.json, phrases.json); a narrow window lists but does not retire.",
+      "description": "Learns from, evolves, and unlearns skills from Grok Build session traces in one pass. --learn creates skills for repeated hand-typed instructions and open gaps; --evolve fixes stale lines in loaded skills; --unlearn retires skills the traces show are never used. Deterministic counts and repeated-phrase material come from the trace pipeline (usage.json, phrases.json); memory-v2 topics add topic-level learn/stale/unlearn signals and the --unlearn keep-list (memory.json). a narrow window lists but does not retire.",
       "when_to_use": "Use when the user wants to learn new skills from repeated hand-typed instructions, evolve stale skill lines to match current reality, or retire skills the traces show they never use. Pick one or more modes: --learn, --evolve, --unlearn; the trace pipeline runs once and every mode applies its own action kinds.",
       "category": "skill-authoring"
     },
     {
-      "name": "design",
-      "description": "Orchestrates a write-review-revise loop using `design-doc-writer` and `design-doc-reviewer` subagents to produce a polished design document and PR plan.",
-      "when_to_use": "Use when asked to write a design doc, produce a system architecture/spec, or via the `/design <description>` slash command. Triggers: 'design a feature', 'write a design doc', 'create technical spec'. Also acts as a step dependency inside `execute-plan`.",
-      "category": "software-development"
-    },
-    {
       "name": "execute-plan",
       "description": "Executes a PR Plan DAG end-to-end: Hermes validates the plan and drops /execute-plan into Grok Build (Grok runs parallel Orca worktrees, implementers, the 3-reviewer panel, fix loops, and final assembly), then Hermes verifies the final branch and ships the PR.",
-      "when_to_use": "Use for /execute-plan <design-doc-path>, execute plan, run the plan, implement the design, or after /design produces a PR plan.",
+      "when_to_use": "Use for /execute-plan <plan-doc-path> [--resume <PLAN_ID>], execute plan, run the plan, implement the plan, or after /planner (or /plan) produces a PR plan.",
       "category": "software-development"
     },
     {
       "name": "grill-me",
-      "description": "Relentlessly interviews a plan or design until a shared understanding is reached.",
+      "description": "Relentlessly interviews a plan or design until a shared understanding is reached, and writes resolved decisions back into the original plan.",
       "when_to_use": "Use when asked to grill, interview, or stress-test a plan, design, or decision tree until every branch is resolved. Triggers: 'grill this plan', 'interview this design', 'stress-test my approach'.",
       "category": "software-development"
     },
@@ -475,27 +403,15 @@
       "category": "software-development"
     },
     {
-      "name": "design-md",
-      "description": "Author/validate/export Google's DESIGN.md design-token spec files.",
-      "when_to_use": "Use when the user wants a DESIGN.md design-token spec file — authoring, linting, diffing, or exporting to Tailwind or W3C DTCG JSON; also for WCAG contrast validation on color palettes.",
-      "category": "web-design"
-    },
-    {
-      "name": "p5js",
-      "description": "p5.js sketches: gen art, shaders, interactive, 3D.",
-      "when_to_use": "Use when the user wants a p5.js sketch — generative art, shaders, interactive visualizations, canvas animations, 3D WebGL scenes, audio-reactive visuals, or data viz, exported as HTML/PNG/GIF/MP4/SVG.",
-      "category": "web-design"
+      "name": "planner",
+      "description": "Orchestrates a write-review-revise loop using `plan-doc-writer` and `plan-doc-reviewer` subagents to produce a polished plan document and PR plan.",
+      "when_to_use": "Use when asked to write a plan doc, produce a system architecture/spec, or via the `/planner <description>` slash command. Triggers: 'plan a feature', 'plan a feature', 'write a plan doc', 'create technical spec'.",
+      "category": "software-development"
     },
     {
       "name": "popular-web-designs",
       "description": "54 real design systems (Stripe, Linear, Vercel) as HTML/CSS.",
       "when_to_use": "Use when the user wants a page styled like a known site — 'build a page that looks like Stripe/Linear/Vercel', a landing page, dashboard, or UI using a real design system's tokens and components.",
-      "category": "web-design"
-    },
-    {
-      "name": "pretext",
-      "description": "Build creative browser demos with DOM-free text layout.",
-      "when_to_use": "Use when the user wants a pretext creative demo — text flowing around a moving shape, ASCII-art effects using real words, text-as-geometry games, kinetic typography, multiline shrink-wrap UI, or per-glyph physics.",
       "category": "web-design"
     }
   ]

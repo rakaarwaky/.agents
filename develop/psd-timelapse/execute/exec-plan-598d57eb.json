@@ -1,0 +1,80 @@
+{
+  "plan_id": "598d57eb",
+  "plan_doc_path": "/home/raka/.agents/develop/psd-timelapse/plan/plan-doc-14c3b92a.md",
+  "status": "initializing",
+  "created_at": "2026-11-19T00:00:00Z",
+  "max_concurrent": 8,
+  "linearized_order": ["pr-1", "pr-2"],
+  "dag": {
+    "nodes": [
+      {
+        "id": "pr-1",
+        "number": "1",
+        "title": "Add canvas upload button, empty-state dropzone, and re-wire StudioLanding",
+        "slug": "add-canvas-upload-button-empty-state-dropzone-and",
+        "files": [
+          "packages/shared/src/common/styles.css",
+          "packages/studio/src/surface_studio_canvas_component.tsx",
+          "packages/studio/src/surface_studio_landing_component.tsx",
+          "packages/studio/tests/unit_studio_canvas_upload.test.tsx"
+        ],
+        "dependencies": [],
+        "description": "Adds the Upload button and re-inspect button to the StudioCanvas toolbar, implements canvas stage empty-state dropzone and drag-and-drop on both empty and loaded states, updates .pt-studio-canvas-chip to dynamically render fileMeta name and dimensions, updates StudioLanding to pass onPickFile/onReinspect/hasDocument/fileMeta to StudioCanvas, and adds unit tests for the new upload and metadata interactions.",
+        "level": 0,
+        "status": "pending",
+        "branch": "execute-plan/598d57eb-pr-1-add-canvas-upload-button-empty-state-dropzone-and",
+        "subagent_id": null,
+        "worktree_path": null,
+        "base_sha": null,
+        "commit_sha": null,
+        "error": null,
+        "reviewer_configs": [],
+        "review_rounds": 0,
+        "started_at": null,
+        "completed_at": null,
+        "worktree_cleaned": false,
+        "orca_worktree_id": null
+      },
+      {
+        "id": "pr-2",
+        "number": "2",
+        "title": "Strip sidebar to layers-only and update sidebar tests",
+        "slug": "strip-sidebar-to-layers-only-and-update-sidebar-te",
+        "files": [
+          "packages/studio/src/surface_studio_layer_panel_component.tsx",
+          "packages/studio/tests/unit_studio_layer_panel_component.test.tsx"
+        ],
+        "dependencies": ["pr-1"],
+        "description": "Removes the SOURCE PSD DOCUMENT header, file metadata block, inline dropzone, and file input from StudioLayerPanel, removes onPickFile, fileMeta, and onReinspect from StudioLayerPanelProps, and updates layer panel unit tests to remove dropzone/file-meta/reinspect assertions.",
+        "level": 1,
+        "status": "pending",
+        "branch": "execute-plan/598d57eb-pr-2-strip-sidebar-to-layers-only-and-update-sidebar-te",
+        "subagent_id": null,
+        "worktree_path": null,
+        "base_sha": null,
+        "commit_sha": null,
+        "error": null,
+        "reviewer_configs": [],
+        "review_rounds": 0,
+        "started_at": null,
+        "completed_at": null,
+        "worktree_cleaned": false,
+        "orca_worktree_id": null
+      }
+    ]
+  },
+  "final_assembly_started": false,
+  "final_branch": null,
+  "final_commit_sha": null,
+  "final_orca_worktree_id": null,
+  "final_worktree_path": null,
+  "final_review_rounds": 0,
+  "final_review_passed": false,
+  "modular_branches_deleted": false,
+  "final_branch_pushed": false,
+  "final_worktree_retired": false,
+  "deferred_issues": [],
+  "pr_urls": [],
+  "user_instructions": "",
+  "gh_available": true
+}

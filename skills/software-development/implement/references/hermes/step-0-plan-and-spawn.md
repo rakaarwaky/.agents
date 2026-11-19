@@ -4,7 +4,7 @@ Hermes never writes code. This entire run has exactly one subagent — the Grok 
 
 ## Start-Turn Gate: Lint Baseline
 
-Before planning or spawning, run `lint-arwaky-cli report .` from the owning repo (absolute path: `/home/raka/.local/bin/lint-arwaky-cli`). This records the scan baseline in `$XDG_DATA_HOME/lint-arwaky/snapshots.json` keyed by target path, so the end-of-turn report shows deltas. Paste the report output verbatim into the run log or brief so the run starts from a known violation count. If the CLI is unavailable, note the failure and continue without the gate.
+Before planning or spawning, run `lint-arwaky-cli report .` from the owning repo (absolute path: `$HOME/.local/bin/lint-arwaky-cli`). This records the scan baseline in `$XDG_DATA_HOME/lint-arwaky/snapshots.json` keyed by target path, so the end-of-turn report shows deltas. Paste the report output verbatim into the run log or brief so the run starts from a known violation count. If the CLI is unavailable, note the failure and continue without the gate.
 
 ## Plan the Task Brief
 
@@ -14,25 +14,26 @@ Grok has zero conversation context. Compose a brief that covers:
 2. **Scope** — in-scope paths, and an explicit out-of-scope list (sibling trees, new top-level directories, anything the task never named). Resolve scope the same way `grok/step-0-setup.md` describes (check candidate paths on disk; if genuinely ambiguous, ask the user ONE clarifying question naming both candidates).
 3. **Constraints** — style, tests to run, things not to touch, repo conventions from AGENTS.md / CONTRIBUTING.md. Include the lint gate: `lint-arwaky-cli report .` from the worktree at the end of the run must show a non-positive Delta versus the start-turn baseline recorded in this step's Start-Turn Gate section; positive delta means the run introduced new violations and the run is not done.
 4. **Acceptance criteria** — what "done" looks like: tests passing, linter clean, specific commands that must exit 0.
-5. **Deliverable** — commit the work in the worktree with a conventional commit message; do NOT push, do NOT open a PR, do NOT merge.
+5. **Deliverable** — completed implementation with all reviews passed; leave changes uncommitted in the worktree (Hermes owns verification and git commit in Step 2); do NOT commit, do NOT push, do NOT open a PR, do NOT merge.
 
 ## Create the Orca Worktree
 
-Resolve `orca-ide` to its absolute path (`/home/raka/.local/bin/orca-ide`) and the owning repo exactly as in `grok/step-0-setup.md` (owning-repo resolution, tie-break, project-name check, reuse-or-create).
+Resolve `orca-ide` with `command -v orca-ide` (never hardcode `$HOME/.local/bin/orca-ide`). The binary is mounted dynamically under `/tmp/.mount_orca.*/orca-ide` on this host and may not resolve at a fixed path.
 
-**Pitfall — Orca CLI path resolution:** Do not rely on `orca-ide` being on `$PATH` or on `$ORCA` being exported. The shell does not export `ORCA`, so `${ORCA}` expands to empty and bash reports `: command not found` instead of running the CLI. Always call the binary by its absolute path.
+**Pitfall — Orca CLI path resolution:** Do not rely on `orca-ide` being on `$PATH` or on `$ORCA` being exported. The shell does not export `ORCA`, so `${ORCA}` expands to empty and bash reports `: command not found` instead of running the CLI. Always call the binary by its resolved absolute path:
 
-Create:
-
-```
-/home/raka/.local/bin/orca-ide worktree create --repo path:<repo_path> --name <task-slug> --agent grok --no-parent --surface terminal --json
+```bash
+ORCA="$(command -v orca-ide)"
+"$ORCA" worktree create --repo path:<repo_path> --name <task-slug> --agent grok --no-parent --surface terminal --json
 ```
 
 - `task-slug`: lowercase `[a-z0-9-]` slug of the task, ≤ 40 chars.
 - Parse JSON: `result.worktree.path` → `worktree_path`, `result.worktree.id` → `worktree_id`, `result.worktree.branch` → `worktree_branch` (strip `refs/heads/`).
 - **Failure:** if create fails or no Orca CLI resolves, report the error and stop. Never fall back to the main clone.
 
-If `--agent grok` is blocked (e.g. `agent_session_operation_unknown`), fall back to plain `git worktree add` at `~/orca/workspaces/<repo-basename>/<task-slug>` and drive Grok headless **inside that worktree** via `grok -p '<brief>' --cwd <worktree_path> --always-approve`. Never run bare `grok` / `grok -p` directly in the Hermes terminal session outside a worktree context.
+If `--agent grok` is blocked (e.g. `agent_session_operation_unknown`), fall back to plain `git worktree add` at `~/orca/workspaces/<repo-basename>/<task-slug>` and drive Grok headless **inside that worktree** via `grok -p '<brief>' --cwd <worktree_path> --always-approve`, passing the full natural-language brief (not a slash command). Never run bare `grok` / `grok -p` directly in the Hermes terminal session outside a worktree context.
+
+**Pitfall — confirm the brief actually started a turn.** `orca terminal send` can return `accepted: true` while only having written the text to the TUI input box without submitting a turn, so Grok never runs. Read the terminal once (`orca terminal read --terminal <handle> --cursor 0 --limit 100 --json`) and check the process list for `systemd-inhibit --who=grok --why="agent turn in progress"`; if no grok turn is running and the worktree stays empty, re-send the brief once before proceeding to Step 1.
 
 ## Drop the Task
 
@@ -46,10 +47,8 @@ Send exactly this, once, via `orca terminal send --terminal <handle> --text "<br
 
 `<task-description>` is the skill argument, expanded verbatim. Confirm `accepted: true` in the response. **After this send, do not send any more text to Grok.** No status checks, no course corrections, no "are you done yet".
 
-## Report & Stop
+## Proceed to Step 1
 
-Report to the user, in one line:
+Do NOT end the turn after dropping the task. Do NOT stop after sending the brief. Hermes must stay active and proceed immediately to Step 1 in this session to wait and poll for Grok Build to finish:
 
-> Dropped /implement into Grok Build at <worktree_path> (branch <worktree_branch>). Waiting for completion.
-
-Then end the turn. When the Orca terminal becomes idle (detected when this conversation resumes), proceed to Step 1.
+> Dropped /implement into Grok Build at <worktree_path> (branch <worktree_branch>). Proceeding to Step 1 to wait for completion.

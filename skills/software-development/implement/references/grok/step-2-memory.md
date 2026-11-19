@@ -9,27 +9,21 @@ The memory file is **workspace-scoped** and lives under `$HOME/.agents/implement
 2. Absolute path of the main `.git` directory (`git rev-parse --git-common-dir`) for repos with no remote.
 3. Absolute path of cwd as a last-ditch fallback for non-git workspaces.
 
-The `memory.py` helper at `<dirname of this SKILL.md>/scripts/memory.py` resolves the path and handles concurrent access via a Python lock (`fcntl.flock` on POSIX, `msvcrt.locking` on Windows; no `flock(1)` shell binary required).
+The `sdc memory` capability (part of `sdc`) resolves the path and handles concurrent access via an exclusive Python lock (`fcntl.flock` on POSIX, `msvcrt.locking` on Windows; no `flock(1)` shell binary required).
 
-### Resolve the helper path once
+### Resolve the helper command once
 
-The helper script lives at a fixed location **relative to this SKILL.md file**: `<dirname of SKILL.md>/scripts/memory.py`. The orchestrator already knows the absolute path to this SKILL.md file from its system context (the skills list announces each skill's path when it's loaded). Derive the helper path from that, **not** from `$(pwd)` — the skill can be loaded from a workspace-local `.agents/skills/`, the user's home `~/.agents/skills/`, or a bundled `~/.agents/bundled/...` location, and only the SKILL-relative path works in all cases.
-
-Capture it once at the start of the run as **orchestrator state** (a value held in your own working memory):
+All memory operations go through `sdc memory <path|read|snapshot|update>`. The `sdc` launcher is already on PATH after installation at `~/.local/bin/sdc`. Capture it once as orchestrator state:
 
 ```
-memory_helper_path = dirname(<path-to-this-SKILL.md>) + "/scripts/memory.py"
+memory_cmd = "sdc memory"
 ```
 
-For example, if this SKILL.md is at `/Users/alice/.agents/worktrees/org/repo/.grok/skills/implement/SKILL.md`, then `memory_helper_path` is `/Users/alice/.agents/worktrees/org/repo/.grok/skills/implement/scripts/memory.py`. If this SKILL.md is at `/Users/alice/.agents/skills/implement/SKILL.md`, then `memory_helper_path` is `/Users/alice/.agents/skills/implement/scripts/memory.py`.
-
-**Substitute this absolute path directly** into every helper invocation throughout the run — do not rely on a shell environment variable surviving across `run_terminal_command` calls. All examples below show `${MEMORY_HELPER}` for readability; in practice, inline the absolute `memory_helper_path` value.
-
-**Invoke the helper from the run's worktree after Step 0 (Setup & Worktree Isolation): `cd <worktree_path> && "${PYTHON}" "${MEMORY_HELPER}" ...`** (before the worktree exists, the session workspace root is fine). The helper itself is cwd-sensitive only for its workspace-id derivation: it runs `git config --get remote.origin.url` and `git rev-parse --git-common-dir` in the cwd, so cwd must be inside the repo that owns the task — the worktree guarantees that even when the session sits in a superproject workspace. Never `cd` to the helper's own directory before invoking it (especially relevant when the skill is loaded from `~/.agents/skills/`, where `cd`-ing to the helper would put cwd outside any workspace and the workspace-id would fall back to that home-dir cwd).
+Invoke the helper from the run's worktree after Step 0 (Setup & Worktree Isolation): `cd <worktree_path> && sdc memory ...`. The helper itself is cwd-sensitive only for its workspace-id derivation: it runs `git config --get remote.origin.url` and `git rev-parse --git-common-dir` in the cwd, so cwd must be inside the repo that owns the task — the worktree guarantees that even when the session sits in a superproject workspace. Never `cd` to the skill's own directory before invoking it.
 
 ### Read Path
 
-1. Run `"${PYTHON}" "${MEMORY_HELPER}" snapshot` via `run_terminal_command` and capture stdout. Use the `snapshot` subcommand for reads — the `read` subcommand is for human inspection only. The helper prints structured JSON — no markdown re-parsing in the orchestrator. The shape is:
+1. Run `cd <worktree_path> && sdc memory snapshot` via `run_terminal_command` and capture stdout. Use the `snapshot` subcommand for reads — the `read` subcommand is for human inspection only. The helper prints structured JSON — no markdown re-parsing in the orchestrator. The shape is:
 
    ```json
    {
@@ -53,7 +47,7 @@ Do NOT read or write `.agents/implement-issues.md` directly during a /implement 
 
 **One-time migration from the legacy file:** if a user has a populated `.agents/implement-issues.md` from a prior version, its `## Common Issues` and `## Recent Runs` sections use the **same markdown format** documented under [Memory File Format](step-8-memory-flush.md#memory-file-format). To bring that history forward:
 
-1. **From the workspace root** (the same directory where `.agents/implement-issues.md` lives — the workspace-id is derived from the cwd's git context, so running this from `~` or any unrelated directory will write to the wrong workspace's memory file), write `{}` to a temp file and run `"${PYTHON}" "${MEMORY_HELPER}" update --file <that-file>` once to create the workspace-scoped file and its parent directory — `memory.py path` only computes the path, it does not create the directory.
+1. **From the workspace root** (the same directory where `.agents/implement-issues.md` lives — the workspace-id is derived from the cwd's git context, so running this from `~` or any unrelated directory will write to the wrong workspace's memory file), write `{}` to a temp file and run `sdc memory update --file <that-file>` once to create the workspace-scoped file and its parent directory — `sdc memory path` only computes the path, it does not create the directory.
 2. Open the printed file path in an editor.
 3. Hand-copy the bullets from the legacy file's `## Common Issues` section into the corresponding categories in the new file (preserving the `- description (seen N time(s))` syntax).
 4. The helper picks up the entries on the next `update`.

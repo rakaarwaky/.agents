@@ -2,19 +2,23 @@
 name: aes-fix
 description: "AES rule fix references for AES1xx-AES7xx: one step-N file per rule code with concrete fix steps and a verify command."
 when-to-use: "Run after `lint-arwaky-cli scan` or `lint-arwaky-cli report` flags AES violations; fix and ship the fixes."
-argument-hint: '<target-path> [rule-code]'
+argument-hint: '[rule-code] ...'
 ---
 
 # aes-fix
 
+AES rule fix references for AES1xx-AES7xx with concrete steps and verify commands.
+
 ## Rules
 
-- **One fact, one home.** Each `references/step-N-AESxxx.md` carries the how-to-fix for its rule code; do not restate the same fix in two files.
-- **Cite the checker name**, not just the rule code, when pointing at implementation (e.g. `NamingConventionChecker` for AES101).
-- **Every reference ends with a Verify step** naming the exact command.
-- **Turn progress gates.** Run `lint-arwaky-cli report` once at the start of the turn (baseline) and once at the end (delta). A positive delta means the run added problems; the turn is not done.
-- **Orchestration and ship** are part of `step-0-setup.md`: collect all violations, spawn one subagent in a single worktree with the rule reference links, verify the delta, then open a PR and merge to main.
-- **Completion.** The end-of-turn report shows zero or negative delta for every touched rule and the PR is merged to main.
+| ID | Rule | Check |
+|----|------|-------|
+| R1 | **One fact, one home.** Each `references/step-N-AESxxx.md` carries the how-to-fix for its rule code; do not restate the same fix in two files. | No duplicated rule fixes across references. |
+| R2 | **Cite the checker name**, not just the rule code, when pointing at implementation (e.g. `NamingConventionChecker` for AES101). | Checker name cited in reference. |
+| R3 | **Every reference ends with a Verify step** naming the exact command. | Verify step present in each reference. |
+| R4 | **Turn progress gates.** Run `lint-arwaky-cli report` once at the start of the turn (baseline) and once at the end (delta). A positive delta means the run added problems; the turn is not done. | Non-positive delta confirmed before turn exit. |
+| R5 | **Orchestration and ship** are part of `step-0-setup.md`: collect all violations, spawn one subagent in a single worktree with the rule reference links, verify the delta, then open a PR and merge to main. | PR opened and merged via setup recipe. |
+| R6 | **Completion.** The end-of-turn report shows zero or negative delta for every touched rule and the PR is merged to main. | Report shows zero or negative delta; PR merged. |
 
 ## Routing
 

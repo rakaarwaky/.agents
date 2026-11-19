@@ -1,0 +1,150 @@
+{
+  "plan_id": "0ac73f1d",
+  "design_doc_path": "/home/raka/.agents/develop/psd-timelapse/plan/design-doc-0ac73f1d.md",
+  "status": "completed",
+  "created_at": "2026-11-18T21:00:00Z",
+  "max_concurrent": 3,
+  "linearized_order": [
+    "pr-1",
+    "pr-2",
+    "pr-3",
+    "pr-5",
+    "pr-6",
+    "pr-4",
+    "pr-7"
+  ],
+  "dag": {
+    "nodes": [
+      {
+        "id": "pr-1",
+        "level": 0,
+        "deps": [],
+        "title": "Add GET /api/renders listing endpoint + AgentSystemOrchestrator.list_runs()",
+        "status": "completed",
+        "branch": "execute-plan/0ac73f1d-pr-1-backend-listing",
+        "worktree_path": "/home/raka/orca/workspaces/psd-timelapse/0ac73f1d-pr-1",
+        "commit_sha": "552accec",
+        "review_rounds": 1,
+        "review_file": "exec-review-0ac73f1d-pr-1.md",
+        "summary_file": "exec-summary-0ac73f1d-pr-1.md",
+        "pr_url": null
+      },
+      {
+        "id": "pr-2",
+        "level": 1,
+        "deps": [
+          "pr-1"
+        ],
+        "title": "Extend client contract with inspectFull, downloadOutput, listCompletedRuns",
+        "status": "completed",
+        "branch": "execute-plan/0ac73f1d-pr-2-client-contract-extension",
+        "worktree_path": "/home/raka/orca/workspaces/psd-timelapse/0ac73f1d-pr-2",
+        "commit_sha": "c3a07d88",
+        "review_rounds": 1,
+        "review_file": "exec-review-0ac73f1d-pr-2.md",
+        "summary_file": "exec-summary-0ac73f1d-pr-2.md",
+        "pr_url": "https://github.com/rakaarwaky/psd-timelapse/pull/243"
+      },
+      {
+        "id": "pr-3",
+        "level": 2,
+        "deps": [
+          "pr-2"
+        ],
+        "title": "Studio PSD inspection integration",
+        "status": "completed",
+        "branch": "execute-plan/0ac73f1d-pr-3-studio-inspect",
+        "worktree_path": "/home/raka/orca/workspaces/psd-timelapse/0ac73f1d-pr-3",
+        "commit_sha": "9a1916d8",
+        "review_rounds": 1,
+        "review_file": "exec-review-0ac73f1d-pr-3.md",
+        "summary_file": "exec-summary-0ac73f1d-pr-3.md",
+        "pr_url": "https://github.com/rakaarwaky/psd-timelapse/pull/244"
+      },
+      {
+        "id": "pr-5",
+        "level": 2,
+        "deps": [
+          "pr-2"
+        ],
+        "title": "Queue live run lifecycle",
+        "status": "completed",
+        "branch": "execute-plan/0ac73f1d-pr-5-queue-lifecycle",
+        "worktree_path": "/home/raka/orca/workspaces/psd-timelapse/0ac73f1d-pr-5",
+        "commit_sha": "d454192c",
+        "review_rounds": 1,
+        "review_file": "exec-review-0ac73f1d-pr-5.md",
+        "summary_file": "exec-summary-0ac73f1d-pr-5.md",
+        "pr_url": "https://github.com/rakaarwaky/psd-timelapse/pull/245"
+      },
+      {
+        "id": "pr-6",
+        "level": 2,
+        "deps": [
+          "pr-2"
+        ],
+        "title": "Gallery completed runs, playback, download",
+        "status": "completed",
+        "branch": "execute-plan/0ac73f1d-pr-6-gallery-live",
+        "worktree_path": "/home/raka/orca/workspaces/psd-timelapse/0ac73f1d-pr-6",
+        "commit_sha": "ee7a6cef",
+        "review_rounds": 1,
+        "review_file": "exec-review-0ac73f1d-pr-6.md",
+        "summary_file": "exec-summary-0ac73f1d-pr-6.md",
+        "pr_url": "https://github.com/rakaarwaky/psd-timelapse/pull/246"
+      },
+      {
+        "id": "pr-4",
+        "level": 3,
+        "deps": [
+          "pr-3"
+        ],
+        "title": "Studio RENDER wiring and bottom-bar cleanup",
+        "status": "completed",
+        "branch": "execute-plan/0ac73f1d-pr-4-studio-render",
+        "worktree_path": "/home/raka/orca/workspaces/psd-timelapse/0ac73f1d-pr-4",
+        "commit_sha": "406c7194",
+        "review_rounds": 1,
+        "review_file": "exec-review-0ac73f1d-pr-4.md",
+        "summary_file": "exec-summary-0ac73f1d-pr-4.md",
+        "pr_url": null
+      },
+      {
+        "id": "pr-7",
+        "level": 4,
+        "deps": [
+          "pr-3",
+          "pr-4",
+          "pr-5",
+          "pr-6"
+        ],
+        "title": "Gate validation (typecheck/build/test/scan)",
+        "status": "completed",
+        "branch": "execute-plan/0ac73f1d-pr-7-gate-validation",
+        "worktree_path": "/home/raka/orca/workspaces/psd-timelapse/0ac73f1d-pr-7",
+        "commit_sha": "cc2b731e",
+        "review_rounds": 1,
+        "review_file": "exec-review-0ac73f1d-pr-7.md",
+        "summary_file": "exec-summary-0ac73f1d-pr-7.md",
+        "pr_url": "https://github.com/rakaarwaky/psd-timelapse/pull/247",
+        "merged": true,
+        "merge_commit": "f6c29e7fee3335d339dd61648efffbe6d1eebb3d"
+      }
+    ]
+  },
+  "final_assembly_started": true,
+  "final_branch_pushed": true,
+  "final_branch": "execute-plan/0ac73f1d-final",
+  "final_pr_url": "https://github.com/rakaarwaky/psd-timelapse/pull/247",
+  "final_pr_merged": true,
+  "final_merge_commit": "f6c29e7fee3335d339dd61648efffbe6d1eebb3d",
+  "pr_urls": [
+    "https://github.com/rakaarwaky/psd-timelapse/pull/243",
+    "https://github.com/rakaarwaky/psd-timelapse/pull/244",
+    "https://github.com/rakaarwaky/psd-timelapse/pull/245",
+    "https://github.com/rakaarwaky/psd-timelapse/pull/246",
+    "https://github.com/rakaarwaky/psd-timelapse/pull/247"
+  ],
+  "user_instructions": "7 PRs, max parallelism 3, linearized order pr-1 -> pr-2 -> pr-3 -> pr-5 -> pr-6 -> pr-4 -> pr-7",
+  "gh_available": true
+}

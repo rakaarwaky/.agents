@@ -3,36 +3,22 @@ name: google-workspace
 description: 'Daily Google ops via workspace MCP: Gmail, Drive, Calendar, Docs, Sheets, Slides, Forms, Tasks, Contacts, Chat. For user tasks.'
 when-to-use: "Use when performing daily Google Workspace operations — Gmail, Drive, Calendar, Docs, Sheets, Slides, Forms, Tasks, Contacts, or Chat — via the workspace MCP server."
 argument-hint: "search_gmail_messages <query>|get_gmail_message_content <message_id>|send_gmail_message|manage_event|read_sheet_values|modify_sheet_values|create_doc|modify_doc_text|create_drive_file|list_drive_items|get_events|query_freebusy|start_google_auth"
-metadata:
-  tags:
-    - Google
-    - Gmail
-    - Calendar
-    - Drive
-    - Sheets
-    - Docs
-    - Slides
-    - Forms
-    - Tasks
-    - Contacts
-    - Chat
-    - OAuth
-  related_skills: []
-  category: office
 ---
 
 # Google Workspace -- Tool Router
 
-MCP is preferred on this host; the CLI path (`workspace-cli`) is for headless use. Load the matching reference per job below — this page is the router, not the content.
+Coordinate Google Workspace tools across Gmail, Drive, Calendar, Docs, Sheets, Slides, Forms, and Chat via MCP server integrations and command line utilities.
 
-## Global rules
+## Rules
 
-- **Confirm before mutating.** Never send mail, create/update/delete calendar events, delete or share Drive files, or modify Docs/Sheets without showing the user the exact target (recipient, file ID, share role, body) and getting approval. Prefer trashing over permanent deletion. A request for a *brief* or a *read* is not authorization to write.
-- **Read back what you wrote.** After an approved mutation, re-read the object and report the ID/link, so a silent no-op cannot pass as success.
-- **Verify auth before first use.** If a call fails with a credential error, walk `references/setup.md` rather than retrying blindly — three rejected calls trigger the ~60s pause described in `references/pitfalls.md`.
-- **Paginate instead of truncating.** `list_calendars`, `get_events`, and the search tools return a `Next page token`; pass it back before concluding a result set is complete.
-- **Never invent tool names or parameters.** Use only the consolidated `manage_*` tools' `action` parameter for create/update/delete, and only parameters documented in the service tables below; if a tool is missing from a table, report the gap instead.
-- **Docs layout: build incrementally.** Insert a heading alone, style it, then insert body as `NORMAL_TEXT`; re-read the doc after every batch, since indices shift — `references/docs-layout.md` is required before building a formatted document.
+| ID | Rule | Check |
+|----|------|-------|
+| R1 | Obtain explicit confirmation before mutating events, sending emails, sharing files, or editing spreadsheets. | Verify approval before executing write actions across Workspace APIs. |
+| R2 | Read back mutated objects following updates to verify provider-confirmed IDs, links, and content changes. | Confirm returned resource ID matches expected updated object. |
+| R3 | Verify OAuth authentication before calling tools; resolve credential failures using setup references rather than blind retries. | Test auth status and halt retries on authentication rejections. |
+| R4 | Handle pagination tokens completely on calendar listings, event retrievals, and drive search results. | Verify all pages are fetched before declaring search or listing complete. |
+| R5 | Never invent tool names or undocumented parameters; use consolidated `manage_*` action schemas. | Validate tool names and arguments against official service schemas. |
+| R6 | Construct formatted documents incrementally, inserting headers and styling before adding paragraph content. | Verify document build sequence follows incremental styling order. |
 
 ## Routing
 

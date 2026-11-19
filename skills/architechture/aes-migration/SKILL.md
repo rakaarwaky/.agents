@@ -22,14 +22,16 @@ metadata:
 
 Guide the phased migration of a legacy codebase into the AES layered architecture: Phase 0 audit the baseline, then Phase 1–7 build each layer bottom-up — taxonomy → contract → utility → capabilities → agent → surface → root — and Phase 8 verify to zero. The audience is the agent planning or executing a migration; the **language** decides which playbook loads, and the **violation count** after the baseline audit decides the strategy (< 10: full, 10–50: phased, > 50: taxonomy-first). Each layer's shape is owned by its layer skill; the playbook carries import matrices, phase templates, and troubleshooting. Invariants read by more than one step live in Global Rules below.
 
-## Global rules
+## Rules
 
-- Baseline first: `lint-arwaky-cli scan .` before touching anything; the recorded violation count picks the strategy.
-- Layer order: migrate bottom-up (taxonomy → contract → utility → capabilities → agent → surface → root); a layer starts only when the one below scans clean.
-- Per-phase gate: `lint-arwaky-cli scan <layer-dir>` → 0 before moving to the next layer; language compile (`python -m compileall` / `cargo check` / `npx tsc --noEmit`) is fallback only.
-- Done: Phase 8 — full scan of the project root exits 0, language compile clean, tests green; commit `migrate: <layer> phase to AES (<rules>)` only when asked.
-- Shape ownership: protocol/aggregate shape, structure, DI, wiring — all owned by `aes-layer` — the migration skill routes; it does not restate layer shape.
-- One fact, one home: the language playbook carries the phase templates and troubleshooting table — read it, do not restate here. Cite the linter, not this file, when pointing at a rule. Each bullet states a fact once; references point at the bullet.
+| ID | Rule | Check |
+|----|------|-------|
+| R1 | **Baseline first.** `lint-arwaky-cli scan .` before touching anything; the recorded violation count picks the strategy. | Baseline scan run before edits. |
+| R2 | **Layer order.** Migrate bottom-up (taxonomy → contract → utility → capabilities → agent → surface → root); a layer starts only when the one below scans clean. | Layers migrated in bottom-up sequence. |
+| R3 | **Per-phase gate.** `lint-arwaky-cli scan <layer-dir>` → 0 before moving to the next layer; language compile (`python -m compileall` / `cargo check` / `npx tsc --noEmit`) is fallback only. | 0 violations per layer gate. |
+| R4 | **Done definition.** Phase 8 — full scan of the project root exits 0, language compile clean, tests green; commit `migrate: <layer> phase to AES (<rules>)` only when asked. | Project scan exits 0 and tests green. |
+| R5 | **Shape ownership.** Protocol/aggregate shape, structure, DI, wiring — all owned by `aes-layer` — the migration skill routes; it does not restate layer shape. | Layer shapes conform to aes-layer definitions. |
+| R6 | **One fact, one home.** The language playbook carries the phase templates and troubleshooting table — read it, do not restate here. Cite the linter, not this file, when pointing at a rule. Each bullet states a fact once; references point at the bullet. | Playbook references followed without duplicating text. |
 
 ## Routing
 
@@ -38,5 +40,5 @@ Guide the phased migration of a legacy codebase into the AES layered architectur
 | [references/python-migration.md](references/python-migration.md) | Python migration playbook — phases 0–8, lint verify pipeline, fix routing, verify |
 | [references/rust-migration.md](references/rust-migration.md) | Rust migration playbook — phases 0–8, lint verify pipeline, fix routing, verify |
 | [references/typescript-migration.md](references/typescript-migration.md) | TypeScript migration playbook — phases 0–8, lint verify pipeline, fix routing, verify |
-| [references/lint-rules.md](references/lint-rules.md) | Lint Rules (Global): shared CLI surface, AES101 naming contract, fix routing, triage order |
+| [references/lint-command.md](references/lint-command.md) | Lint Rules (Global): shared CLI surface, AES101 naming contract, fix routing, triage order |
 | Related skills | aes-layer |

@@ -2,13 +2,13 @@
 
 When the review-fix loop reaches 0 open issues, memory is flushed (Step 8), and the PR is pushed (Step 9), present a final report:
 
-1. **Summary of what was implemented** — from the summary_file: which files were changed, what was added/modified, key design decisions.
+1. **Summary of what was implemented** — from the summary_file: which files were changed, what was added/modified, key plan decisions.
 2. **Review panel** — the fixed three-reviewer panel that ran: 1 general + tests + simplicity (3 reviewers).
 3. **Review rounds** — how many review→fix iterations it took to reach 0 issues (the value of `round_count`).
 4. **Total issues fixed** — the cumulative count from `total_issues_by_severity`, broken down by severity (bugs, suggestions, nits).
 5. **Issues by reviewer** — breakdown of how many issues each reviewer found across all rounds (by specialization tag).
 6. **Files changed** — list the files that were created or modified.
-7. **Anything notable** — if the implementer made design decisions, disagreed with a reviewer suggestion (`wontfix`), or anything unexpected happened, call it out.
+7. **Anything notable** — if the implementer made plan decisions, disagreed with a reviewer suggestion (`wontfix`), or anything unexpected happened, call it out.
 8. **Memory update** — what patterns were written or updated in the workspace memory file (path returned by the helper as the `file` field). Use the `existed_before` flag from the helper's stats output to choose between "file created" and "file updated" wording.
 9. **PR** — the PR/compare URL from stack assembly and the branch name.
 10. **Worktree** — the worktree is left in place. Post-merge action (after the PR merges to `main`):
@@ -17,14 +17,14 @@ When the review-fix loop reaches 0 open issues, memory is flushed (Step 8), and 
 
 ## End-Turn Gate: Lint Verification
 
-Before the final report, run `lint-arwaky-cli report .` from the worktree or owning repo (absolute path: `/home/raka/.local/bin/lint-arwaky-cli`). Compare against the start-turn baseline recorded in Step 0. The Delta column must be zero or negative — a positive delta means the run introduced new lint violations. Any regression: stop and fix before reporting; never claim completion while deltas are positive. Include the final report output in the final report to the user.
+Before the final report, run `lint-arwaky-cli report .` from the worktree or owning repo (absolute path: `$HOME/.local/bin/lint-arwaky-cli`). Compare against the start-turn baseline recorded in Step 0. The Delta column must be zero or negative — a positive delta means the run introduced new lint violations. Any regression: stop and fix before reporting; never claim completion while deltas are positive. Include the final report output in the final report to the user.
 
 ## Cleanup
 
-After the final report (memory was flushed in Step 8), clean up the temporary artifact files with `<PYTHON> <HOST_PY> cleanup`. List each concrete path; do not use `rm -f` or globs. Missing files are ok.
+After the final report (memory was flushed in Step 8), clean up the temporary artifact files with `sdc host cleanup`. List each concrete path; do not use `rm -f` or globs. Missing files are ok.
 
 ```
-<PYTHON> <HOST_PY> cleanup <path> <path> ...
+sdc host cleanup <path> <path> ...
 ```
 
 ### Files to Remove

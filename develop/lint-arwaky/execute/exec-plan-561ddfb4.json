@@ -1,0 +1,83 @@
+{
+  "plan_id": "561ddfb4",
+  "design_doc_path": "/home/raka/.agents/develop/lint-arwaky/plan/design-doc-ea65de47.md",
+  "status": "running",
+  "created_at": "2026-11-17T12:15:00Z",
+  "max_concurrent": 8,
+  "linearized_order": [
+    "pr-1",
+    "pr-2",
+    "pr-3",
+    "pr-4"
+  ],
+  "dag": {
+    "nodes": [
+      {
+        "id": "pr-1",
+        "title": "Update ARCHITECTURE.md AES102 surface row",
+        "slug": "update-architecture-md-aes102-surface-row",
+        "branch": "execute-plan/561ddfb4-pr-1-update-architecture-md-aes102-surface-row",
+        "level": 0,
+        "status": "branch_created",
+        "dependencies": [],
+        "files": [
+          "ARCHITECTURE.md"
+        ],
+        "description": "Consolidate surface sub-categories into one row with allowed imports taxonomy, contract(aggregate), utility, surface and forbidden imports contract(protocol), capabilities, agent, root."
+      },
+      {
+        "id": "pr-2",
+        "title": "Simplify AES201 surface rules in configuration",
+        "slug": "simplify-aes201-surface-rules-in-configuration",
+        "branch": "execute-plan/561ddfb4-pr-2-simplify-aes201-surface-rules-in-configuration",
+        "level": 1,
+        "status": "pending",
+        "dependencies": [
+          "pr-1"
+        ],
+        "files": [
+          "crates/shared/src/config_system/utility_config_architecture_rules.rs",
+          "crates/shared/src/import_rules/taxonomy_import_rules_constant.rs"
+        ],
+        "description": "Update surface allowed and forbidden lists in the rule definitions."
+      },
+      {
+        "id": "pr-3",
+        "title": "Update AES201 surface checker logic",
+        "slug": "update-aes201-surface-checker-logic",
+        "branch": "execute-plan/561ddfb4-pr-3-update-aes201-surface-checker-logic",
+        "level": 2,
+        "status": "pending",
+        "dependencies": [
+          "pr-2"
+        ],
+        "files": [
+          "crates/import-rules/src/capabilities_import_forbidden_checker.rs"
+        ],
+        "description": "Enforce the unified surface import matrix and permit surface self-imports."
+      },
+      {
+        "id": "pr-4",
+        "title": "Verify test fixtures and run CI gates",
+        "slug": "verify-test-fixtures-and-run-ci-gates",
+        "branch": "execute-plan/561ddfb4-pr-4-verify-test-fixtures-and-run-ci-gates",
+        "level": 3,
+        "status": "pending",
+        "dependencies": [
+          "pr-2",
+          "pr-3"
+        ],
+        "files": [
+          "workspaces-good/",
+          "workspaces-bad/"
+        ],
+        "description": "Align surface fixtures with the unified matrix and run the verification suite."
+      }
+    ]
+  },
+  "final_assembly_started": false,
+  "final_branch_pushed": false,
+  "pr_urls": [],
+  "user_instructions": "",
+  "gh_available": true
+}

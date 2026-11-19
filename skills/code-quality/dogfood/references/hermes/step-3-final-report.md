@@ -9,6 +9,7 @@ Report to the user:
 5. **Worktree** — if a worktree was used, it is left in place. Post-action (after the QA issues are actioned):
 
    ```
+   # Resolve $ORCA (default /home/raka/.local/bin/orca-ide)
    "$ORCA" worktree rm --worktree <worktree_id> --force --json
    ```
 

@@ -1,8 +1,6 @@
 # Step 1 — Desktop Target
 
 QA workflow for native desktop GUI apps using `computer_use` (cua-driver).
-See the [computer-use skill](../../automation/computer-use/SKILL.md) for the full
-toolset and the verify → escalate ladder.
 
 ## Prerequisites
 

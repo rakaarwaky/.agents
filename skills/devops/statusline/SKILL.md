@@ -7,13 +7,16 @@ argument-hint: "[builtin | command <path> | disabled]"
 
 # Status Line
 
-Configure the optional Grok Build status-line row: pick built-in items, point it at a custom script, or turn it off, then land the edit in the one config file Grok reads.
+Configure the optional Grok Build status-line row: pick built-in items, point it at a custom script, or turn it off, then land the edit in the user config file Grok reads.
 
-## Global Rules
+## Rules
 
-- **Write only the user config file.** `[ui.status_line]` belongs in the resolved user `config.toml`; repo-level `.agents/config.toml` cannot set the row. See `config-location.md` for the resolution rule.
-- **Ask before writing when the user has not named the row.** The row is optional and off by default; a write without a request is a defect.
-- **The table change takes effect at startup; the script change on the next run.** Tell the user which one applies.
+| ID | Rule | Check |
+|----|------|-------|
+| R1 | Write `[ui.status_line]` configurations exclusively to the resolved user `config.toml`, never repository-level files. | Inspect target config file path to ensure user configuration directory is used. |
+| R2 | Prompt for confirmation before writing when the user has not explicitly requested status line configuration. | Verify explicit user intent prior to modifying status line settings. |
+| R3 | Communicate effect timing clearly: table schema changes take effect at startup, custom scripts on the next execution cycle. | Confirm messaging to user distinguishes startup changes from next-run updates. |
+| R4 | Adhere strictly to the script contract for stdin JSON parsing, stdout budgets, timeouts, and ANSI escaping. | Test custom status script against contract constraints and output budget. |
 
 ## Routing
 

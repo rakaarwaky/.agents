@@ -11,6 +11,7 @@ Report to the user:
 7. **Worktree** — left in place. Post-merge/acceptance action:
 
    ```
+   # Resolve $ORCA (default /home/raka/.local/bin/orca-ide)
    "$ORCA" worktree rm --worktree <worktree_id> --force --json
    ```
 

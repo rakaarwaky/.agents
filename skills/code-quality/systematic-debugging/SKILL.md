@@ -28,48 +28,33 @@ metadata:
 
 For any technical issue — test failures, production bugs, build or performance problems — find the root cause before touching a fix. This file is the lane identification step only; the working method lives in `references/hermes/` and `references/grok/`.
 
-## Global Rules
+## Rules
 
-The lane is determined from a physical signal, not by self-identification. Each agent's launcher stamps a fixed attribution env var into every command it runs; the model cannot set these.
-
-```bash
-if [[ -n "${HERMES_AGENT:-}" ]]; then echo HERMES
-elif [[ -n "${GROK_AGENT:-}" ]]; then echo GROK
-else echo UNSET; fi
-```
-
-- `HERMES` → **Hermes lane.** Read `references/hermes/`. Stop.
-- `GROK` → **Grok lane.** Read `references/grok/`. Stop.
-- `UNSET` → stop and report. Do not guess the lane.
-
-Marker provenance:
-
-- **Hermes** re-exports `AI_AGENT=hermes-agent` and `HERMES_AGENT=true` on every command.
-- **Grok Build** runs with `GROK_AGENT=1`.
-
-Read only the winning lane's references. Do not read the other lane's.
+| ID | Rule | Check |
+|----|------|-------|
+| R1 | **Lane by physical signal.** Lane is determined from launcher env var (`HERMES_AGENT` -> Hermes lane; `GROK_AGENT` -> Grok lane; unset -> stop). Model cannot self-identify. | Signal evaluated via `[[ -n "${HERMES_AGENT:-}" ]]` / `[[ -n "${GROK_AGENT:-}" ]]`; UNSET halts immediately. |
+| R2 | **Winning lane isolation.** Read only the winning lane's references (`references/hermes/` or `references/grok/`). Do not cross-read the other lane. | Zero reads of the non-winning lane's files. |
+| R3 | **Iron law of root-cause.** No fix without root-cause investigation first (Steps 1–3). Proposing solutions before tracing data flow is strictly forbidden. | Step 1 investigation checklist satisfied before Step 4. |
+| R4 | **Iron law of TDD.** No production code without a failing regression test first. Watch the test fail (RED), make it pass with the minimal fix (GREEN), then refactor (REFACTOR). | Regression test observed RED before GREEN change is made. |
+| R5 | **Rule of three.** Stop after 3 failed fix attempts. A 4th attempt is forbidden without questioning the architecture and discussing with the user. | `fix_attempts` incremented; architecture review triggered when `fix_attempts >= 3`. |
+| R6 | **Diff discipline.** The fix commit must contain only the regression test and the minimal fix. Drive-by refactoring or unrelated changes are forbidden. | `git show --stat` lists only test and minimal fix files. |
+| R7 | **Clean tree verification.** Verification runs (regression test and full test suite) must execute against a clean committed worktree, never a dirty tree. | `git status --short` is clean before verification commands run. |
+| R8 | **Completion.** The run is done when: regression test is RED->GREEN, full suite passes, output is pristine with zero stray debug statements (`breakpoint()`, `dbg!()`, `console.log`), and final report is emitted. | Regression test passes; full suite green; cleanup grep returns zero hits. |
 
 ## Routing
 
-### Hermes lane (Steps 0–3)
-
-| Step | Reference                                                                              | Purpose                                                                                                  |
-| ----: | -------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
-| 0    | [`references/hermes/step-0-plan-and-spawn.md`](references/hermes/step-0-plan-and-spawn.md) | Detect lang; plan the brief (symptom, repro, phase, constraints, acceptance criteria); create the Orca worktree with `--agent grok`; drop `/systematic-debugging <issue-or-error>` |
-| 1    | [`references/hermes/step-1-wait-grok.md`](references/hermes/step-1-wait-grok.md)         | Wait for Grok to finish the pipeline; read its debug summary and commit                                 |
-| 2    | [`references/hermes/step-2-verify-and-ship.md`](references/hermes/step-2-verify-and-ship.md) | Verify the iron law (regression test present), re-run the gate on the clean tree; commit/push/PR as appropriate |
-| 3    | [`references/hermes/step-3-final-report.md`](references/hermes/step-3-final-report.md) | Final report to the user (root cause, fix, verification, open decisions, commit/PR, worktree teardown) |
-
-### Grok lane (Steps 0–6, run by Grok Build)
-
-| Step | Reference | Purpose |
-| ---- | --------- | ------- |
-| 0. Intake | [`references/grok/step-0-intake.md`](references/grok/step-0-intake.md) | Symptom statement, target lang, repro command, run state; iron-law gate; invocation. |
-| 1. Investigate | [`references/grok/step-1-investigate.md`](references/grok/step-1-investigate.md) | Read errors, build a tight red-capable loop, check recent changes, gather multi-component evidence, trace data flow. |
-| 2. Pattern | [`references/grok/step-2-pattern.md`](references/grok/step-2-pattern.md) | Minimize the repro, find working examples, compare against references, identify differences, understand dependencies. |
-| 3. Hypothesis | [`references/grok/step-3-hypothesis.md`](references/grok/step-3-hypothesis.md) | Form 3–5 ranked falsifiable hypotheses; test minimally, one variable at a time; pick the language debugger variant. |
-| 3a/3b/3c. Language debugger | [`step-3a-python-debugger.md`](references/grok/step-3a-python-debugger.md), [`step-3b-node-debugger.md`](references/grok/step-3b-node-debugger.md), [`step-3c-rust-debugger.md`](references/grok/step-3c-rust-debugger.md) | Python (pdb + debugpy), Node/TS (node inspect + CDP, profiles), Rust (dbg!, RUST_BACKTRACE, rust-gdb/lldb). |
-| 4. Implement | [`references/grok/step-4-implement.md`](references/grok/step-4-implement.md) | TDD cycle: RED failing test, GREEN single fix, per-language verify, REFACTOR; rule of three; question architecture at 3+ failures. |
-| 5. Verify & finish | [`references/grok/step-5-verify.md`](references/grok/step-5-verify.md) | Verification checklist, language cleanup pass (delegates to 5a/5b/5c), guardrails final pass, reporting format. |
-| 5a/5b/5c. Language verify | [`step-5a-python-verify.md`](references/grok/step-5a-python-verify.md), [`step-5b-node-verify.md`](references/grok/step-5b-node-verify.md), [`step-5c-rust-verify.md`](references/grok/step-5c-rust-verify.md) | Per-language verification + cleanup grep. |
-| 6. Guardrails | [`references/grok/step-6-guardrails.md`](references/grok/step-6-guardrails.md) | Red-flags list, common-rationalizations table, TDD rationale, TDD cycle detail; cross-cutting rules applied before reporting done. |
+| Lane | Step | Reference | Purpose |
+|------|------|-----------|---------|
+| Hermes | 0 | [`references/hermes/step-0-plan-and-spawn.md`](references/hermes/step-0-plan-and-spawn.md) | Detect lang; plan the brief (symptom, repro, phase, constraints, acceptance criteria); create the Orca worktree with `--agent grok`; drop `/systematic-debugging <issue-or-error>` |
+| Hermes | 1 | [`references/hermes/step-1-wait-grok.md`](references/hermes/step-1-wait-grok.md) | Wait for Grok to finish the pipeline; read its debug summary and commit |
+| Hermes | 2 | [`references/hermes/step-2-verify-and-ship.md`](references/hermes/step-2-verify-and-ship.md) | Verify the iron law (regression test present), re-run the gate on the clean tree; commit/push/PR as appropriate |
+| Hermes | 3 | [`references/hermes/step-3-final-report.md`](references/hermes/step-3-final-report.md) | Final report to the user (root cause, fix, verification, open decisions, commit/PR, worktree teardown) |
+| Grok | 0. Intake | [`references/grok/step-0-intake.md`](references/grok/step-0-intake.md) | Symptom statement, target lang, repro command, run state; iron-law gate; invocation. |
+| Grok | 1. Investigate | [`references/grok/step-1-investigate.md`](references/grok/step-1-investigate.md) | Read errors, build a tight red-capable loop, check recent changes, gather multi-component evidence, trace data flow. |
+| Grok | 2. Pattern | [`references/grok/step-2-pattern.md`](references/grok/step-2-pattern.md) | Minimize the repro, find working examples, compare against references, identify differences, understand dependencies. |
+| Grok | 3. Hypothesis | [`references/grok/step-3-hypothesis.md`](references/grok/step-3-hypothesis.md) | Form 3–5 ranked falsifiable hypotheses; test minimally, one variable at a time; pick the language debugger variant. |
+| Grok | 3a/3b/3c. Language debugger | [`step-3a-python-debugger.md`](references/grok/step-3a-python-debugger.md), [`step-3b-node-debugger.md`](references/grok/step-3b-node-debugger.md), [`step-3c-rust-debugger.md`](references/grok/step-3c-rust-debugger.md) | Python (pdb + debugpy), Node/TS (node inspect + CDP, profiles), Rust (dbg!, RUST_BACKTRACE, rust-gdb/lldb). |
+| Grok | 4. Implement | [`references/grok/step-4-implement.md`](references/grok/step-4-implement.md) | TDD cycle: RED failing test, GREEN single fix, per-language verify, REFACTOR; rule of three; question architecture at 3+ failures. |
+| Grok | 5. Verify & finish | [`references/grok/step-5-verify.md`](references/grok/step-5-verify.md) | Verification checklist, language cleanup pass (delegates to 5a/5b/5c), guardrails final pass, reporting format. |
+| Grok | 5a/5b/5c. Language verify | [`step-5a-python-verify.md`](references/grok/step-5a-python-verify.md), [`step-5b-node-verify.md`](references/grok/step-5b-node-verify.md), [`step-5c-rust-verify.md`](references/grok/step-5c-rust-verify.md) | Per-language verification + cleanup grep. |
+| Grok | 6. Guardrails | [`references/grok/step-6-guardrails.md`](references/grok/step-6-guardrails.md) | Red-flags list, common-rationalizations table, TDD rationale, TDD cycle detail; cross-cutting rules applied before reporting done. |

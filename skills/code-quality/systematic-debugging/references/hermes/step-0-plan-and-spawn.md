@@ -16,7 +16,7 @@ Grok has zero conversation context. Compose a brief covering:
 
 ## Create the Orca Worktree
 
-Resolve `$ORCA` (`$ORCA_CLI_COMMAND` if set, else `orca-ide` on Linux — never bare `orca`) and the owning repo (same resolution as the other lanes: `git -C <parent-dir> rev-parse --show-toplevel` on a path inside `<affected_paths>` or the current workspace cwd; tie-break preferring the standalone clone).
+Resolve `$ORCA` (`$ORCA_CLI_COMMAND` if set, else `/home/raka/.local/bin/orca-ide` — never bare `orca`). `$ORCA` is not exported by the shell, so `${ORCA}` expands to empty and bash reports `command not found`. Always call by the absolute path unless `$ORCA_CLI_COMMAND` is set. Resolve the owning repo (same resolution as the other lanes: `git -C <parent-dir> rev-parse --show-toplevel` on a path inside `<affected_paths>` or the current workspace cwd; tie-break preferring the standalone clone).
 
 ```
 "$ORCA" worktree create --repo path:<repo_path> --name debug-<issue-slug> --agent grok --no-parent --surface terminal --json
@@ -40,8 +40,8 @@ Send exactly this, once, via `orca terminal send --terminal <handle> --text "<br
 
 Confirm `accepted: true`. **After this send, do not send any more text to Grok.** A debugging run that needs a mid-run decision (a red-flag stop, a 3-failures architecture question) is Grok's to surface in its final report — not something you ping it about.
 
-## Report & Stop
+## Proceed to Step 1
 
-> Dropped /systematic-debugging into Grok Build at <worktree_path> (issue: <issue-or-error>, lang: <lang>). Waiting for completion.
+Do NOT end the turn after dropping the task. Hermes must stay active and proceed immediately to Step 1 in this session to wait and poll for Grok Build to finish:
 
-Then end the turn. When the Orca terminal becomes idle (detected when this conversation resumes), proceed to Step 1.
+> Dropped /systematic-debugging into Grok Build at <worktree_path> (issue: <issue-or-error>, lang: <lang>). Proceeding to Step 1 to wait for completion.

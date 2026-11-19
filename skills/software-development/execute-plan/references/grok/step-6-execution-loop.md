@@ -69,7 +69,7 @@ You are working in an isolated git worktree. Your current branch is `<pr.branch>
 Do not switch branches. Do not attempt to push to a remote. Just implement the changes and commit them locally.
 
 ## Task
-<design context and specific PR instructions>
+<plan context and specific PR instructions>
 
 ## Output Requirements
 1. Implement the changes described above.
