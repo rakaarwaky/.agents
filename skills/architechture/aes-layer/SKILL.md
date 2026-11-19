@@ -76,3 +76,4 @@ Every `reference/<layer>/<language>.md` HOW-TO must use identical H2 heading ord
 | [reference/test/python.md](reference/test/python.md) | Python test-suite HOW-TO — prefixes, run commands, coverage, verify |
 | [reference/test/rust.md](reference/test/rust.md) | Rust test-suite HOW-TO — prefixes, nextest, criterion, verify |
 | [reference/test/typescript.md](reference/test/typescript.md) | TypeScript test-suite HOW-TO — prefixes, vitest, coverage, verify |
+| [references/test-python-pitfalls.md](references/test-python-pitfalls.md) | Python test pitfalls — sys.path bootstrap, forkserver, GIT_CEILING_DIRECTORIES, stale assertions |

@@ -16,19 +16,19 @@ Invoke the helper from the workspace root (the default cwd for `run_terminal_com
 
 ### Read Path
 
-1. Run `sdc memory snapshot` via `run_terminal_command` and capture stdout. The helper prints structured JSON:
+1. Run `sdc memory top --n 10` via `run_terminal_command` and capture stdout. The helper prints structured JSON:
 
    ```json
    {
-     "common_issues": [
+     "patterns": [
        {"category": "Error Handling", "description": "Missing null check", "count": 5}
      ],
-     "recent_runs": [...],
+     "total": 12,
      "exists": true
    }
    ```
 
-   Store the `common_issues` list as `existing_patterns_snapshot`. Store the boolean `exists` as `memory_existed_before`.
+   Store the `patterns` list as `existing_patterns_snapshot`. Store the boolean `exists` as `memory_existed_before`.
 2. If the helper exits non-zero, log a brief note, set `past_issues_briefing` to `""`, `existing_patterns_snapshot` to `[]`, `memory_existed_before` to `false`, and proceed to Step 3.
 3. If `existing_patterns_snapshot` is empty (or `exists` is `false`), set `past_issues_briefing` to `""`.
 

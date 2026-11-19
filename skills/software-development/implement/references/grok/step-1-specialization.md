@@ -1,6 +1,6 @@
 # Step 1: Specialization Selection
 
-The reviewer panel is **fixed**: every run launches exactly **3 reviewers** — 1 General, 1 Tests, 1 Simplicity — regardless of task size or content. No specialization is conditional, nothing competes for slots, and none is ever dropped. This decision is made **before Step 3 (Implement)** and does not depend on the description. Always use the parallel-reviewer path (`len(reviewer_configs) >= 2` on every run) — **every run is multi-reviewer**, with individual review files and a merge on every run, and Simplicity is always in `reviewer_configs`.
+The reviewer panel is **fixed**: every run launches exactly **5 reviewers** — 1 General, 1 Tests, 1 Simplicity, 1 Lint, 1 User — regardless of task size or content. No specialization is conditional, nothing competes for slots, and none is ever dropped. This decision is made **before Step 3 (Implement)** and does not depend on the description. Always use the parallel-reviewer path (`len(reviewer_configs) >= 2` on every run) — **every run is multi-reviewer**, with individual review files and a merge on every run, and all 5 specialists are always in `reviewer_configs`.
 
 ### Specialization Catalog
 
@@ -9,10 +9,12 @@ The reviewer panel is **fixed**: every run launches exactly **3 reviewers** — 
 | **General** | `reviewer` | Code quality, bugs, naming, SOLID, style, security-relevant defects, and plan/requirement alignment of the implementation | Always (every run) |
 | **Tests** | None (prompt-only) | Test coverage, test quality, edge cases, mocking | Always (every run) |
 | **Simplicity** | None (prompt-only) | Over-engineering, extra helpers/files for one caller, unused abstractions, reinvented stdlib, YAGNI | Always (every run) |
+| **Lint** | None (prompt-only) | Running `lint-arwaky-cli` and project linters/formatters/typecheckers, flagging violations, syntax, formatting, and typing errors until 0 issues remain | Always (every run) |
+| **User** | None (prompt-only) | User POV: what the user wants, needs, and expects; UX/DX, CLI ergonomics, error messages, output clarity, and friction | Always (every run) |
 
 The security and plan-alignment concerns are folded into the General reviewer; they no longer get a dedicated specialist.
 
-**Note on persona injection:** The `Tests` and `Simplicity` specializations do NOT get persona instructions prepended — they rely entirely on the task prompt to define their behavior. This avoids a conflict between the `reviewer` persona's review focus and the specialist prompt's scope restriction.
+**Note on persona injection:** The `Tests`, `Simplicity`, `Lint`, and `User` specializations do NOT get persona instructions prepended — they rely entirely on the task prompt to define their behavior. This avoids a conflict between the `reviewer` persona's review focus and the specialist prompt's scope restriction.
 
 The `reviewer` persona instructions are prepended as-is for the general code quality review.
 
@@ -22,7 +24,7 @@ There is no selection algorithm and no input analysis — the composition is ide
 
 ```
 # Fixed panel — no input analysis, no slot allocation, no conditionals.
-PANEL = ["general", "tests", "simplicity"]  # 3 reviewers
+PANEL = ["general", "tests", "simplicity", "lint", "user"]  # 5 reviewers
 ```
 
 If the task is a typo fix or a doc-only change, the panel is unchanged — every specialist still runs and simply reports 0 issues if they find nothing in their scope.
@@ -34,7 +36,7 @@ Build `reviewer_configs` the same way on every run — one config per panel memb
 ```
 reviewer_configs = []
 
-for specialist in ["general", "tests", "simplicity"]:
+for specialist in ["general", "tests", "simplicity", "lint", "user"]:
     reviewer_configs.append({
         subagent_id: null,
         persona_to_inject: specialist == "general" ? "reviewer" : null,  # null = prompt-only, no persona prepended
@@ -43,14 +45,14 @@ for specialist in ["general", "tests", "simplicity"]:
     })
 ```
 
-The specialization-to-suffix mapping is: `general` → `general`, `tests` → `tests`, `simplicity` → `simplicity`.
+The specialization-to-suffix mapping is: `general` → `general`, `tests` → `tests`, `simplicity` → `simplicity`, `lint` → `lint`, `user` → `user`.
 
 There is exactly **one** general reviewer per run. The general reviewer's source tag in the merged review is `[General]`.
 
 ### Announce Specializations
 
 Announce the specialization choices to the user **once**, then move on. Example of a correct message:
-> "Review panel: 1 general + tests + simplicity (3 reviewers)."
+> "Review panel: 1 general + tests + simplicity + lint + user (5 reviewers)."
 
 Strict rules for this announcement:
 - This message describes **only the specialization selection**. Do **not** also claim that the implementer is being launched, that reviewers are starting, or that the run is "now running" — those statements belong to later steps, after the corresponding `spawn_subagent` calls.

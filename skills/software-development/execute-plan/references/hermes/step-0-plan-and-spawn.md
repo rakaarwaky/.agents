@@ -26,7 +26,7 @@ Grok has zero conversation context. Compose a brief covering:
 2. **DAG summary** — the validated `linearized_order` with each PR's id, slug, and dependencies. This is Grok's authoritative execution order; it must not re-derive or re-order.
 3. **Per-PR instructions** — for each PR, the `description`, `files/components affected`, and `dependencies` from the plan.
 4. **Constraints** — style, tests, repo conventions from AGENTS.md / CONTRIBUTING.md; out-of-scope list (any path the plan never named).
-5. **Acceptance criteria** — all PRs implemented, 3-reviewer panel (general, tests, simplicity) at 0 open issues on every PR, final branch assembled with all conflicts resolved, final PR opened as a draft to `main`.
+5. **Acceptance criteria** — all PRs implemented, 5-reviewer panel (general, tests, simplicity, lint, user) at 0 open issues on every PR, final branch assembled with all conflicts resolved, final PR opened as a draft to `main`.
 6. **Deliverable** — one final branch `execute-plan/<PLAN_ID>-final` with all PRs merged, one draft PR opened. Grok writes `exec-summary-<PLAN_ID>-<pr-id>.md` and `exec-review-<PLAN_ID>-<pr-id>.md` to its scratch dir for every PR, and `exec-plan-<PLAN_ID>.json` as the state file.
 
 ## Create the Orca Worktree

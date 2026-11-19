@@ -1,13 +1,13 @@
 ---
 name: implement
-description: "Run the implement → review → fix loop for a single small-to-medium task in one Orca worktree: Hermes plans the brief, drops /implement into Grok Build (Grok runs the full loop with its 3-reviewer panel), then Hermes verifies, commits, pushes, and opens the PR."
+description: "Run the implement → review → fix loop for a single small-to-medium task in one Orca worktree: Hermes plans the brief, drops /implement into Grok Build (Grok runs the full loop with its 5-reviewer panel), then Hermes verifies, commits, pushes, and opens the PR."
 when-to-use: "Use when asked to implement, build, add a feature, fix a bug, or via the /implement slash command. Best for tasks that fit in one worktree. For multi-PR stacks with dependencies, use /execute-plan instead."
 argument-hint: "<task-description>"
 ---
 
 # Implement Skill
 
-Execute a comprehensive implement-review-fix loop for a single task within an Orca worktree, orchestrating a 3-reviewer specialist panel and enforcing lint progress gates.
+Execute a comprehensive implement-review-fix loop for a single task within an Orca worktree, orchestrating a 5-reviewer specialist panel and enforcing lint progress gates.
 
 ## Rules
 
@@ -17,7 +17,7 @@ Execute a comprehensive implement-review-fix loop for a single task within an Or
 | R2 | Read only the winning lane's step files; never read or load files from the alternate lane. | Confirm references inspected match active execution lane. |
 | R3 | Never yield conversation turns passively after dispatching `/implement`; poll terminal status actively until completion. | Confirm active wait loop in Hermes lane until Orca terminal is idle or exited. |
 | R4 | Enforce lint progress gates bookending start and end of turn with `lint-arwaky-cli report .`; reject positive deltas. | Verify zero or negative issue delta between turn start and turn end. |
-| R5 | Require all 3 specialist reviewers to reach consensus with zero open issues before proceeding to PR creation. | Check merged reviewer findings report zero blocking issues. |
+| R5 | Require all 5 specialist reviewers to reach consensus with zero open issues before proceeding to PR creation. | Check merged reviewer findings report zero blocking issues. |
 
 ## Routing
 
@@ -28,10 +28,10 @@ Execute a comprehensive implement-review-fix loop for a single task within an Or
 | Hermes 2 | [`references/hermes/step-2-verify-and-ship.md`](references/hermes/step-2-verify-and-ship.md) | Verify Grok work (0 open issues, clean gate), commit, push, open PR |
 | Hermes 3 | [`references/hermes/step-3-final-report.md`](references/hermes/step-3-final-report.md) | Flush new issue patterns to workspace memory, final report to user |
 | Grok 0 | [`references/grok/step-0-setup.md`](references/grok/step-0-setup.md) | Host setup, shared file paths, orchestrator state, owning repo, worktree |
-| Grok 1 | [`references/grok/step-1-specialization.md`](references/grok/step-1-specialization.md) | Fixed 3-reviewer panel; build reviewer configs and announce |
+| Grok 1 | [`references/grok/step-1-specialization.md`](references/grok/step-1-specialization.md) | Fixed 5-reviewer panel; build reviewer configs and announce |
 | Grok 2 | [`references/grok/step-2-memory.md`](references/grok/step-2-memory.md) | Past-issues briefing from workspace memory file |
 | Grok 3 | [`references/grok/step-3-implement.md`](references/grok/step-3-implement.md) | Spawn implementer in worktree, prepare reviewer focus areas |
-| Grok 4 | [`references/grok/step-4-review.md`](references/grok/step-4-review.md) | Launch all 3 reviewers in parallel with specialized prompts |
+| Grok 4 | [`references/grok/step-4-review.md`](references/grok/step-4-review.md) | Launch all 5 reviewers in parallel with specialized prompts |
 | Grok 5 | [`references/grok/step-5-merge.md`](references/grok/step-5-merge.md) | Merge review findings, evaluate exit conditions and stalemates |
 | Grok 6 | [`references/grok/step-6-fix.md`](references/grok/step-6-fix.md) | Resume implementer to address identified issues |
 | Grok 7 | [`references/grok/step-7-rereview.md`](references/grok/step-7-rereview.md) | Re-run reviewers in parallel on updated changes |

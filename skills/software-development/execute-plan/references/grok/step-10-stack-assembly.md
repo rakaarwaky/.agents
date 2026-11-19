@@ -57,7 +57,7 @@ Create a final worktree (with `--agent grok` — the Grok Build TUI in the first
 orca-ide worktree create --repo path:<main_clone_path> --name <PLAN_ID>-final --base-branch <final_branch> --agent grok --no-parent --json
 ```
 
-Launch the 3-reviewer panel (General, Tests, Simplicity) in parallel. Merge their findings.
+Launch the 5-reviewer panel (General, Tests, Simplicity, Lint, User) in parallel. Merge their findings.
 If open issues exist, spawn a fixer subagent in the final worktree. The loop has a round cap of 3: run up to 3 rounds. If the loop stalls (same issues reappear in identical snapshots) or the cap is reached with unresolved issues, stop and ask the user for input. If the loop reaches 0 open issues, record `final_review_passed = true`.
 
 If 0 open issues: record `final_review_passed = true`.
@@ -103,7 +103,7 @@ fi)
 
 ## Test Plan
 
-- [ ] All modular PRs reviewed and approved (3-reviewer panel at 0 open issues each)
+- [ ] All modular PRs reviewed and approved (5-reviewer panel at 0 open issues each)
 - [ ] Final branch assembled with all conflicts resolved
 - [ ] Final review passed (0 open issues)
 EOF

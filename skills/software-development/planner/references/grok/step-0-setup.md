@@ -60,29 +60,28 @@ Injection timing: prepend the persona instructions on the initial launch only, n
 
 Before spawning any subagent, load the workspace's past issue patterns. The briefing is **injected, not enforced**, and the run never fails over memory.
 
-All memory operations go through `sdc memory <path|read|snapshot|update>`. The `sdc` launcher is on PATH at `~/.local/bin/sdc`; capture it once as `memory_cmd = "sdc memory"`. The helper is cwd-sensitive only for workspace-id derivation (it runs `git config --get remote.origin.url` and `git rev-parse --git-common-dir` in the cwd), so invoke it from the session's cwd — the worktree or main clone that owns the task's repo. Never `cd` to the skill's own directory before invoking it.
+All memory operations go through `sdc memory <path|read|top|update>`. The `sdc` launcher is on PATH at `~/.local/bin/sdc`; capture it once as `memory_cmd = "sdc memory"`. The helper is cwd-sensitive only for workspace-id derivation (it runs `git config --get remote.origin.url` and `git rev-parse --git-common-dir` in the cwd), so invoke it from the session's cwd — the worktree or main clone that owns the task's repo. Never `cd` to the skill's own directory before invoking it.
 
-1. Run `sdc memory snapshot` via `run_terminal_command` and capture stdout. Use the `snapshot` subcommand for programmatic reads — the `read` subcommand is for human inspection only. The helper prints structured JSON:
+1. Run `sdc memory top --n 10` via `run_terminal_command` and capture stdout. The `top` subcommand is the cheap read-only briefing query — it returns the count-desc top-10 patterns without parsing the full snapshot. The helper prints structured JSON:
 
    ```json
    {
-     "common_issues": [
-       {"category": "Error Handling", "description": "Missing null check", "count": 5}
+     "patterns": [
+       {"category": "Error Handling", "description": "Missing null check", "count": 5},
+       ...
      ],
-     "recent_runs": [
-       {"date": "2026-04-23", "description": "\"Add retry logic\"", "body_lines": ["- **Rounds**: 2", "- **Key patterns**: ..."]}
-     ],
+     "total": 12,
      "exists": true
    }
    ```
 
    Parse the JSON (no `jq`, no markdown re-parsing) and store orchestrator state:
-   - `existing_patterns_snapshot` — the `common_issues` list (used in the Step 7 flush to harmonize phrasing and reuse category names).
+   - `existing_patterns_snapshot` — the `patterns` list (used in the Step 7 flush to harmonize phrasing and reuse category names).
    - `memory_existed_before` — the `exists` boolean (report wording: "file created" vs "file updated").
    - `past_issues_briefing` — the briefing block (built below), or `""` when the snapshot is empty, does not exist, or the helper fails.
    - `plan_issue_patterns` — `[]`. One-line descriptions of distinct issues observed open in any review pass; appended at Step 3, flushed at Step 7.
 
-   The `recent_runs` array is for debugging and forward compatibility; the planner does not consume it.
+   The `total` field is the full pattern count (before the `--n 10` truncation); the planner does not consume it beyond the briefing.
 2. If `existing_patterns_snapshot` is non-empty, build `past_issues_briefing`:
    1. Filter to entries with `count >= 2` (one-off issues are excluded — they may not be real patterns).
    2. Sort by `count` descending; take the top 10.

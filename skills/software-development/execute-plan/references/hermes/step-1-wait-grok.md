@@ -1,6 +1,6 @@
 # Step 1: Wait for Grok to Finish
 
-Grok Build runs the full execution loop itself — per-PR worktrees, implementer subagents, the 3-reviewer panel per PR, fix rounds, failure cascades, final assembly — driven by its own `grok/` references. Hermes waits and does nothing else.
+Grok Build runs the full execution loop itself — per-PR worktrees, implementer subagents, the 5-reviewer panel per PR, fix rounds, failure cascades, final assembly — driven by its own `grok/` references. Hermes waits and does nothing else.
 
 ## Wait
 

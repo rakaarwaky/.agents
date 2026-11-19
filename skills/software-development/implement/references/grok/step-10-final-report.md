@@ -3,7 +3,7 @@
 When the review-fix loop reaches 0 open issues, memory is flushed (Step 8), and the PR is pushed (Step 9), present a final report:
 
 1. **Summary of what was implemented** — from the summary_file: which files were changed, what was added/modified, key plan decisions.
-2. **Review panel** — the fixed three-reviewer panel that ran: 1 general + tests + simplicity (3 reviewers).
+2. **Review panel** — the fixed five-reviewer panel that ran: 1 general + tests + simplicity + lint + user (5 reviewers).
 3. **Review rounds** — how many review→fix iterations it took to reach 0 issues (the value of `round_count`).
 4. **Total issues fixed** — the cumulative count from `total_issues_by_severity`, broken down by severity (bugs, suggestions, nits).
 5. **Issues by reviewer** — breakdown of how many issues each reviewer found across all rounds (by specialization tag).
@@ -33,7 +33,7 @@ sdc host cleanup <path> <path> ...
 |------|-------|
 | Implementation summary | `<scratch_dir>/impl-summary-<IMPL_ID>.md` |
 | Merged review | `<scratch_dir>/review-<IMPL_ID>.md` |
-| Per-reviewer reviews | `<scratch_dir>/review-<IMPL_ID>-<suffix>.md` (`general`, `tests`, `simplicity`) |
+| Per-reviewer reviews | `<scratch_dir>/review-<IMPL_ID>-<suffix>.md` (`general`, `tests`, `simplicity`, `lint`, `user`) |
 | Memory update spec | `<scratch_dir>/impl-mem-<IMPL_ID>.json` |
 
 ### Kept

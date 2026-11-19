@@ -38,7 +38,7 @@ Extract the `instructions` value from each file's top-level `instructions` field
 - `implementer_persona_instructions`
 - `reviewer_persona_instructions`
 
-When launching a subagent, **prepend** the appropriate persona instructions to its prompt. Do NOT pass a `persona` parameter to `spawn_subagent`. Prefix the `description` with a bracketed role tag (`[implementer]`, `[reviewer]`, `[tests]`, `[simplicity]`). Keep the tag on `resume_from` follow-ups.
+When launching a subagent, **prepend** the appropriate persona instructions to its prompt. Do NOT pass a `persona` parameter to `spawn_subagent`. Prefix the `description` with a bracketed role tag (`[implementer]`, `[reviewer]`, `[tests]`, `[simplicity]`, `[lint]`, `[user]`). Keep the tag on `resume_from` follow-ups.
 
 ## Host & Environment Setup
 

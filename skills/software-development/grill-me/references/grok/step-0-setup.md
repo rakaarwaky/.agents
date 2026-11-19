@@ -53,14 +53,14 @@ Host setup (`sdc host setup --subdir plan`) must run from inside the owning git 
 
 Before the branch walk, load the workspace's past issue patterns so the interview probes known recurring weaknesses. The briefing is **injected, not enforced**, and the run never fails over memory.
 
-All memory operations go through `sdc memory <path|read|snapshot|update>`; the launcher is on PATH at `~/.local/bin/sdc`. Capture it once as `memory_cmd = "sdc memory"`. The helper is cwd-sensitive only for workspace-id derivation (it runs `git config --get remote.origin.url` and `git rev-parse --git-common-dir` in the cwd), so invoke it from the owning repository — `cd <repo_path> && sdc memory snapshot` — never from the skill's own directory.
+All memory operations go through `sdc memory <path|read|top|update>`; the launcher is on PATH at `~/.local/bin/sdc`. Capture it once as `memory_cmd = "sdc memory"`. The helper is cwd-sensitive only for workspace-id derivation (it runs `git config --get remote.origin.url` and `git rev-parse --git-common-dir` in the cwd), so invoke it from the owning repository — `cd <repo_path> && sdc memory top --n 10` — never from the skill's own directory.
 
-1. Run `sdc memory snapshot` via `run_terminal_command` and parse the JSON on stdout. Store orchestrator state:
-   - `existing_patterns_snapshot` — the `common_issues` list (used in the Hermes Step 3 flush to harmonize phrasing and reuse category names).
+1. Run `sdc memory top --n 10` via `run_terminal_command` and parse the JSON on stdout. The `top` subcommand is the cheap read-only briefing query — it returns the count-desc top-10 patterns without parsing the full snapshot. Store orchestrator state:
+   - `existing_patterns_snapshot` — the `patterns` list (used in the Hermes Step 3 flush to harmonize phrasing and reuse category names).
    - `memory_existed_before` — the `exists` boolean (report wording: "file created" vs "file updated").
    - `past_issues_briefing` — the top-10 block of entries with `count >= 2` sorted by `count` descending, formatted as a "Known Recurring Issues in This Workspace" list (same shape as `planner/references/grok/step-0-setup.md` builds), or `""` when the snapshot is empty, does not exist, or the helper fails.
 
-   The `recent_runs` array is for debugging and forward compatibility; grill-me does not consume it.
+   The `total` field is the full pattern count (before the `--n 10` truncation); grill-me does not consume it beyond the briefing.
 
 2. When non-empty, `past_issues_briefing` seeds the Step 1 branch walk (Memory-Aware Probing). If the snapshot is empty or the helper exits non-zero, set `past_issues_briefing` to `""` and proceed — a missing memory file is not an error.
 

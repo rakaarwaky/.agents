@@ -57,7 +57,7 @@ Construct a JSON object with this shape (omit `run` only if you want to record p
     "rounds": 2,
     "issues_by_severity": {"bug": 1, "suggestion": 1, "nit": 5},
     "key_patterns": ["Missing entries in error-type allowlists", "Incomplete configuration validation"],
-    "specializations": ["general", "tests", "simplicity"]
+    "specializations": ["general", "tests", "simplicity", "lint", "user"]
   }
 }
 ```
@@ -74,7 +74,7 @@ Field notes (the helper rejects wrong-typed input with exit code 4 and a clear e
   - **Option A (recommended): severity-ranked.** Re-read the latest merged review_file (still on disk at this point in the loop). Each issue has a `Severity:` tag. Take 1-2 of the highest-severity issues first (bugs > suggestions > nits), then top up with the next-highest severity until you have 3 entries. This sees only **final-round survivors** (issues that the implementer actually had to address) which is the natural "most-significant" reading.
   - **Option B (fallback): recency-ranked.** Take the **last 2-3 entries** of `issue_patterns` (the list grows by appending per round in Step 5, so the tail is the most-recent round's issues). This sees **cross-round accumulation** including issues that were introduced and fixed mid-loop. Use this only if re-reading the review_file is impractical — the resulting `key_patterns` will sometimes include issues that ended up wontfix or were ephemeral.
   - **Pick one option and stick with it for the run.** The two options return semantically different sets, so mixing them across runs makes the Recent Runs log inconsistent.
-- `run.specializations`: must be a list of strings (or `null`/omitted to skip the `**Specializations used**` body line). The panel is fixed, so this is always the full set: `["general", "tests", "simplicity"]`; deduplicate. Include `simplicity` (always).
+- `run.specializations`: must be a list of strings (or `null`/omitted to skip the `**Specializations used**` body line). The panel is fixed, so this is always the full set: `["general", "tests", "simplicity", "lint", "user"]`; deduplicate. Include `simplicity`, `lint`, and `user` (always).
 
 ### Step 8d: Invoke the Helper
 
@@ -162,7 +162,7 @@ The helper writes a markdown file with this structure:
 - **Rounds**: 3
 - **Issues**: 12 total (3 bugs, 4 suggestions, 5 nits)
 - **Key patterns**: Missing expiration/TTL validation on tokens, missing rate limiting on new endpoints, missing tests for error/edge case paths
-- **Specializations used**: general, tests, simplicity
+- **Specializations used**: general, tests, simplicity, lint, user
 ```
 
 Notes on the format:

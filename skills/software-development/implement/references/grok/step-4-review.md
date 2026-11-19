@@ -3,7 +3,7 @@
 
 **Use `spawn_subagent` only** — do not review code yourself.
 
-Always use the parallel-reviewer path — every run is multi-reviewer, with individual review files and a merge on every run. The panel is fixed at 3 reviewers (general, tests, simplicity), and Simplicity is always in `reviewer_configs`.
+Always use the parallel-reviewer path — every run is multi-reviewer, with individual review files and a merge on every run. The panel is fixed at 5 reviewers (general, tests, simplicity, lint, user), and all 5 specialists are always in `reviewer_configs`.
 
 ### Parallel Reviewers
 
@@ -11,11 +11,11 @@ Launch all reviewers in parallel by calling the subagent-spawn tool with `backgr
 
 For each config in `reviewer_configs`, launch with the appropriate prompt for the specialization.
 
-**Parameters (verify against the tool schema at dispatch time; the set is backend-dependent).** The spawn tool in this environment is `delegate_task`-shaped: its `tasks[]` entries take `goal` (the prompt body) and `context` (background, worktree path, file paths) — and on the default delegation backend there is NO `description`, `subagent_type`, `cwd`, `background`, or `persona` field: `cwd` is carried by the `context` text (each child is told the worktree path and told to work only there), `background` is implicit (children run in background and results re-enter the conversation as a new message when they finish), and tag/labeling (e.g. `[reviewer]`, `[tests]`, `[simplicity]`) goes into the `goal` text. The skill's canonical parameter table (`subagent_type`, `background`, `cwd`, `description`) describes a richer launcher; when that schema is not what the runtime offers, do not stall — adapt: put everything the parameters were meant to carry into `goal` + `context`, and emit the calls in ONE batched array. A batched call whose entries name unsupported fields is rejected whole; re-emit without them rather than serializing.
+**Parameters (verify against the tool schema at dispatch time; the set is backend-dependent).** The spawn tool in this environment is `delegate_task`-shaped: its `tasks[]` entries take `goal` (the prompt body) and `context` (background, worktree path, file paths) — and on the default delegation backend there is NO `description`, `subagent_type`, `cwd`, `background`, or `persona` field: `cwd` is carried by the `context` text (each child is told the worktree path and told to work only there), `background` is implicit (children run in background and results re-enter the conversation as a new message when they finish), and tag/labeling (e.g. `[reviewer]`, `[tests]`, `[simplicity]`, `[lint]`, `[user]`) goes into the `goal` text. The skill's canonical parameter table (`subagent_type`, `background`, `cwd`, `description`) describes a richer launcher; when that schema is not what the runtime offers, do not stall — adapt: put everything the parameters were meant to carry into `goal` + `context`, and emit the calls in ONE batched array. A batched call whose entries name unsupported fields is rejected whole; re-emit without them rather than serializing.
 
-Batch every independent launch (all 3 reviewers) into a single tool response — parallel-first; serialize only true dependencies.
+Batch every independent launch (all 5 reviewers) into a single tool response — parallel-first; serialize only true dependencies.
 
-If `config.persona_to_inject` is non-null, prepend the corresponding persona instructions to the prompt. If null (Tests, Simplicity), use the prompt as-is — those specializations are prompt-only.
+If `config.persona_to_inject` is non-null, prepend the corresponding persona instructions to the prompt. If null (Tests, Simplicity, Lint, User), use the prompt as-is — those specializations are prompt-only.
 
 Use the specialization-specific prompt (see Specialized Review Prompts below).
 
@@ -25,7 +25,7 @@ Save each returned `subagent_id` to the corresponding `reviewer_configs` entry.
 
 If any reviewer fails on initial launch:
 - If the **general reviewer** fails: report the error and stop entirely.
-- If the **tests** or **simplicity** reviewer fails: report a warning, remove that entry from `reviewer_configs`, and continue with remaining reviewers.
+- If the **tests**, **simplicity**, **lint**, or **user** reviewer fails: report a warning, remove that entry from `reviewer_configs`, and continue with remaining reviewers.
 
 After all reviewers complete, proceed to Step 5 (Merge & Check).
 
@@ -122,6 +122,65 @@ Map findings:
 A single complementary test or assert-based check is not bloat; never flag tests for deletion.
 
 Stay in lane. Use the same structured output as other specialists (`bug`/`suggestion`/`nit`, file:line, description, suggestion, Status: open). Do not invent a new severity taxonomy.
+
+Write your review notes to: <individual_review_file>
+Use the structured format with severity (bug/suggestion/nit), file:line, description, suggestion, and status for each issue.
+Every issue must have a Status field set to "open".
+```
+
+#### Lint Specialist
+
+Inject: none (prompt-only subagent — no persona prepended).
+
+```
+You are a meticulous lint and code hygiene specialist reviewing the implementer's changes.
+
+The implementer's summary is at: <summary_file>
+Read it to understand what was changed.
+
+<if past_issues_briefing is non-empty, include the following block verbatim:>
+<past_issues_briefing>
+<end if>
+
+Your primary duty is to run and evaluate linting tools — specifically our linting tool `lint-arwaky-cli` (`lint-arwaky-cli scan .`, `lint-arwaky-cli report .`) as well as any repo-level linters, formatters, and type-checkers (e.g. `ruff check`, `clippy`, `eslint`, `tsc --noEmit`, etc.) — to detect any lint, formatting, typing, or architecture rule violations (AES rules AES1xx–AES7xx), and drive every issue down to 0.
+
+Your review should focus on:
+- Running `lint-arwaky-cli scan .` and verifying that 0 rule violations exist in modified code.
+- Checking that no new lint regressions or warnings are introduced (verify against `lint-arwaky-cli report .`).
+- Inspecting formatting, import order, dead imports, unused variables, and typing consistency.
+- Ensuring repository linter commands exit with code 0 cleanly.
+
+Stay in lane: focus strictly on linting, formatting, type diagnostics, and architectural rule compliance. Do NOT review for general business logic or user requirements — other reviewers handle those.
+
+Write your review notes to: <individual_review_file>
+Use the structured format with severity (bug/suggestion/nit), file:line, description, suggestion, and status for each issue.
+Every issue must have a Status field set to "open".
+```
+
+#### User Specialist (User POV / UX)
+
+Inject: none (prompt-only subagent — no persona prepended).
+
+```
+You are a dedicated user advocate reviewing the implementer's changes strictly from the end-user perspective.
+
+The implementer's summary is at: <summary_file>
+Read it to understand what was changed.
+
+<if past_issues_briefing is non-empty, include the following block verbatim:>
+<past_issues_briefing>
+<end if>
+
+Your primary duty is evaluating the changes from the user POV: what the user wants, what the user needs, and what the user expects. Ensure the implementation improves the user experience and eliminates user friction.
+
+Your review should focus on:
+- User expectations: Does the feature/fix behave exactly as an end-user would expect? Are there counter-intuitive behaviors or surprise breaking changes?
+- Usability & ergonomics: Are CLI flags, arguments, commands, API signatures, or UI workflows intuitive and easy to use?
+- Error messaging & feedback: When the user makes a mistake or an operation fails, are error messages clear, actionable, and user-friendly (not cryptic stack traces or silent failures)?
+- User documentation & guidance: Are help texts, examples, man/doc explanations, or output formatting clear, helpful, and concise?
+- Edge cases from a user standpoint: What happens when the user provides empty inputs, invalid formats, or cancels an operation?
+
+Stay in lane: focus strictly on user experience, ergonomics, clarity, and satisfaction from the user POV. Do NOT review internal code style or unit test mocking — other reviewers handle those.
 
 Write your review notes to: <individual_review_file>
 Use the structured format with severity (bug/suggestion/nit), file:line, description, suggestion, and status for each issue.

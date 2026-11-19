@@ -386,7 +386,7 @@
     },
     {
       "name": "execute-plan",
-      "description": "Executes a PR Plan DAG end-to-end: Hermes validates the plan and drops /execute-plan into Grok Build (Grok runs parallel Orca worktrees, implementers, the 3-reviewer panel, fix loops, and final assembly), then Hermes verifies the final branch and ships the PR.",
+      "description": "Executes a PR Plan DAG end-to-end: Hermes validates the plan and drops /execute-plan into Grok Build (Grok runs parallel Orca worktrees, implementers, the 5-reviewer panel, fix loops, and final assembly), then Hermes verifies the final branch and ships the PR.",
       "when_to_use": "Use for /execute-plan <plan-doc-path> [--resume <PLAN_ID>], execute plan, run the plan, implement the plan, or after /planner (or /plan) produces a PR plan.",
       "category": "software-development"
     },
@@ -398,7 +398,7 @@
     },
     {
       "name": "implement",
-      "description": "Run the implement → review → fix loop for a single small-to-medium task in one Orca worktree: Hermes plans the brief, drops /implement into Grok Build (Grok runs the full loop with its 3-reviewer panel), then Hermes verifies, commits, pushes, and opens the PR.",
+      "description": "Run the implement → review → fix loop for a single small-to-medium task in one Orca worktree: Hermes plans the brief, drops /implement into Grok Build (Grok runs the full loop with its 5-reviewer panel), then Hermes verifies, commits, pushes, and opens the PR.",
       "when_to_use": "Use when asked to implement, build, add a feature, fix a bug, or via the /implement slash command. Best for tasks that fit in one worktree. For multi-PR stacks with dependencies, use /execute-plan instead.",
       "category": "software-development"
     },

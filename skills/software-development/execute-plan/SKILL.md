@@ -1,6 +1,6 @@
 ---
 name: execute-plan
-description: "Executes a PR Plan DAG end-to-end: Hermes validates the plan and drops /execute-plan into Grok Build (Grok runs parallel Orca worktrees, implementers, the 3-reviewer panel, fix loops, and final assembly), then Hermes verifies the final branch and ships the PR."
+description: "Executes a PR Plan DAG end-to-end: Hermes validates the plan and drops /execute-plan into Grok Build (Grok runs parallel Orca worktrees, implementers, the 5-reviewer panel, fix loops, and final assembly), then Hermes verifies the final branch and ships the PR."
 when-to-use: "Use for /execute-plan <plan-doc-path> [--resume <PLAN_ID>], execute plan, run the plan, implement the plan, or after /planner (or /plan) produces a PR plan."
 argument-hint: "<plan-doc-path> | --resume <PLAN_ID>"
 ---
@@ -17,7 +17,7 @@ Orchestrate a PR Plan DAG end-to-end across parallel Orca worktrees, driving imp
 | R2 | Read only the winning lane's step files; never read or load files from the alternate lane. | Confirm references inspected match active execution lane. |
 | R3 | Validate the PR Plan DAG using `sdc validate-plan` before dispatching worktrees or subagents. | Check plan validation command exit code before spawning implementers. |
 | R4 | Enforce modular branch creation and linearized merge ordering to prevent integration conflicts. | Verify branch preparation sequence follows DAG topological sort. |
-| R5 | Require full reviewer panel sign-off (0 open issues) on every modular branch before stack assembly. | Inspect reviewer verdict files for zero blocking issues prior to merge. |
+| R5 | Require full reviewer panel sign-off (5 reviewers, 0 open issues) on every modular branch before stack assembly. | Inspect reviewer verdict files for zero blocking issues prior to merge. |
 
 ## Routing
 

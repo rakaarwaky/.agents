@@ -1,14 +1,14 @@
 # Step 5: Merge & Check Exit Condition
 
 
-Always merge. Every run has the fixed three-reviewer panel (general, tests, simplicity).
+Always merge. Every run has the fixed five-reviewer panel (general, tests, simplicity, lint, user).
 
 ### Merge
 
 After all reviewers complete:
 
 1. Read each reviewer's individual review file.
-2. Merge into the single `review_file` with source tags. Prefix each issue with a tag indicating its source: `[General]`, `[Tests]`, `[Simplicity]`. Every run uses all three tags.
+2. Merge into the single `review_file` with source tags. Prefix each issue with a tag indicating its source: `[General]`, `[Tests]`, `[Simplicity]`, `[Lint]`, `[User]`. Every run uses all five tags.
 3. Consolidate obviously duplicated findings — use your judgment to identify issues that reference the same file, same line, and the same underlying problem. When in doubt, keep both issues — false duplicates are worse than redundant findings.
 4. Write the merged result to `review_file`.
 
@@ -43,6 +43,18 @@ Before deciding the round's outcome, audit the worktree diff against the resolve
 - **File**: src/handler.rs:60
 - **Description**: Helper function used by one caller only
 - **Suggestion**: Inline the helper
+- **Status**: open
+
+### Issue 4 [Lint] — Severity: suggestion
+- **File**: src/handler.rs:12
+- **Description**: Unused import and formatting violation flagged by linter
+- **Suggestion**: Remove unused import and run formatter
+- **Status**: open
+
+### Issue 5 [User] — Severity: suggestion
+- **File**: src/cli.rs:88
+- **Description**: Error message prints raw internal error instead of actionable user guidance
+- **Suggestion**: Provide helpful user-facing error message explaining how to fix the input
 - **Status**: open
 ```
 

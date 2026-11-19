@@ -2,17 +2,19 @@
 
 ## Step 7: Orchestrator-Level Review
 
-After each PR's implementation completes successfully, the orchestrator launches the **fixed 3-reviewer panel** targeting the implementer's worktree: 1 General, 1 Tests, 1 Simplicity. Independent review is mandatory for every PR -- there is no self-review-only mode. The panel is identical for every PR and every run:
+After each PR's implementation completes successfully, the orchestrator launches the **fixed 5-reviewer panel** targeting the implementer's worktree: 1 General, 1 Tests, 1 Simplicity, 1 Lint, 1 User. Independent review is mandatory for every PR -- there is no self-review-only mode. The panel is identical for every PR and every run:
 
 | Reviewer | Persona | Focus |
 |----------|---------|-------|
 | General | `reviewer` | Code quality, bugs, naming, SOLID, style, security-relevant defects, and plan-alignment of this PR's implementation to its plan-doc scope |
 | Tests | none (prompt-only) | Test coverage, test quality, edge cases, mocking |
 | Simplicity | none (prompt-only) | Over-engineering, unused abstractions, YAGNI |
+| Lint | none (prompt-only) | Running `lint-arwaky-cli` and project linters/formatters/type-checkers to detect rule violations, syntax, formatting, and typing errors until 0 issues remain |
+| User | none (prompt-only) | User POV: evaluating what the user wants, needs, and expects; UX/DX, CLI ergonomics, error messages, output clarity, and friction |
 
-The security and plan-alignment concerns are folded into the General reviewer, and the Tests and Simplicity specialists are prompt-only. There are no effort levels, no slot allocation, and no conditional selection — the composition is identical on every PR.
+The security and plan-alignment concerns are folded into the General reviewer, and the Tests, Simplicity, Lint, and User specialists are prompt-only. There are no effort levels, no slot allocation, and no conditional selection — the composition is identical on every PR.
 
-The review-fix loop (Steps 7b/7c) runs per PR until **all** of that PR's reviewers report 0 open issues in the same round. The loop has a **round cap of 5** per PR: if 5 rounds pass without 0 open issues, mark the PR as `failed` with reason `"review round cap exceeded"` and proceed to the next PR. Reviewer fan-out is per PR and is **independent of `max_concurrent`**, which caps only implementation subagents — each PR has exactly 3 reviewers running in parallel.
+The review-fix loop (Steps 7b/7c) runs per PR until **all** of that PR's reviewers report 0 open issues in the same round. The loop has a **round cap of 5** per PR: if 5 rounds pass without 0 open issues, mark the PR as `failed` with reason `"review round cap exceeded"` and proceed to the next PR. Reviewer fan-out is per PR and is **independent of `max_concurrent`**, which caps only implementation subagents — each PR has exactly 5 reviewers running in parallel.
 
 ### Step 7.0: Per-PR Reviewer Setup (Specialization Selection)
 
@@ -21,7 +23,7 @@ This step runs for **every** PR — populate `pr.reviewer_configs` as follows (p
 **Build `pr.reviewer_configs`** (one entry per reviewer, in panel order):
 
 ```
-PANEL = ["general", "tests", "simplicity"]  # 3 reviewers
+PANEL = ["general", "tests", "simplicity", "lint", "user"]  # 5 reviewers
 
 pr.reviewer_configs = []
 for specialist in PANEL:
@@ -33,13 +35,13 @@ for specialist in PANEL:
     })
 ```
 
-Suffix map: `general` → `general`, `tests` → `tests`, `simplicity` → `simplicity`. Merged-review source tags: `[General]`, `[Tests]`, `[Simplicity]`.
+Suffix map: `general` → `general`, `tests` → `tests`, `simplicity` → `simplicity`, `lint` → `lint`, `user` → `user`. Merged-review source tags: `[General]`, `[Tests]`, `[Simplicity]`, `[Lint]`, `[User]`.
 
-Announce the per-PR choice once, e.g. `"<pr.id> review: 1 general + tests + simplicity."` Persist `pr.reviewer_configs` to the state file.
+Announce the per-PR choice once, e.g. `"<pr.id> review: 1 general + tests + simplicity + lint + user (5 reviewers)."` Persist `pr.reviewer_configs` to the state file.
 
 ### Step 7a: Launch Reviewer(s)
 
-Always launch all 3 reviewers in `pr.reviewer_configs` in parallel. See *Parallel reviewers* and *Specialized Review Prompts* below.
+Always launch all 5 reviewers in `pr.reviewer_configs` in parallel. See *Parallel reviewers* and *Specialized Review Prompts* below.
 
 Before launching the reviewers, read the PR's implementation summary at `${scratch_dir}/exec-summary-<PLAN_ID>-<pr.id>.md`. Based on it, identify 2-3 concrete areas the reviewers should pay extra attention to (e.g., "Verify error paths are tested", "Check that callers of renamed functions were updated"). Store as `reviewer_focus_areas` for this PR; include it in every reviewer prompt for this PR.
 
@@ -50,15 +52,15 @@ Launch every config in `pr.reviewer_configs` in parallel with `background: true`
 `spawn_subagent` parameters:
 - `cwd`: `<pr.worktree_path>`
 - `background`: `true`
-- `description`: `"[<tag>] <pr.id>: <specialization>"` where `<tag>` is `[reviewer]` for `general`, `[tests]` for tests, `[simplicity]` for simplicity. The bracketed tag drives the pager row label.
+- `description`: `"[<tag>] <pr.id>: <specialization>"` where `<tag>` is `[reviewer]` for `general`, `[tests]` for tests, `[simplicity]` for simplicity, `[lint]` for lint, `[user]` for user. The bracketed tag drives the pager row label.
 
-If `config.persona_to_inject` is non-null, **prepend** that persona's instructions (`reviewer` for the general reviewer); if null (Tests, Simplicity), use the prompt as-is — those are prompt-only. Each reviewer writes to **its own** `config.review_file` (never the merged file), so parallel writes never collide. Use the matching prompt from *Specialized Review Prompts* below.
+If `config.persona_to_inject` is non-null, **prepend** that persona's instructions (`reviewer` for the general reviewer); if null (Tests, Simplicity, Lint, User), use the prompt as-is — those are prompt-only. Each reviewer writes to **its own** `config.review_file` (never the merged file), so parallel writes never collide. Use the matching prompt from *Specialized Review Prompts* below.
 
 After launching all reviewers, wait for all to complete via `get_command_or_subagent_output` with every reviewer `task_id` in the `task_ids` array and a positive `timeout_ms` (there is no `block` parameter). Save each returned `subagent_id` into its `pr.reviewer_configs` entry.
 
 If a reviewer fails on initial launch:
 - If the **general** reviewer (`specialization == "general"`) fails: mark the PR `"failed"`, cascade-skip dependents (Step 8), and return to the loop **without merging** — do NOT proceed to Step 7b.
-- If the **tests** or **simplicity** reviewer fails: warn, drop that entry from `pr.reviewer_configs`, and continue with the remaining reviewers.
+- If the **tests**, **simplicity**, **lint**, or **user** reviewer fails: warn, drop that entry from `pr.reviewer_configs`, and continue with the remaining reviewers.
 
 Only if the general reviewer succeeded, proceed to Step 7b (merge).
 
@@ -135,9 +137,58 @@ Write review findings to: <individual_review_file>
 Use the structured format (severity bug|suggestion|nit; File; Description; Suggestion; Status: open).
 ```
 
+**Lint Specialist** — inject none (prompt-only):
+```
+You are a meticulous lint and code hygiene specialist reviewing the changes for <pr.id>: <pr.title>.
+
+The implementation summary is at: ${scratch_dir}/exec-summary-<PLAN_ID>-<pr.id>.md
+
+Your primary duty is to run and evaluate linting tools — specifically our linting tool `lint-arwaky-cli` (`lint-arwaky-cli scan .`, `lint-arwaky-cli report .`) as well as repo-level linters, formatters, and type-checkers (e.g. `ruff check`, `clippy`, `eslint`, `tsc --noEmit`, etc.) — to detect any lint, formatting, typing, or architecture rule violations (AES rules AES1xx–AES7xx), and drive every issue down to 0.
+
+Focus on:
+- Running `lint-arwaky-cli scan .` and verifying that 0 rule violations exist in this PR's modified code.
+- Checking that no new lint regressions or warnings are introduced (verify against `lint-arwaky-cli report .`).
+- Inspecting formatting, import order, dead imports, unused variables, and typing consistency.
+- Ensuring repository linter commands exit with code 0 cleanly.
+
+Stay in lane: focus strictly on linting, formatting, type diagnostics, and architectural rule compliance. Do NOT review for general business logic or user requirements -- other reviewers handle those.
+
+<past_issues_briefing block if non-empty>
+<user_instructions block if non-empty>
+<reviewer_focus_areas block if non-empty>
+
+Write review findings to: <individual_review_file>
+Use the structured format (severity bug|suggestion|nit; File; Description; Suggestion; Status: open).
+```
+
+**User Specialist (User POV / UX)** — inject none (prompt-only):
+```
+You are a dedicated user advocate reviewing the changes for <pr.id>: <pr.title> strictly from the end-user perspective.
+
+The implementation summary is at: ${scratch_dir}/exec-summary-<PLAN_ID>-<pr.id>.md
+
+Your primary duty is evaluating the changes from the user POV: what the user wants, what the user needs, and what the user expects. Ensure the implementation improves the user experience and eliminates user friction.
+
+Focus on:
+- User expectations: Does this PR behave exactly as an end-user would expect? Are there counter-intuitive behaviors or surprise breaking changes?
+- Usability & ergonomics: Are CLI flags, arguments, commands, API signatures, or UI workflows intuitive and easy to use?
+- Error messaging & feedback: When the user makes a mistake or an operation fails, are error messages clear, actionable, and user-friendly?
+- User documentation & guidance: Are help texts, examples, docstrings, or output formatting clear, helpful, and concise?
+- Edge cases from a user standpoint: What happens when the user provides empty inputs, invalid formats, or cancels an operation?
+
+Stay in lane: focus strictly on user experience, ergonomics, clarity, and satisfaction from the user POV. Do NOT review internal code style or unit test mocking -- other reviewers handle those.
+
+<past_issues_briefing block if non-empty>
+<user_instructions block if non-empty>
+<reviewer_focus_areas block if non-empty>
+
+Write review findings to: <individual_review_file>
+Use the structured format (severity bug|suggestion|nit; File; Description; Suggestion; Status: open).
+```
+
 ### Step 7b: Check / Merge Review Results
 
-Read each reviewer's individual `config.review_file`, then merge them into the single merged review file `${scratch_dir}/exec-review-<PLAN_ID>-<pr.id>.md` using the `write` tool. Prefix each issue with its source tag (`[General]`, `[Tests]`, `[Simplicity]`). Consolidate obviously duplicated findings (same file, same line, same underlying problem) using judgment — when in doubt, keep both. The merged file is what the implementer reads in Step 7c. Merge format:
+Read each reviewer's individual `config.review_file`, then merge them into the single merged review file `${scratch_dir}/exec-review-<PLAN_ID>-<pr.id>.md` using the `write` tool. Prefix each issue with its source tag (`[General]`, `[Tests]`, `[Simplicity]`, `[Lint]`, `[User]`). Consolidate obviously duplicated findings (same file, same line, same underlying problem) using judgment — when in doubt, keep both. The merged file is what the implementer reads in Step 7c. Merge format:
 
 ```markdown
 # Merged Review: <pr.id> — <pr.title>
@@ -155,6 +206,16 @@ Read each reviewer's individual `config.review_file`, then merge them into the s
 
 ## [Simplicity]
 (no issues found)
+
+## [Lint]
+### Issue 1 -- Severity: suggestion
+- **File**: path/to/file.ext:LINE
+- **Description**: Formatting violation flagged by linter
+- **Suggestion**: Reformat file to adhere to repo style
+- **Status**: open
+
+## [User]
+(no issues found)
 ```
 
 After merging, count the total open issues across all source tags. This count drives the fix loop in Step 7c.
@@ -165,17 +226,17 @@ If the merged review has open issues:
 
 1. Spawn a fixer subagent in `<pr.worktree_path>` seeded with the implementer persona and the merged review file `${scratch_dir}/exec-review-<PLAN_ID>-<pr.id>.md`. The fixer implements fixes and commits locally on `<pr.branch>` (subject to the *subagent boundary*, Step 0).
 2. Re-run Rules 1 & 2 (fetch + record `pr.commit_sha`) from `step-0-setup.md` so the orchestrator's main repo sees the fix commits.
-3. Re-launch all 3 reviewers in parallel (resume with `resume_from` where `config.subagent_id` is set, fresh spawn otherwise).
+3. Re-launch all 5 reviewers in parallel (resume with `resume_from` where `config.subagent_id` is set, fresh spawn otherwise).
 4. Re-merge. Loop to step 1 while any reviewer reports open issues.
 
-When all 3 reviewers report 0 open issues in the same round, the PR is complete: set `pr.review_rounds` and mark the PR `"completed"`. Extract a one-line description of each issue seen this round into `issue_patterns` (deduplicated) and update `total_issues_by_severity` for the memory flush (Step 12).
+When all 5 reviewers report 0 open issues in the same round, the PR is complete: set `pr.review_rounds` and mark the PR `"completed"`. Extract a one-line description of each issue seen this round into `issue_patterns` (deduplicated) and update `total_issues_by_severity` for the memory flush (Step 12).
 
 If a re-reviewer fails and cannot be resumed, apply the Step 7a reviewer-failure rules unchanged.
 
 ## In-Progress Reporting
 
-- After per-PR reviewer setup: `"<pr.id> review: 1 general + tests + simplicity."`
-- After all of a PR's reviewers complete: `"<pr.id>: all 3 reviewers complete. Merging findings..."`
+- After per-PR reviewer setup: `"<pr.id> review: 1 general + tests + simplicity + lint + user (5 reviewers)."`
+- After all of a PR's reviewers complete: `"<pr.id>: all 5 reviewers complete. Merging findings..."`
 - After review (0 issues): `"<pr.id> review: 0 issues found. PR complete."`
 - After review (N issues): `"<pr.id> merged review: <N> issues (<X> bugs [tag breakdown], <Y> suggestions, <Z> nits). Fixing..."`
-- After fix cycle: `"<pr.id> fix applied. Re-reviewing with 3 reviewers (round <N>)..."`
+- After fix cycle: `"<pr.id> fix applied. Re-reviewing with 5 reviewers (round <N>)..."`

@@ -23,23 +23,20 @@ Invoke the helper from the run's worktree after Step 0 (Setup & Worktree Isolati
 
 ### Read Path
 
-1. Run `cd <worktree_path> && sdc memory snapshot` via `run_terminal_command` and capture stdout. Use the `snapshot` subcommand for reads — the `read` subcommand is for human inspection only. The helper prints structured JSON — no markdown re-parsing in the orchestrator. The shape is:
+1. Run `cd <worktree_path> && sdc memory top --n 10` via `run_terminal_command` and capture stdout. The `top` subcommand is the cheap read-only briefing query — it returns the count-desc top-10 patterns without parsing the full snapshot. The helper prints structured JSON — no markdown re-parsing in the orchestrator. The shape is:
 
    ```json
    {
-     "common_issues": [
+     "patterns": [
        {"category": "Error Handling", "description": "Missing null check", "count": 5},
        ...
      ],
-     "recent_runs": [
-       {"date": "2026-04-23", "description": "\"Add retry logic\"", "body_lines": ["- **Rounds**: 2", "- **Issues**: 7 total (1 bug, 1 suggestion, 5 nits)", "- **Key patterns**: Missing entries in error-type allowlists, incomplete configuration validation", "- **Specializations used**: general, tests, simplicity"]},
-       ...
-     ],
+     "total": 12,
      "exists": true
    }
    ```
 
-   Parse the JSON and store the `common_issues` list as `existing_patterns_snapshot` (used in Step 8b). Store the boolean `exists` as `memory_existed_before` (used in the Final Report to decide between "file created" and "file updated" wording). The `recent_runs` array is included in the snapshot for debugging and forward compatibility (parse `.recent_runs` from the JSON yourself; do not invoke `jq`). The orchestrator does not currently consume it. Each entry's `body_lines` are the verbatim markdown bullets (leading `- ` and `**...**` formatting preserved).
+   Parse the JSON and store the `patterns` list as `existing_patterns_snapshot` (used in Step 8b). Store the boolean `exists` as `memory_existed_before` (used in the Final Report to decide between "file created" and "file updated" wording). The `total` field is the full pattern count (before the `--n 10` truncation); the orchestrator does not consume it beyond the briefing.
 2. If the helper exits non-zero (very rare — only happens if `$HOME` is unset and inferable home fails, or if cwd is unreadable), log a brief note, set `past_issues_briefing` to `""`, `existing_patterns_snapshot` to `[]`, `memory_existed_before` to `false`, and proceed to Step 3 (Implement). Note that a non-git workspace is **not** a failure mode — the helper falls back to a cwd-based id.
 3. If `existing_patterns_snapshot` is empty (or `exists` is `false`), set `past_issues_briefing` to `""` and skip the briefing block below.
 
