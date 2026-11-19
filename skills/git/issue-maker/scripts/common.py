@@ -6,9 +6,8 @@ and classify.py are pure and do not import this module in PR 1.
 
 from __future__ import annotations
 
-import os
-from pathlib import Path
 import subprocess
+from pathlib import Path
 
 # gh CLI invocations never block a run longer than this.
 GH_TIMEOUT = 30
