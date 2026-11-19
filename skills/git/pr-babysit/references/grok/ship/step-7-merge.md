@@ -1,13 +1,13 @@
-# Step 7 — Merge (when `--ship` is active)
+# Step 7 — Merge
 
-Run only after all checks pass, review threads are resolved, protections are cleared, and `ship` is `true`. Default (no `--ship`) stops at "ready to merge" and reports green.
+Run only after all checks pass, review threads are resolved, protections are cleared, and `ship` is `true`.
 
 ## Pre-merge checks
 
 1. Live gate re-query: `state==OPEN`, `!isDraft`, `mergeable==MERGEABLE`, `mergeStateStatus!=DIRTY`, `reviewDecision!=CHANGES_REQUESTED`
 2. Every job passed (`SUCCESS`, `NEUTRAL`, `SKIPPED`)
 3. No open comments or unresolved threads
-4. Merge protections cleared (Step 6)
+4. Merge protections cleared (Step 6) in `ship/`.
 
 Any gate fails → stop and report live values.
 

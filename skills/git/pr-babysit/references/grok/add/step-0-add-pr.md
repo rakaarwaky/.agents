@@ -1,8 +1,8 @@
-# Step 0 — Add PR to Watchlist
+# Step 0 — Add PR to Watchlist (add lane)
 
-When the user runs `/pr-babysit add [--ship] <number>`:
+When the user runs `/pr-babysit add <number>`:
 
-If `--ship` is present, set `ship: true` on the PR entry. Otherwise leave `ship` at the default `false`.
+Set `ship: false` on the PR entry.
 
 ## Step 0.1 — Verify authentication
 
@@ -29,7 +29,7 @@ If `baseRefName` is another PR branch (not the repo default branch), stop and te
 
 State file (per session): `~/.agents/develop/<namarepo>/pr-babysit/watched-prs-<INSTANCE_ID>.json`. `<namarepo>` is the basename of the repo containing the PR (resolve from `OWNER_REPO` via `basename`, lowercased and slugified to match the `implement` host.py convention). `INSTANCE_ID` is a UUID generated on first `add` (resolve `HOST_PY` as `<dirname of this SKILL.md>/scripts/host.py`, run `<python> <HOST_PY> uuid --full` with a real Python 3 interpreter, rejecting WindowsApps stubs) and held in conversation context.
 
-Deduplicate: skip if `number` + repo already in the watchlist. If `--ship` was passed and the PR is already watched, set `ship: true`.
+Deduplicate: skip if `number` + repo already in the watchlist. The `ship` flag is always `false` in this lane.
 
 ```json
 {
@@ -53,4 +53,4 @@ Write the state file. Report what was added and the ship flag.
 
 ## Next
 
-After `add`, the pipeline continues with step 1 (watch CI).
+After `add`, the pipeline continues with step 1 (watch CI) in `add/`.

@@ -1,6 +1,9 @@
-# Step 4 — Detect & Bootstrap Mergify
+# Step 0 — Detect Mergify (setup lane)
 
-Run when `--ship` is active and the repo's Mergify status is unknown. Determines whether Mergify merge-queue is available and bootstraps it if missing.
+When the user runs `/pr-babysit setup <number>`:
+
+Run only for the target PR's repo. Determines whether Mergify merge-queue is available
+and bootstraps a `.mergify.yml` config when missing.
 
 ## Detect Mergify
 
@@ -33,8 +36,6 @@ No config, no check-runs → `MERGIFY_AVAILABLE="none"`.
 
 ## Bootstrap `.mergify.yml` (when `MERGIFY_AVAILABLE` is `"none"` or `"installed"`)
 
-Only when `ship` is `true`. If `ship` is `false`, record the detection and move on.
-
 ### Ask the user
 
 > PR <number> targets a repo without Mergify merge-queue configuration.
@@ -42,11 +43,11 @@ Only when `ship` is `true`. If `ship` is `false`, record the detection and move 
 > on a separate branch and open a setup PR.
 > Proceed?
 
-If declined, set `MERGIFY_AVAILABLE="declined"` and skip to the direct-merge path in Step 7.
+If declined, set `MERGIFY_AVAILABLE="declined"` and stop.
 
 ### Write the config
 
-Fetch the Mergify docs before writing — never invent config from memory. See [`../mergify/config.md`](../mergify/config.md) for the full workflow and schema.
+Fetch the Mergify docs before writing — never invent config from memory. See [`../mergify/config.md`](../mergify/config.md) if it exists; otherwise use the minimal config below.
 
 Minimal config:
 
@@ -75,7 +76,7 @@ pull_request_rules:
 mergify config validate
 ```
 
-If it fails, fix and retry (max 2 attempts). If still failing, report the error and fall back to direct merge.
+If it fails, fix and retry (max 2 attempts). If still failing, report the error and stop.
 
 ### Open a setup PR
 
@@ -102,3 +103,7 @@ Include `MERGIFY_AVAILABLE` in the final report:
 > Mergify: <configured|installed|none|declined|bootstrapping>
 > Config file: <path or "not found">
 > Setup PR: #<N> (if bootstrapping)
+
+## Next
+
+After setup completes, continue to step 1 (configure merge rules).
