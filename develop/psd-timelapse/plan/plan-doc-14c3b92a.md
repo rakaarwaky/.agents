@@ -54,8 +54,9 @@ Currently, the Studio surface is split into three main components under `package
   - In populated state (PSD loaded), display the canvas preview mockup frame, while maintaining active drag-over and drop event handlers so dropping a new file replaces the active document.
   - Clicking the empty state or the top bar Upload button triggers a hidden `<input type="file" accept=".psd,image/*">` within the canvas component.
 - Strip `StudioLayerPanel` down strictly to layer controls: remove document header, file metadata block, and the inline sidebar dropzone.
-- Maintain passive component boundaries: `StudioCanvas` receives `onPickFile: (file: File) => void` and `hasDocument?: boolean` threaded through `StudioLanding`.
-- Place the `↻` re-inspect button in the canvas toolbar beside the Upload button, gated behind `hasDocument`. This consolidates document-level actions in one location.
+- Maintain passive component boundaries: `StudioCanvas` receives `onPickFile: (file: File) => void`, `hasDocument?: boolean`, and `fileMeta?: StudioFileMeta` threaded through `StudioLanding`.
+- Render active document name and dimensions dynamically in the canvas preview frame chip (`.pt-studio-canvas-chip`) when `fileMeta` is provided, replacing the static mockup text.
+- Place the `↻` re-inspect button in the canvas toolbar beside the Upload button, gated behind `hasDocument`. This consolidates document-level actions in one location, while removing all refresh controls from the sidebar.
 - Update unit tests in `packages/studio/tests/unit_studio_layer_panel_component.test.tsx` and add new canvas upload/drop tests in `packages/studio/tests/unit_studio_canvas_upload.test.tsx`.
 
 ### Non-Goals
@@ -74,8 +75,8 @@ Currently, the Studio surface is split into three main components under `package
 graph TD
   SC["StudioContainer<br/>(root_web_smart_container.ts)"] -->|"onPickFile, onReinspect, onRender,<br/>layers, fileMeta, runId, progress"| SL["StudioLanding<br/>(surface_studio_landing_component.tsx)"]
   
-  SL -->|"onPickFile, onReinspect,<br/>hasDocument=Boolean(fileMeta),<br/>onRender, runId, progress"| SCanvas["StudioCanvas<br/>(surface_studio_canvas_component.tsx)"]
-  SL -->|"layers, onSelectLayer,<br/>onReinspect"| SPanel["StudioLayerPanel<br/>(surface_studio_layer_panel_component.tsx)"]
+  SL -->|"onPickFile, onReinspect, fileMeta,<br/>hasDocument=Boolean(fileMeta),<br/>onRender, runId, progress"| SCanvas["StudioCanvas<br/>(surface_studio_canvas_component.tsx)"]
+  SL -->|"layers, onSelectLayer"| SPanel["StudioLayerPanel<br/>(surface_studio_layer_panel_component.tsx)"]
 
   subgraph StudioCanvas
     TB["Top Bar: Upload ↑ · ↻ · Zoom cluster"]
@@ -101,21 +102,24 @@ graph TD
 
 #### 1. `surface_studio_canvas_component.tsx` (`StudioCanvas`)
 
-**Props change** — add `onPickFile`, `onReinspect`, `hasDocument`:
+**Props change** — add `onPickFile`, `onReinspect`, `hasDocument`, and `fileMeta`:
 ```ts
+import type { StudioFileMeta } from "./surface_studio_layer_panel_component";
+
 export interface StudioCanvasProps {
   className?: string;
   onRender?: (settings: { quality: string; resolution: string }) => void;
   readonly runId?: string | null;
   readonly progress?: StudioCanvasProgress | null;
-  // New props for upload affordance:
+  // New props for upload affordance and document metadata:
   readonly onPickFile?: (file: File) => void;
   readonly onReinspect?: () => void;
   readonly hasDocument?: boolean;
+  readonly fileMeta?: StudioFileMeta;
 }
 ```
 
-`fileMeta` is **not** passed to the canvas. The canvas doesn't render file metadata — it only needs `hasDocument` (a boolean) to switch between empty and loaded states. `StudioLanding` derives `hasDocument` from `Boolean(fileMeta)` internally.
+`fileMeta` is passed to the canvas alongside `hasDocument` (derived via `Boolean(fileMeta)` in `StudioLanding`). While `hasDocument` controls the macro empty-vs-loaded stage branch, `fileMeta` provides the active document name and dimensions to the canvas frame chip (`.pt-studio-canvas-chip`), dynamically replacing the static mockup label (`CANVAS PREVIEW · 3000 × 3000 PX`) with the inspected document's name and dimensions without altering smart container responsibilities.
 
 **Internal state additions**:
 - `isDragging: boolean` — tracks active drag-over on `.pt-studio-canvas-stage`.
@@ -161,14 +165,22 @@ export interface StudioCanvasProps {
     ↻
   </button>
 ) : null}
-<span className="pt-studio-canvas-divider" />
+<span className="pt-studio-canvas-divider" aria-hidden="true" />
 ```
 
-**Canvas stage render logic** — conditionally render the empty state or preview frame in `.pt-studio-canvas-stage`. Drag event handlers (`onDragOver`, `onDragLeave`, `onDrop`) are attached to the stage div regardless of state:
+**Canvas stage render logic** — conditionally render the empty state or preview frame in `.pt-studio-canvas-stage` (identified by `data-testid="studio-canvas-stage"`). Drag event handlers (`onDragOver`, `onDragLeave`, `onDrop`) are attached to the stage div regardless of state:
+
+**Empty vs Loaded String Usage Reconciliation**:
+The user brief explicitly requires the canonical copy `"Click or drag new .PSD to replace"` on the empty canvas (preserving verbatim the original dropzone affordance). To eliminate UX ambiguity between an empty canvas and active document replacement, string usage is explicitly differentiated across interaction states:
+- **Empty State Idle (`!hasDocument && !isDragging`)**: Centered dropzone displays the user-mandated canonical string `"Click or drag new .PSD to replace"` with hint `"Photoshop CC 2024+ · Max 500 MB"`.
+- **Empty State Drag-Over (`!hasDocument && isDragging`)**: Dropzone transitions to `.pt-studio-canvas-dropzone-drag` and updates label to `"Drop PSD file to inspect"`.
+- **Loaded State Idle (`hasDocument && !isDragging`)**: Canvas frame renders the active PSD preview with metadata chip `${fileMeta.name} · ${fileMeta.dimensions} PX`.
+- **Loaded State Drag-Over (`hasDocument && isDragging`)**: `.pt-studio-canvas-drag-overlay` mounts over the preview frame, displaying explicit replacement copy `"Drop new .PSD to replace"` to confirm file replacement on drop.
 
 ```tsx
 <div
   className="pt-studio-canvas-stage"
+  data-testid="studio-canvas-stage"
   onDragOver={(e) => {
     e.preventDefault();
     setIsDragging(true);
@@ -179,10 +191,21 @@ export interface StudioCanvasProps {
   {hasDocument ? (
     <>
       <div className="pt-studio-canvas-frame" style={{ ... }}>
-        {/* existing preview content */}
+        {/* existing preview SVG and img label */}
+        <span
+          className="pt-studio-canvas-chip"
+          title={fileMeta?.name}
+          data-testid="studio-canvas-chip"
+        >
+          {fileMeta?.name
+            ? `${fileMeta.name}${fileMeta.dimensions ? ` · ${fileMeta.dimensions} PX` : ""}`
+            : "CANVAS PREVIEW · 3000 × 3000 PX"}
+        </span>
       </div>
       {isDragging ? (
-        <div className="pt-studio-canvas-drag-overlay" />
+        <div className="pt-studio-canvas-drag-overlay">
+          <span>Drop new .PSD to replace</span>
+        </div>
       ) : null}
     </>
   ) : (
@@ -194,7 +217,10 @@ export interface StudioCanvasProps {
       aria-label="Drop PSD file or click to browse"
       data-testid="studio-canvas-empty-dropzone"
       onKeyDown={(e) => {
-        if (e.key === "Enter" || e.key === " ") fileInputRef.current?.click();
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          fileInputRef.current?.click();
+        }
       }}
     >
       <span className="material-symbols-outlined pt-studio-canvas-dropzone-icon">
@@ -235,18 +261,19 @@ const handleFileInputChange = (e: ChangeEvent<HTMLInputElement>) => {
   if (e.target.files && e.target.files.length > 0) {
     onPickFile?.(e.target.files[0]);
   }
+  // Clear the input value so selecting the exact same file path consecutively triggers onChange
+  e.target.value = "";
 };
 ```
 
 #### 2. `surface_studio_layer_panel_component.tsx` (`StudioLayerPanel`)
 
-**Props change** — remove `onPickFile` and `fileMeta`:
+**Props change** — remove `onPickFile`, `fileMeta`, and `onReinspect`:
 ```ts
 export interface StudioLayerPanelProps {
   className?: string;
   readonly layers?: readonly StudioLayerRow[];
   readonly onSelectLayer?: (layerId: string) => void;
-  readonly onReinspect?: () => void;
 }
 ```
 
@@ -262,6 +289,7 @@ The `StudioFileMeta` **interface** definition stays in this file since it is re-
 - `fileInputRef`, `isDragging` state
 - `processFile`, `handleDrop`, `handleFileInputChange` functions
 - `handleReset` function (the `↻` refresh button moves to the canvas toolbar)
+- `onReinspect` prop removed from `StudioLayerPanelProps`
 - `meta`, `metaLine` derived variables
 - `DEFAULT_FILE_META` constant
 
@@ -270,11 +298,10 @@ The `StudioFileMeta` **interface** definition stays in this file since it is re-
 - `hiddenLayerIds` helper
 - `searchQuery`, `activeLayerId`, `hiddenIds` state
 - `toggleVisibility`, `handleSelect` handlers
-- `onReinspect` prop (remains available; the layers header or canvas can invoke it)
 - The `<aside>` root wrapper with `.pt-studio-sidebar-panel`
 - `.pt-studio-sidebar-layers` containing layers header, search, and list
 
-**Reinspect in sidebar layers header**: The `onReinspect` callback is optionally wired to a small refresh icon in the layers header row (beside the count badge), providing secondary access to re-inspect without cluttering the layer list itself. This is lower priority; the primary `↻` is in the canvas toolbar.
+**Reinspect consolidation in canvas toolbar**: The re-inspect action (`↻`) moves entirely to the canvas toolbar (`StudioCanvas`), shown when `hasDocument` is true. `onReinspect` is removed from `StudioLayerPanelProps` and the sidebar layers header retains only the layers icon, title (`LAYERS`), and layer count badge. This strictly scopes the sidebar to layer inspection and eliminates redundant or dead refresh controls.
 
 #### 3. `surface_studio_landing_component.tsx` (`StudioLanding`)
 
@@ -304,13 +331,13 @@ export function StudioLanding({
             onPickFile={onPickFile}
             onReinspect={onReinspect}
             hasDocument={Boolean(fileMeta)}
+            fileMeta={fileMeta}
           />
         </main>
         <aside className="pt-studio-sidebar">
           <StudioLayerPanel
             layers={layers}
             onSelectLayer={onSelectLayer}
-            onReinspect={onReinspect}
           />
         </aside>
       </div>
@@ -320,9 +347,9 @@ export function StudioLanding({
 ```
 
 Key differences from current:
-- `<StudioCanvas>` receives three new props: `onPickFile`, `onReinspect`, `hasDocument`.
-- `<StudioLayerPanel>` no longer receives `onPickFile` or `fileMeta`.
-- `StudioLandingProps` does **not** need a `hasDocument` prop; it derives the boolean from `fileMeta`, keeping `StudioContainer` unchanged.
+- `<StudioCanvas>` receives four new props: `onPickFile`, `onReinspect`, `hasDocument`, and `fileMeta`.
+- `<StudioLayerPanel>` no longer receives `onPickFile`, `fileMeta`, or `onReinspect`.
+- `StudioLandingProps` already receives `fileMeta` from `StudioContainer`; it passes `fileMeta` down to `StudioCanvas` and derives `hasDocument={Boolean(fileMeta)}`, keeping `StudioContainer` unchanged.
 
 #### 4. `packages/shared/src/common/styles.css`
 
@@ -344,6 +371,17 @@ Key differences from current:
 }
 .pt-studio-canvas-upload-btn:hover {
   background: #4f46e5;
+}
+
+/* ── Canvas toolbar divider ── */
+
+.pt-studio-canvas-divider:empty {
+  display: inline-block;
+  width: 1px;
+  height: 1rem;
+  background: rgba(255, 255, 255, 0.15);
+  margin: 0 0.5rem;
+  vertical-align: middle;
 }
 
 /* ── Canvas empty state dropzone ── */
@@ -394,11 +432,19 @@ Key differences from current:
 .pt-studio-canvas-drag-overlay {
   position: absolute;
   inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   border: 2px dashed var(--pt-primary, #6366f1);
-  background: rgba(99, 102, 241, 0.06);
+  background: rgba(99, 102, 241, 0.12);
+  backdrop-filter: blur(4px);
   border-radius: var(--pt-radius-xl, 16px);
   z-index: 20;
   pointer-events: none;
+  font-family: var(--pt-font-mono);
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #e2e6ee;
 }
 ```
 
@@ -414,9 +460,9 @@ Key differences from current:
 - `"falls back to DEFAULT_LAYERS caption when no layers/fileMeta provided"` — remove lines that assert `screen.getByTitle("hoodie_oversize_apparel_design.psd")` and `screen.getByText("184.2 MB · RGB 16-bit")`. Keep the layer-stack fallback assertions (`"Base Fabric Body Silhouette"`, `"10"`).
 - `"invokes onPickFile with the selected File on drop"` — remove entirely (dropzone no longer in sidebar).
 - `"invokes onPickFile when the file input changes"` — remove entirely (file input no longer in sidebar).
-- `"invokes onReinspect when the refresh button is clicked"` — remove or relocate to canvas tests (sidebar may retain a secondary refresh but the primary is in canvas).
+- `"invokes onReinspect when the refresh button is clicked"` — remove entirely (sidebar no longer renders refresh controls; re-inspect is tested on StudioCanvas in unit_studio_canvas_upload.test.tsx).
 
-**Update `renderPanel` helper**: Remove `fileMeta` from the default props since `StudioLayerPanelProps` no longer has `fileMeta` or `onPickFile`.
+**Update `renderPanel` helper**: Remove `fileMeta`, `onPickFile`, and `onReinspect` from the default props since `StudioLayerPanelProps` no longer includes them.
 
 ##### `packages/studio/tests/unit_studio_canvas_upload.test.tsx` (new file)
 
@@ -424,13 +470,16 @@ New test file (AES103 `unit_` prefix), covering:
 
 1. **Renders Upload button in toolbar** — `screen.getByTestId("studio-upload-btn")` exists, has `aria-label="Upload PSD document"`.
 2. **Upload button triggers file input click** — Mock `fileInputRef.current.click`, click the upload button, verify file input receives focus/click.
-3. **Empty state renders centered dropzone when hasDocument=false** — `screen.getByTestId("studio-canvas-empty-dropzone")` exists, contains `"Click or drag new .PSD to replace"` and `"Photoshop CC 2024+ · Max 500 MB"`.
+3. **Empty state renders centered dropzone when hasDocument=false** — `screen.getByTestId("studio-canvas-empty-dropzone")` exists, contains canonical label `"Click or drag new .PSD to replace"` and `"Photoshop CC 2024+ · Max 500 MB"`.
 4. **Empty state does not render when hasDocument=true** — `screen.queryByTestId("studio-canvas-empty-dropzone")` returns null.
-5. **Clicking empty state dropzone triggers file input** — Same as #2 but click target is the dropzone.
-6. **Drop onto stage calls onPickFile** — `fireEvent.drop` on `.pt-studio-canvas-stage` with a fake File; verify `onPickFile` called with file.
-7. **Drop works when hasDocument=true (replacement)** — Same drop test but with `hasDocument={true}`.
+5. **Clicking or keyboard activation of empty state dropzone triggers file input** — Click triggers `fileInputRef.current.click`. Pressing Enter or Space triggers `fileInputRef.current.click` and invokes `e.preventDefault()` to prevent default page scrolling.
+6. **Drop onto stage calls onPickFile** — `fireEvent.drop` on `screen.getByTestId("studio-canvas-stage")` with a fake File; verify `onPickFile` called with file.
+7. **Drop works when hasDocument=true (replacement)** — `fireEvent.drop` on `screen.getByTestId("studio-canvas-stage")` with `hasDocument={true}`; verify drag overlay displays `"Drop new .PSD to replace"` on drag-over and `onPickFile` is called with replacement file.
 8. **Reinspect button shown only when hasDocument=true** — `screen.queryByTestId("studio-reinspect-btn")` null when false, present when true.
 9. **Reinspect button calls onReinspect** — Click `studio-reinspect-btn`, verify callback.
+10. **Resets file input value after file change** — Trigger file change on `studio-canvas-file-input`, verify `onPickFile` called, verify `input.value` is reset to `""` so consecutive selection of the same file path triggers `onChange`.
+11. **Renders dynamic document name and dimensions in canvas chip when fileMeta provided** — Render `<StudioCanvas hasDocument={true} fileMeta={{ name: "test-doc.psd", sizeLabel: "50 MB", dimensions: "1920 × 1080" }} />`, verify `.pt-studio-canvas-chip` text contains `"test-doc.psd · 1920 × 1080 PX"`.
+12. **Falls back to default canvas chip text when fileMeta is omitted** — Render `<StudioCanvas hasDocument={true} />`, verify `.pt-studio-canvas-chip` displays `"CANVAS PREVIEW · 3000 × 3000 PX"`.
 
 This file does **not** need to test render/zoom/preview (already covered by `unit_studio_render_wiring.test.tsx`).
 
@@ -490,6 +539,7 @@ export interface StudioCanvasProps {
   readonly onPickFile?: (file: File) => void;       // NEW
   readonly onReinspect?: () => void;                 // NEW
   readonly hasDocument?: boolean;                    // NEW
+  readonly fileMeta?: StudioFileMeta;                // NEW
 }
 
 // StudioLayerPanelProps — packages/studio/src/surface_studio_layer_panel_component.tsx
@@ -498,8 +548,8 @@ export interface StudioLayerPanelProps {
   readonly layers?: readonly StudioLayerRow[];
   //  fileMeta REMOVED
   //  onPickFile REMOVED
+  //  onReinspect REMOVED
   readonly onSelectLayer?: (layerId: string) => void;
-  readonly onReinspect?: () => void;
 }
 
 // StudioLandingProps — unchanged structurally
@@ -525,8 +575,8 @@ export interface StudioLandingProps {
 No changes to database schemas, value objects (VOs), or API contracts.
 
 - `StudioFileMeta` and `StudioLayerRow` interface definitions remain in `surface_studio_layer_panel_component.tsx`.
-- `StudioFileMeta` is re-exported through `surface_studio_landing_component.tsx` (line 40) and consumed by `root_web_smart_container.ts` (line 38). The re-export chain is preserved even though `StudioLayerPanel` no longer receives `fileMeta` as a prop.
-- `StudioCanvasProps` does **not** include `fileMeta`. The canvas only knows `hasDocument: boolean`, which `StudioLanding` derives from `Boolean(fileMeta)`.
+- `StudioFileMeta` is re-exported through `surface_studio_landing_component.tsx` (line 40) and consumed by `root_web_smart_container.ts` (line 38) and `surface_studio_canvas_component.tsx`. The re-export chain is preserved even though `StudioLayerPanel` no longer receives `fileMeta` as a prop.
+- `StudioCanvasProps` includes `readonly fileMeta?: StudioFileMeta;` alongside `hasDocument?: boolean`. `StudioLanding` threads `fileMeta` directly from `StudioLandingProps` to `StudioCanvas`. `root_web_smart_container.ts` already computes and passes `fileMeta` to `StudioLanding`, so no smart container changes are required.
 
 ---
 
@@ -547,10 +597,10 @@ No changes to database schemas, value objects (VOs), or API contracts.
 - **Trade-offs**: Violates AES406 (passive surface component importing or owning transport/server state). The server path bar belongs to the container layer (`root_web_smart_container.ts`).
 - **Decision**: Rejected. The server path bar remains in `StudioContainer` above `StudioLanding`, while `StudioCanvas` remains a pure passive surface taking callbacks.
 
-### Alternative 4: Pass `fileMeta` to `StudioCanvas` instead of `hasDocument`
-- **Approach**: Pass the full `StudioFileMeta` object to `StudioCanvas` so the canvas can display file name, dimensions, etc.
-- **Trade-offs**: Creates unnecessary data coupling. The canvas does not render file metadata; it only needs a boolean to switch between empty and loaded render paths.
-- **Decision**: Rejected. Minimal interface principle: `hasDocument: boolean` is sufficient. If the canvas needs to display file metadata in a future iteration, `fileMeta` can be added then.
+### Alternative 4: Omit `fileMeta` from `StudioCanvas` and Pass Only `hasDocument: boolean`
+- **Approach**: Pass only `hasDocument: boolean` to `StudioCanvas` and omit `fileMeta` entirely.
+- **Trade-offs**: Stripping `fileMeta` leaves the canvas frame chip hardcoded to `"CANVAS PREVIEW · 3000 × 3000 PX"`, removing all visual confirmation of the active document name and dimensions once loaded, while leaving `fileMeta` computation in `root_web_smart_container.ts` effectively dead.
+- **Decision**: Rejected. `StudioCanvas` receives `fileMeta?: StudioFileMeta` alongside `hasDocument`. The frame chip (`.pt-studio-canvas-chip`) dynamically renders the active document name and dimensions, preserving metadata observability while respecting passive component boundaries and requiring zero edits to `root_web_smart_container.ts`.
 
 ---
 
@@ -567,13 +617,14 @@ No changes to database schemas, value objects (VOs), or API contracts.
 - **DOM Test Attributes**:
   - `data-testid="studio-upload-btn"` — canvas toolbar upload button.
   - `data-testid="studio-reinspect-btn"` — canvas toolbar re-inspect button (shown when `hasDocument`).
+  - `data-testid="studio-canvas-stage"` — canvas stage container element receiving drag-and-drop events.
   - `data-testid="studio-canvas-empty-dropzone"` — empty-state canvas dropzone.
   - `data-testid="studio-canvas-file-input"` — canvas hidden file input.
   - `data-testid="studio-canvas"` — existing canvas root (unchanged).
   - `data-testid="studio-layer-panel"` — existing layer panel root (unchanged).
 - **Removed test IDs**:
   - `data-testid="studio-file-input"` — removed from sidebar (was in `surface_studio_layer_panel_component.tsx` line 169).
-- **User Action Feedback**: Drag-over on the stage activates `.pt-studio-canvas-dropzone-drag` (empty state) or renders `.pt-studio-canvas-drag-overlay` (loaded state), providing clear visual cues. Child-boundary containment in `handleDragLeave` prevents flickering as the pointer crosses child nodes.
+- **User Action Feedback & Accessibility**: Drag-over on the stage activates `.pt-studio-canvas-dropzone-drag` (empty state) or renders `.pt-studio-canvas-drag-overlay` (loaded state) with explicit replacement copy, providing clear visual cues. Child-boundary containment in `handleDragLeave` prevents flickering as the pointer crosses child nodes. Empty dropzone keyboard accessibility handles `Enter` and `Space` with `e.preventDefault()` to prevent unwanted window scrolling.
 
 ---
 
@@ -581,8 +632,8 @@ No changes to database schemas, value objects (VOs), or API contracts.
 
 This is a cosmetic/structural surface-layer change with no backend dependencies, feature flags, or staged rollout needed.
 
-1. **PR 1**: Implement all canvas-side changes (upload button, file input, empty state, drag-and-drop) with new CSS classes and a new canvas upload test file. `StudioLanding` is updated in the same PR to wire `onPickFile`/`onReinspect`/`hasDocument` to `StudioCanvas`. At this PR, the canvas takes over primary file ingestion while `StudioLanding` stops passing `onPickFile`/`fileMeta` to `StudioLayerPanel`, decommissioned at the composition level.
-2. **PR 2**: Strip the sidebar of dead upload-related DOM and state, remove `onPickFile`/`fileMeta` from `StudioLayerPanelProps`, and update sidebar tests. After this PR, upload lives exclusively on the canvas and dead code is removed from `StudioLayerPanel`.
+1. **PR 1**: Implement all canvas-side changes (upload button, file input, empty state, drag-and-drop, and dynamic metadata chip) with new CSS classes and a new canvas upload test file. `StudioLanding` is updated in the same PR to wire `onPickFile`/`onReinspect`/`hasDocument`/`fileMeta` to `StudioCanvas`. At this PR, the canvas takes over primary file ingestion and document metadata display, while `StudioLanding` stops passing `onPickFile`/`fileMeta`/`onReinspect` to `StudioLayerPanel`, decommissioned at the composition level.
+2. **PR 2**: Strip the sidebar of dead upload-related DOM and state, remove `onPickFile`, `fileMeta`, and `onReinspect` from `StudioLayerPanelProps`, and update sidebar tests. After this PR, upload and document lifecycle controls live exclusively on the canvas and dead code is removed from `StudioLayerPanel`.
 
 **Rollback**: Revert PR 2 to restore sidebar markup/props, then revert PR 1 to restore sidebar wiring in `StudioLanding` and remove canvas upload.
 
@@ -600,10 +651,10 @@ None.
 ## Key Decisions
 
 1. **Upload button placement**: The Upload button is placed at the leading edge of `.pt-studio-canvas-toolbar`, before the zoom controls cluster, styled with `--pt-primary` background to mark it as the primary call to action. A divider span separates it from the zoom group.
-2. **Re-inspect button**: The `↻` re-inspect button moves from the sidebar to the canvas toolbar, shown conditionally when `hasDocument` is true. This consolidates all document-level actions (upload, re-inspect) in the toolbar while the sidebar owns only layer interactions.
-3. **`hasDocument` vs `fileMeta`**: The canvas receives `hasDocument: boolean` instead of the full `StudioFileMeta` object. This minimizes data coupling — the canvas switching logic only needs a boolean, and `StudioLanding` derives it from `Boolean(fileMeta)`. No new prop is needed on `StudioLandingProps` or `StudioContainer`.
+2. **Re-inspect button**: The `↻` re-inspect button moves from the sidebar to the canvas toolbar, shown conditionally when `hasDocument` is true. `onReinspect` is removed entirely from `StudioLayerPanelProps`, consolidating all document-level lifecycle actions (upload, re-inspect) in the toolbar while the sidebar owns only layer interactions.
+3. **`fileMeta` and `hasDocument` threading to canvas**: `StudioCanvas` receives `fileMeta?: StudioFileMeta` alongside `hasDocument: boolean`. This allows the canvas frame chip (`.pt-studio-canvas-chip`) to dynamically display the active document name and dimensions (`sycan-front-shirt.psd · 3000 × 3000 PX`) while `hasDocument` cleanly controls the empty-vs-loaded stage branch. Props threading flows passively from `StudioContainer` through `StudioLanding` without modifying the smart container.
 4. **`StudioFileMeta` type location**: The `StudioFileMeta` interface definition stays in `surface_studio_layer_panel_component.tsx` even though the component no longer renders file metadata. The re-export chain (`panel → landing → container`) is preserved. Moving the type to a separate file would require updating imports across the codebase for no functional benefit.
-5. **Sidebar responsibility**: `StudioLayerPanel` is stripped to LAYERS header (icon + "LAYERS" + count), search input, and layer list. All file ingestion, metadata display, and refresh controls are removed.
+5. **Sidebar responsibility**: `StudioLayerPanel` is stripped to LAYERS header (icon + "LAYERS" + count), search input, and layer list. All file ingestion, metadata display, and refresh controls are removed, and `onReinspect` is removed from `StudioLayerPanelProps`.
 6. **Architectural purity (AES201 & AES406)**: `StudioCanvas` remains a passive surface component. It invokes `onPickFile(file)` and `onReinspect()` callbacks; `StudioContainer` orchestrates inspection and state updates. No domain logic enters the surface layer.
 7. **CSS deprecation**: Sidebar CSS classes (`.pt-studio-sidebar-header`, `.pt-studio-sidebar-file*`, `.pt-studio-sidebar-dropzone*`) are left in `styles.css` after the DOM is removed. Removing them is optional cleanup.
 
@@ -612,9 +663,9 @@ None.
 ### PR 1: Add canvas upload button, empty-state dropzone, and re-wire StudioLanding
 - **Files/components affected:** packages/shared/src/common/styles.css, packages/studio/src/surface_studio_canvas_component.tsx, packages/studio/src/surface_studio_landing_component.tsx, packages/studio/tests/unit_studio_canvas_upload.test.tsx
 - **Dependencies:** None
-- **Description:** Adds the Upload button and re-inspect button to the StudioCanvas toolbar, implements canvas stage empty-state dropzone and drag-and-drop on both empty and loaded states, updates StudioLanding to pass onPickFile/onReinspect/hasDocument to StudioCanvas, and adds unit tests for the new upload interactions.
+- **Description:** Adds the Upload button and re-inspect button to the StudioCanvas toolbar, implements canvas stage empty-state dropzone and drag-and-drop on both empty and loaded states, updates `.pt-studio-canvas-chip` to dynamically render fileMeta name and dimensions, updates StudioLanding to pass onPickFile/onReinspect/hasDocument/fileMeta to StudioCanvas, and adds unit tests for the new upload and metadata interactions.
 
 ### PR 2: Strip sidebar to layers-only and update sidebar tests
 - **Files/components affected:** packages/studio/src/surface_studio_layer_panel_component.tsx, packages/studio/tests/unit_studio_layer_panel_component.test.tsx
 - **Dependencies:** PR 1
-- **Description:** Removes the SOURCE PSD DOCUMENT header, file metadata block, inline dropzone, and file input from StudioLayerPanel, removes onPickFile and fileMeta from StudioLayerPanelProps, and updates layer panel unit tests to remove dropzone/file-meta assertions.
+- **Description:** Removes the SOURCE PSD DOCUMENT header, file metadata block, inline dropzone, and file input from StudioLayerPanel, removes onPickFile, fileMeta, and onReinspect from StudioLayerPanelProps, and updates layer panel unit tests to remove dropzone/file-meta/reinspect assertions.
