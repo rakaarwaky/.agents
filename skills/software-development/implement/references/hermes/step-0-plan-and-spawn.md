@@ -4,7 +4,7 @@ Hermes never writes code. This entire run has exactly one subagent — the Grok 
 
 ## Start-Turn Gate: Lint Baseline
 
-Before planning or spawning, run `lint-arwaky-cli report .` from the owning repo (absolute path: `/home/raka/.local/bin/lint-arwaky-cli`). This records the scan baseline in `$XDG_DATA_HOME/lint-arwaky/snapshots.json` keyed by target path, so the end-of-turn report shows deltas. Paste the report output verbatim into the run log or brief so the run starts from a known violation count. If the CLI is unavailable, note the failure and continue without the gate.
+Before planning or spawning, run `lint-arwaky-cli report .` from the owning repo (absolute path: `$HOME/.local/bin/lint-arwaky-cli`). This records the scan baseline in `$XDG_DATA_HOME/lint-arwaky/snapshots.json` keyed by target path, so the end-of-turn report shows deltas. Paste the report output verbatim into the run log or brief so the run starts from a known violation count. If the CLI is unavailable, note the failure and continue without the gate.
 
 ## Plan the Task Brief
 
@@ -18,7 +18,7 @@ Grok has zero conversation context. Compose a brief that covers:
 
 ## Create the Orca Worktree
 
-Resolve `orca-ide` with `command -v orca-ide` (never hardcode `/home/raka/.local/bin/orca-ide`). The binary is mounted dynamically under `/tmp/.mount_orca.*/orca-ide` on this host and may not resolve at a fixed path.
+Resolve `orca-ide` with `command -v orca-ide` (never hardcode `$HOME/.local/bin/orca-ide`). The binary is mounted dynamically under `/tmp/.mount_orca.*/orca-ide` on this host and may not resolve at a fixed path.
 
 **Pitfall — Orca CLI path resolution:** Do not rely on `orca-ide` being on `$PATH` or on `$ORCA` being exported. The shell does not export `ORCA`, so `${ORCA}` expands to empty and bash reports `: command not found` instead of running the CLI. Always call the binary by its resolved absolute path:
 

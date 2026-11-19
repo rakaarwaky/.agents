@@ -4,7 +4,7 @@ Everything the run needs before any subagent can spawn: host helpers, shared fil
 
 ## Start-Turn Gate: Lint Baseline
 
-Run `lint-arwaky-cli report .` from the owning repo (absolute path: `/home/raka/.local/bin/lint-arwaky-cli`) before any subagent spawns. This records the scan baseline in `$XDG_DATA_HOME/lint-arwaky/snapshots.json` keyed by target path. Paste the report output verbatim into the orchestrator's run log. The baseline is the starting violation count for this run. If the CLI is unavailable, note the failure and continue without the gate.
+Run `lint-arwaky-cli report .` from the owning repo (absolute path: `$HOME/.local/bin/lint-arwaky-cli`) before any subagent spawns. This records the scan baseline in `$XDG_DATA_HOME/lint-arwaky/snapshots.json` keyed by target path. Paste the report output verbatim into the orchestrator's run log. The baseline is the starting violation count for this run. If the CLI is unavailable, note the failure and continue without the gate.
 
 ## Host Setup
 
