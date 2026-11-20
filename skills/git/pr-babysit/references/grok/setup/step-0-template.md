@@ -31,7 +31,7 @@ defaults:
     # commit. `merge` rather than `rebase` when GitHub Rulesets enforce
     # strict_required_status_checks_policy (rejects force-pushes).
     update_method: <merge|rebase>
-    merge_method: <squash|merge|rebase>
+    merge_method: <merge|squash|rebase>
     # Size this against cold-cache CI duration per check, not warm local runs.
     # Evidence from lint-arwaky: a 5min timeout dequeued PR #683 with all
     # checks green; 15min clears cold runs with room for slower runners.
@@ -192,7 +192,7 @@ scopes:
 | `<duration>` | user answer / `15min` default | `15min`, `20min`, `10min` |
 | `<N>` (max_parallel_checks) | user answer / `1` default | `1`, `2`, `3` |
 | `<merge|rebase>` (update_method) | user answer / `merge` default | `merge`, `rebase` |
-| `<squash|merge|rebase>` (merge_method) | user answer / `squash` default | `squash`, `merge`, `rebase` |
+| `<merge|squash|rebase>` (merge_method) | user answer / `merge` default | `merge`, `squash`, `rebase` |
 | `<required_approvals>` | user answer / `0` default | `0`, `1`, `2` |
 | `{% if ... %}` blocks | user yes/no answers | `yes` → include, `no` → omit |
 
@@ -212,7 +212,7 @@ validation happens on GitHub after the config PR merges.
 - CI checks: `Clippy`, `Build`, `Tests`, `Lint`
 - Timeout: `15min`
 - Max parallel: `1`
-- Merge method: `squash`
+- Merge method: `merge`
 - Update method: `merge`
 - Approvals: `0`
 - Author gate: `rakaarwaky`
@@ -223,7 +223,7 @@ validation happens on GitHub after the config PR merges.
 - CI checks: `lint`, `test`, `typecheck`, `build`
 - Timeout: `10min`
 - Max parallel: `1`
-- Merge method: `squash`
+- Merge method: `merge`
 - Update method: `merge`
 - Approvals: `1`
 - Author gate: `rakaarwaky`
@@ -234,7 +234,7 @@ validation happens on GitHub after the config PR merges.
 - CI checks: `lint`,`ruff`, `mypy`, `pytest`
 - Timeout: `10min`
 - Max parallel: `1`
-- Merge method: `squash`
+- Merge method: `merge`
 - Update method: `merge`
 - Approvals: `0`
 - Author gate: `rakaarwaky`
