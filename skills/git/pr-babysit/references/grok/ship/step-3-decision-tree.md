@@ -4,12 +4,12 @@ The core per-cycle pass. Runs on every `check` and on every scheduled `/loop` tr
 
 ## When this file loads
 
-After step 2 (watch CI) reports a red check, or after step 3 (auto-fix) has pushed a fix and needs to re-judge the PR. Runs before step 5 (merge) to confirm the PR is actually ready.
+After step 1 (watch CI) reports a red check, or after step 2 (auto-fix) has pushed a fix and needs to re-judge the PR. Runs before step 7 (merge) to confirm the PR is actually ready.
 
 ## Inputs
 
 - The PR number, `OWNER`, `REPO` (from step 0)
-- The worktree path (created in step 0)
+- `ship: true` — this lane merges via Mergify queue once the PR is healthy
 - `stack_type: null` — this skill handles standalone PRs only; if the user's PR is part of a Graphite/GitHub stack, stop and tell them the stack tool owns those
 
 ## State
@@ -20,11 +20,11 @@ In-memory only (single invocation):
 - `fix_count` — per-cycle counter, observational only; does not gate or skip fixes
 - `PROCESSED_THREAD_IDS`, `REPLIED_UNRESOLVED_THREAD_IDS`, `REPLY_FAILED_THREAD_IDS`, `FIX_FAILED_THREAD_IDS` — thread lifecycle lists
 
-Persist `last_status` and `fix_count` to `~/.agents/develop/<namarepo>/pr-babysit/watched-prs-<INSTANCE_ID>.json` when the cycle ends. `<namarepo>` is the basename of the repo containing the PR (same resolution as step 0).
+Persist `last_status` and `fix_count` to `/home/raka/.agents/develop/<namarepo>/pr-babysit/watched-prs-<INSTANCE_ID>.json` when the cycle ends. `<namarepo>` is the basename of the repo containing the PR (same resolution as step 0).
 
 ## Worktree initialization
 
-The subagent worktree from step 0 is the working boundary. `git fetch origin` before the first ref-sensitive operation; `has_fetched` flag guards repeat fetches.
+The worktree from step 0 is the working boundary. `git fetch origin` before the first ref-sensitive operation; `has_fetched` flag guards repeat fetches.
 
 ```bash
 git fetch origin || (sleep 2 && git fetch origin) || FETCH_FAILED=true
@@ -35,7 +35,7 @@ If `FETCH_FAILED`, set `last_status` to `"error"`, log both attempts, skip all g
 ## Query the PR
 
 ```bash
-gh pr view <number> --json state,mergeable,mergeStateStatus,statusCheckRollup,reviewDecision,headRefName,baseRefName
+gh pr view <number> --json state,isDraft,mergeable,mergeStateStatus,statusCheckRollup,reviewDecision,headRefName,baseRefName
 ```
 
 On network/rate-limit/auth error: log, set `last_status` to `"error"`, continue to next decision branch.
@@ -325,12 +325,13 @@ Any check with status `IN_PROGRESS` or `QUEUED` (and no failure/cancel). Set `la
 All of:
 
 - `mergeable` is `"MERGEABLE"`
+- `isDraft` is `false` (undraft in step 0 if it was draft)
 - No check has conclusion `FAILURE`, `ERROR`, `CANCELLED`, `TIMED_OUT`, `STARTUP_FAILURE`, or `STALE`
 - `reviewDecision` is not `"CHANGES_REQUESTED"`
 - No unresolved review threads (human or bot) — confirmed by the passes above
 - No open conversation-tab comment without a later `Addressed in ` closer
 
-Set `last_status` to `"healthy"`. No action. The PR is ready to merge. Proceed to Mergify detect and bootstrap ([`ship/step-4-mergify-detect.md`](ship/step-4-mergify-detect.md)), then merge protections ([`ship/step-6-merge-protections.md`](ship/step-6-merge-protections.md)), then the merge step ([`ship/step-7-merge.md`](ship/step-7-merge.md)).
+Set `last_status` to `"healthy"`. The PR is ready to merge. Proceed to Mergify detect ([`ship/step-4-mergify-detect.md`](ship/step-4-mergify-detect.md)), then merge protections ([`ship/step-6-merge-protections.md`](ship/step-6-merge-protections.md)), then the merge step ([`ship/step-7-merge.md`](ship/step-7-merge.md)).
 
 ## Last-status precedence
 

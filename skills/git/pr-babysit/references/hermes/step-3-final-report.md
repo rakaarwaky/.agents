@@ -7,7 +7,7 @@ Report to the user:
 3. **Outcome**:
    - `ship: true, merge_method: "queue"` → "Merged via Mergify merge queue to `<base_ref>`, branch deleted."
    - `ship: true, merge_method: "direct"` → "Merged to `<base_ref>` (<squash|auto>), branch deleted."
-   - `ship: false` → "Green and ready to merge. Run `/pr-babysit ship <number>` when you want it landed."
+   - Non-owner PR detected → "Rejected: PR #<number> authored by `<author>` is not `rakaarwaky`. Not processed, per the security gate."
 4. **Mergify** (when `mergify_available` is `"configured"`):
    - Queue history: how many queue/dequeue cycles occurred
    - Merge protections checked: freezes, Depends-On, Merge-After status

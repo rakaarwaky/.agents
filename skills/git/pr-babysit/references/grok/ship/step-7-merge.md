@@ -2,6 +2,19 @@
 
 Run only after all checks pass, review threads are resolved, protections are cleared, and `ship` is `true`.
 
+## Security gate (re-check before merging)
+
+```bash
+AUTHOR=$(gh pr view <number> --json author --jq '.author.login')
+[ "$AUTHOR" = "rakaarwaky" ] || { echo "REFUSED: author=$AUTHOR"; exit 1; }
+```
+
+If the author is not `rakaarwaky`, refuse the merge and report to the owner. Do not queue, do not direct-merge.
+
+## Auto-merge authorized
+
+SOUL.md authorizes auto-merge for `rakaarwaky`-authored PRs. Once the pre-merge checks below pass, queue the PR immediately — do not ask the owner for merge permission.
+
 ## Pre-merge checks
 
 1. Live gate re-query: `state==OPEN`, `!isDraft`, `mergeable==MERGEABLE`, `mergeStateStatus!=DIRTY`, `reviewDecision!=CHANGES_REQUESTED`
@@ -84,6 +97,7 @@ git push origin --delete <head_ref>
 
 - Comment on linked issue (if any): PR link + one-line note
 - Update state: `last_status: "merged"`, `merge_method: "queue" | "direct"`
+- Remove the PR number from the repo's `open_prs` array in `/home/raka/.agents/develop/repo.json`
 - Delete branch if not already deleted
 
 ## Report to Hermes

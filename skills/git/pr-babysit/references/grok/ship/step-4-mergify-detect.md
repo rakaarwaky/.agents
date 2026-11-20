@@ -46,7 +46,9 @@ If declined, set `MERGIFY_AVAILABLE="declined"` and skip to the direct-merge pat
 
 ### Write the config
 
-Fetch the Mergify docs before writing — never invent config from memory. See [`../../setup/step-0-template.md`](../../setup/step-0-template.md) if it exists; otherwise use the minimal config below.
+Fetch the Mergify docs before writing — never invent config from memory. The authoritative template is [`../../setup/step-0-template.md`](../../setup/step-0-template.md).
+
+**Security gate is mandatory.** Every config this lane writes MUST include `author = rakaarwaky` in `queue_rules.queue_conditions` and in `merge_protections_settings.auto_merge_conditions`. A config without that condition lets non-owner PRs into the merge queue and violates SOUL.md.
 
 Minimal config:
 
@@ -56,6 +58,16 @@ queue_rules:
   - name: default
     merge_method: squash
     merge_bot_account: null
+    # Security: only PRs authored by rakaarwaky are allowed in the queue.
+    queue_conditions:
+      - author = rakaarwaky
+
+merge_protections_settings:
+  # Security: only PRs authored by rakaarwaky are auto-queued.
+  auto_merge_conditions:
+    - author = rakaarwaky
+  post_comment: true
+  reporting_method: check-runs
 
 pull_request_rules:
   - name: auto-merge when CI passes and approved
@@ -64,6 +76,7 @@ pull_request_rules:
       - "#approved-reviews-by>=1"
       - -draft
       - -closed
+      - author = rakaarwaky
     actions:
       queue:
         name: default
@@ -76,6 +89,14 @@ mergify config validate
 ```
 
 If it fails, fix and retry (max 2 attempts). If still failing, report the error and fall back to direct merge.
+
+Also verify the author gate is present before opening the PR:
+
+```bash
+grep -c "author = rakaarwaky" .mergify.yml   # must be >= 2
+```
+
+If that prints `0`, stop — do not open a setup PR with an unprotected queue.
 
 ### Open a setup PR
 
@@ -94,6 +115,16 @@ gh pr create \
 
 Report: "Created PR #<N> to add Mergify config. Once merged, Mergify merge queue will be available."
 Set `MERGIFY_AVAILABLE="bootstrapping"` (with the setup PR number).
+
+## Security gate on existing configs
+
+Before leaving this step, verify a config that is already present carries the author gate:
+
+```bash
+grep -c "author = rakaarwaky" "$MERGIFY_CONFIG"
+```
+
+If the count is `0`, the queue is unprotected. Report to the owner and open a separate PR adding the gate via `/pr-babysit setup`; do not queue any PR in this repo until the gate lands.
 
 ## Report to Hermes
 

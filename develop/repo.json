@@ -1,0 +1,32 @@
+{
+  "repos": [
+    {
+      "owner": "rakaarwaky",
+      "name": "psd-timelapse",
+      "default_branch": "main",
+      "mergify": true,
+      "ci_workflow": "ci.yml",
+      "status": "watching",
+      "main_ci": "red",
+      "open_prs": [
+        "#301 draft",
+        999
+      ]
+    },
+    {
+      "owner": "rakaarwaky",
+      "name": "lint-arwaky",
+      "default_branch": "main",
+      "mergify": true,
+      "ci_workflow": "ci.yml",
+      "status": "watching",
+      "main_ci": "red",
+      "open_prs": []
+    }
+  ],
+  "watch_all_new_prs": true,
+  "autofix_ci": true,
+  "merge_only_on_owner_approval": true,
+  "undraft_ready_prs": true,
+  "mergify_needed_repos": []
+}
