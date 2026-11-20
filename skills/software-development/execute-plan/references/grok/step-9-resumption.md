@@ -6,7 +6,7 @@ When invoked with `--resume <PLAN_ID>`:
 
 Setup is skipped on resume, so first **recompute the scratch directory** — re-run `sdc host setup --subdir execute` and read `scratch_dir` from the JSON output so the path matches the original run's per-repo plans dir (Step 0):
 
-1. Read the state file at `<scratch_dir>/exec-plan-<PLAN_ID>.json`.
+1. Read the state file at `<scratch_dir>/exec-plan-<PLAN_ID>.json`. **This is the only valid location.** If the file does not exist here, report the error and stop — do NOT search the worktree root or any repo-tracked directory, as that indicates a prior run violated the scratch-dir contract.
 2. If the file does not exist, report the error and stop.
 3. Restore orchestrator state from the file: `plan_doc_path`, `max_concurrent`, `dag`, `linearized_order`, `user_instructions`, `gh_available`, `pr_urls`. Re-run the Step 2 probe to populate `gh_available`.
 4. Evaluate each PR node's status:

@@ -9,6 +9,8 @@ A full-screen TUI agent (Grok) renders to its terminal *screen*, not to the line
 Poll with BOTH: use `orca terminal wait --terminal <handle> --for tui-idle --timeout-ms 60000 --json` to detect idle, and `orca terminal read --terminal <handle> --screen --json` to inspect the rendered screen for the sentinel and the final report. A multi-PR plan routinely runs 15–25 minutes; background the loop (see below), do not run it in the foreground.
 
 - `terminal wait --for tui-idle` returns `result.satisfied: true` both while Grok is mid-turn between renders and when it is truly done — idle alone does not mean finished. Confirm completion by finding `EXECUTE_PLAN_COMPLETE` on the screen, not by idle.
+- A `terminal wait --for tui-idle` that returns `satisfied: false` means the agent is BUSY, not that the poll failed — keep polling. Only a genuine CLI/parse failure (empty or non-JSON `orca` output) counts as an error; never abort the loop on not-satisfied waits. Treating busy-as-error is what makes a poll script report a false failure on a run that is progressing normally.
+- Do NOT gate completion solely on the literal `EXECUTE_PLAN_COMPLETE` sentinel — many runs end with a per-PR summary table and a `Draft PR: #N` line plus a `Worked for Xm` footer and never print the sentinel. Detect completion from EITHER the sentinel OR a final-report shape (a GitHub PR URL / `Draft PR` reference on screen while the agent is idle at its prompt). The bundled `scripts/poll_grok.py` implements both checks.
 
 ### Automated Polling Script
 
@@ -24,12 +26,7 @@ If you must inline the loop instead, use `python3 -c 'import sys,json; ...'` for
 
 ## When Grok Is Done
 
-Grok writes artifacts to its scratch dir (`~/.agents/develop/<repo-slug>/execute/`):
-
-- **State file**: `exec-plan-<PLAN_ID>.json` — the full DAG state: per-PR status, `commit_sha`, `review_rounds`, `final_branch`, `final_review_passed`, `pr_urls`, `deferred_issues`.
-- **Per-PR summaries**: `exec-summary-<PLAN_ID>-<pr-id>.md`.
-- **Per-PR merged reviews**: `exec-review-<PLAN_ID>-<pr-id>.md`.
-- **Final report**: Grok's terminal output ends with its final report (per `grok/step-13-final-report.md`).
+Grok writes a state file `exec-plan-<PLAN_ID>.json` with the full DAG state: per-PR status, `commit_sha`, `review_rounds`, `final_branch`, `final_review_passed`, `pr_urls`, `deferred_issues`. **The state file MUST be written exclusively to `<scratch_dir>/exec-plan-<PLAN_ID>.json`**, where `scratch_dir` is the absolute path returned by `sdc host setup --subdir execute` (Step 0). If the state file is not found at `<scratch_dir>/exec-plan-<PLAN_ID>.json`, treat it as missing — do NOT search the worktree root or any repo-tracked directory, as that indicates Grok violated the scratch-dir contract. The per-PR `exec-summary-<PLAN_ID>-<pr-id>.md` / `exec-review-<PLAN_ID>-<pr-id>.md` markdown artifacts are written unreliably and are often absent from disk even on a clean run — do not gate verification on their existence; reconstruct the per-PR outcome from the state file's `dag` array plus `git log` on the final branch.
 
 Do NOT trust the state file as proof of completion — it is written at the start and is frequently left at `status: "initializing"` with every PR `pending` even after a fully successful run. Confirm completion from the rendered screen (`terminal read --screen` shows Grok's final report block: PR URL, branch, CI results, `EXECUTE_PLAN_COMPLETE`) and from the actual `git` / `gh pr` state on `origin`, not from `exec-plan-<PLAN_ID>.json`. If Grok reports failure or the terminal exits non-idle with an error, report it verbatim to the user and stop — do not retry, do not hand-assemble the final branch yourself.
 

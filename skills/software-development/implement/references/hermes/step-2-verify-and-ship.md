@@ -11,7 +11,11 @@ Start from the diff, not the artifacts — Grok runs may leave no review files, 
 3. Run the repo's local gate against the clean tree (per AGENTS.md / the repo's lint commands — e.g. `npm test -- --run`, `pytest`, `ruff check`, etc.). A dirty-tree green is not a proof; clean the tree first, then run. When a gate fails, compare against the same gate on `origin/main` (a separate checkout) before blaming the change — a pre-existing failure in an untouched area is not a regression this run introduced.
 
    **Pitfall — run the JS/TS gate from the package root, not the repo root.** In repos that keep `package.json` in a `packages/` subdirectory (with the Python project at the repo root), `npm test` from the worktree root fails `ENOENT: no such file or directory, open '.../package.json'`. `cd` into the directory that actually contains `package.json` first. The Python gates (`ruff`, `mypy`, `pytest`) run from the repo root against `modules/`.
+
+   **Pitfall — worktree has no `.venv`.** Grok may create its own virtualenv or use the main repo's. Before running tests, check if `.venv/bin/python` exists in the worktree; if not, create it with `python3 -m venv .venv && .venv/bin/pip install -q pytest ruff` then run tests with `PYTHONPATH=modules .venv/bin/python -m pytest modules/ -q -m "not dogfood"`.
 4. Run `lint-arwaky-cli report .` from the worktree (absolute path: `$HOME/.local/bin/lint-arwaky-cli`). This is the end-of-run lint gate: the Delta column must be zero or negative versus the start-turn baseline recorded in `hermes/step-0-plan-and-spawn.md`. A positive delta means the run introduced new lint violations — stop, revert the offending changes, and re-run the gate before proceeding to commit. Include the final report output in the run log. If the CLI is unavailable, note the failure and continue.
+
+**Pitfall — CLI exception handler must include new error classes.** When Grok adds a new `SdcError` subclass (e.g. `MemoryUsageError` for UX-S5-004) and the fix brief touches the CLI surface, the exception handler in `surface_sdc_command.py` (`except (...)` tuple) must be updated to catch the new class — otherwise the exit code won't propagate and the error escapes as an unhandled exception. This is a legitimate 1-line change to an otherwise out-of-scope file; do not revert it as out-of-scope.
 
 ## 2b: Read Grok's Artifacts (optional)
 

@@ -30,6 +30,13 @@ for pr in <completed PRs in linearized_order>:
         orca-ide worktree rm --worktree "<pr.orca_worktree_id>" --force --json || true
         pr.worktree_cleaned = true
     fi
+    # Safety: prevent scratch-dir artifacts from being merged into the final branch.
+    # If a prior run wrote exec-plan-*/exec-summary-*/exec-review-* into a repo-tracked
+    # path, remove them from the PR branch before merging.
+    git ls-files -- 'exec-plan-*.json' 'exec-summary-*.md' 'exec-review-*.md' | while read -r leaked; do
+        echo "WARNING: removing scratch-dir artifact from PR branch: $leaked" >&2
+        git rm --cached --quiet -- "$leaked"
+    done
     git merge <pr.commit_sha> --no-edit
 ```
 

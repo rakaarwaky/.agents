@@ -18,6 +18,7 @@
 - Non-SdcError exceptions raised for invalid input bypass exit-code contract (seen 1 time)
 - OSError handler ignores dynamic exit code (seen 1 time)
 - Partial failure exit code with no failure detail (seen 1 time)
+- UnicodeDecodeError and OSError must be wrapped in MemoryHelperError, not propagate as tracebacks (seen 1 time)
 - Unwired capability misclassified as a usage error (seen 1 time)
 
 ### Code Quality
@@ -41,7 +42,34 @@
 - Doc references removed CLI flag (seen 1 time)
 - Docstring implies mutual exclusivity that no longer holds (seen 1 time)
 
+### Python
+- datetime.UTC requires Python 3.11+; use timezone.utc for 3.9 compat (seen 1 time)
+
+### Git
+- memory_paths() must fall back to cwd slug when not inside a git repo (seen 1 time)
+
+### Parser
+- parse_memory_file() must preserve unmatched lines; render_memory_file() must re-emit them (seen 1 time)
+
+### CLI
+- top_patterns() must validate n >= 1 and raise MemoryUsageError for invalid input (seen 1 time)
+
+### UX
+- Error messages must use plain language, not Python tuple reprs (seen 1 time)
+- Lock timeout messages must state cause, retry guidance, and that nothing was written (seen 1 time)
+- TTY-gated stderr hints needed for missing-file states in read commands (seen 1 time)
+
+### Design System
+- Closed vocabularies (workflow enum) and prefix gates must be consistently applied (seen 1 time)
+
 ## Recent Runs
+
+### 2026-11-20 — "impl: fix 13 UX review findings for memory store"
+- **Workflow**: impl
+- **Rounds**: 1
+- **Issues**: 10 total (3 bugs, 5 suggestions, 2 nits)
+- **Key patterns**: datetime.UTC 3.9 compat, non-git cwd fallback, parse-preserve-re-emit, MemoryUsageError exit 2, MemoryHelperError wrapping
+- **Specializations used**: Python 3.9 compat, AES layer conventions, git worktree orchestration
 
 ### 2026-11-18 — "Fix planner review findings"
 - **Rounds**: 2

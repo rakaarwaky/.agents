@@ -23,7 +23,8 @@ git -C <path> log --oneline <final_branch> -<N>   # N = completed PR count + 1
 
 - Confirm the final branch exists on `origin` with `final_commit_sha` as its tip (Grok pushed it per `grok/step-10-stack-assembly.md`).
 - Run the repo's local gate on the final branch tip (per AGENTS.md / repo lint commands). A dirty-tree green is not proof; check `git status --short` is clean first.
-- If the gate fails on the committed SHA, that is a verification defect, not a Grok flake — report it to the user with the exact failing commands and do not push a fix yourself.
+- **Scope gate failures to plan-touched files.** The repo may carry a large pre-existing failing baseline (test/mypy/lint failures in untouched packages) that predates this plan. If the gate fails outside `packages/psd/` / `packages/shared/src/psd/` paths touched by the PR, those are pre-existing defects, not regressions — verify plan-touched files pass cleanly and report the pre-existing failures as informational, not blocking.
+- If the gate fails on the committed SHA within plan-touched files, that is a verification defect, not a Grok flake — report it to the user with the exact failing commands and do not push a fix yourself.
 
 ## 2c: Handle Partial Failures
 

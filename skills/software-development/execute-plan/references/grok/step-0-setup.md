@@ -63,6 +63,8 @@ Run `sdc host setup --subdir execute` and parse the JSON stdout. Store `python` 
 **Validate** that `PLAN_ID` is 8 hex characters.
 **Inline the resolved absolute `SCRATCH_DIR` and `PYTHON`** into every later command.
 
+> **Hard rule — state file location.** The state file `exec-plan-<PLAN_ID>.json` and all per-PR artifacts (`exec-summary-*`, `exec-review-*`) MUST be written exclusively under `<SCRATCH_DIR>/`. Never write them to the worktree root, the repo root, or any git-tracked directory. Before writing the state file, verify the resolved absolute path starts with `<SCRATCH_DIR>` — if it does not, abort and fix the path. Writing artifacts into the repo tree causes them to be committed and merged into the final branch.
+
 Define shared file paths (all under `SCRATCH_DIR`):
 
 - `state_file`: `<SCRATCH_DIR>/exec-plan-<PLAN_ID>.json`

@@ -50,6 +50,8 @@ The run id (`REVIEW_ID`) is an 8-hex-character identifier (e.g. `cca7ab30`) prin
 ls -lt /tmp/grok-<username>/grok-review-* 2>/dev/null
 ```
 
+**Pitfall — terminal `tui-idle` and empty content are not reliable completion signals.** `orca terminal read` can return `content len: 0` and `nextCursor: 0` while Grok is still actively working internally (e.g. the TUI shows "Waiting for response…" but edits, test runs, and lint scans are happening in parallel). Do not stop polling based on empty terminal output or `tui-idle` alone. Confirm Grok finished by checking `git -C <worktree_path> diff --stat` for the expected edits — if the diff is stable across multiple polls and matches the brief scope, Grok is done even if the terminal shows no new output.
+
 **Pitfall — Grok may write no review artifacts.** A headless or single-pass Grok run produces no files under `/tmp/grok-<username>/` and its terminal `tail` can stay empty for minutes, showing only the `grok '--permission-mode' 'bypassPermissions'` launch line while it works. Neither is a failure: confirm the run did its job by checking `git -C <worktree> diff` / `status --short` for the expected edits rather than blocking on artifacts that may never appear. The worktree diff is the primary proof of completion, not the artifact files.
 
 If Grok reports failure or exits non-idle with an error, report it verbatim to the user and stop — do not retry, do not hand-fix the worktree.

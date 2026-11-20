@@ -14,6 +14,7 @@
 - Missing tests for file-input change with empty selection (cancelled dialog) (seen 1 time)
 - Missing tests for keyboard accessibility preventDefault verification (seen 1 time)
 - Missing tests for uppercase file extensions in accept checks (seen 1 time)
+- Test file name does not match the capability under test (seen 1 time)
 
 ### Code Quality
 - CSS hover specificity conflicts resolved by source order, not compound selectors (seen 1 time)
@@ -22,7 +23,27 @@
 - Inline styles override CSS class declarations for visual state (seen 1 time)
 - Use full shorthand border instead of partial border-property overrides (seen 1 time)
 
+### Planning
+- Agent dispatch shape not stated, risking AES405 free-function violation (seen 1 time)
+- Async signature vs synchronous execution tension not resolved for blocking I/O (seen 1 time)
+- Blocking dependency decision not enforced as a PR gate (seen 1 time)
+- Field-name mapping obligation between surface rows and domain VOs not documented for deferred wiring (seen 1 time)
+- Missing optional document rationale not stated for the layer (seen 1 time)
+- Plan assumes member-level config files exist without checking the workspace's shared config pattern (seen 1 time)
+- Plan lacks an objective test-count or coverage completion criterion (seen 1 time)
+- PR Plan dependency edges inconsistent between diagram and text (seen 1 time)
+- Shared folder mirror created without DATA.md/BACKLOG.md DT-ID registration (seen 1 time)
+- Validation rule missing an edge case that the server-side counterpart enforces (seen 1 time)
+
+### Security
+- Security table omits a client-side injection/prototype-pollution vector (seen 1 time)
+
 ## Recent Runs
+
+### 2026-11-20 — "plan: psd adapter package packages/psd"
+- **Rounds**: 2
+- **Issues**: 12 total (1 bug, 2 suggestions, 9 nits)
+- **Key patterns**: Plan assumes member-level config files exist without checking the workspace's shared config pattern, Shared folder mirror created without DATA.md/BACKLOG.md DT-ID registration, Blocking dependency decision not enforced as a PR gate
 
 ### 2026-11-19 — "fix studio visual hierarchy dropzone focal point"
 - **Rounds**: 3

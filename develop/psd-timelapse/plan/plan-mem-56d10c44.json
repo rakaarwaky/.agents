@@ -1,0 +1,27 @@
+{
+  "patterns": [
+    {"category": "Planning", "description": "Plan assumes member-level config files exist without checking the workspace's shared config pattern"},
+    {"category": "Planning", "description": "Shared folder mirror created without DATA.md/BACKLOG.md DT-ID registration"},
+    {"category": "Planning", "description": "Blocking dependency decision not enforced as a PR gate"},
+    {"category": "Planning", "description": "Validation rule missing an edge case that the server-side counterpart enforces"},
+    {"category": "Testing", "description": "Test file name does not match the capability under test"},
+    {"category": "Planning", "description": "Field-name mapping obligation between surface rows and domain VOs not documented for deferred wiring"},
+    {"category": "Planning", "description": "Agent dispatch shape not stated, risking AES405 free-function violation"},
+    {"category": "Planning", "description": "Async signature vs synchronous execution tension not resolved for blocking I/O"},
+    {"category": "Planning", "description": "PR Plan dependency edges inconsistent between diagram and text"},
+    {"category": "Planning", "description": "Plan lacks an objective test-count or coverage completion criterion"},
+    {"category": "Planning", "description": "Missing optional document rationale not stated for the layer"},
+    {"category": "Security", "description": "Security table omits a client-side injection/prototype-pollution vector"}
+  ],
+  "run": {
+    "date": "2026-11-20",
+    "description": "plan: psd adapter package packages/psd",
+    "rounds": 2,
+    "issues_by_severity": {"bug": 1, "suggestion": 2, "nit": 9},
+    "key_patterns": [
+      "Plan assumes member-level config files exist without checking the workspace's shared config pattern",
+      "Shared folder mirror created without DATA.md/BACKLOG.md DT-ID registration",
+      "Blocking dependency decision not enforced as a PR gate"
+    ]
+  }
+}
