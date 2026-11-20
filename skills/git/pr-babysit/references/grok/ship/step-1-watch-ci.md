@@ -1,4 +1,4 @@
-# Step 3 — Watch CI Until Green
+# Step 1 — Watch CI Until Green
 
 ## Check CI Status
 
@@ -58,4 +58,4 @@ for i in $(seq 1 20); do
 done
 ```
 
-Ambiguous failure logs: see [`ship/step-3-troubleshoot.md`](ship/step-3-troubleshoot.md).
+Ambiguous failure logs: see [`step-3-troubleshoot.md`](step-3-troubleshoot.md).

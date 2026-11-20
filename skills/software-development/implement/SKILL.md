@@ -18,6 +18,10 @@ Execute a comprehensive implement-review-fix loop for a single task within an Or
 | R3 | Never yield conversation turns passively after dispatching `/implement`; poll terminal status actively until completion. | Confirm active wait loop in Hermes lane until Orca terminal is idle or exited. |
 | R4 | Enforce lint progress gates bookending start and end of turn with `lint-arwaky-cli report .`; reject positive deltas. | Verify zero or negative issue delta between turn start and turn end. |
 | R5 | Require all 5 specialist reviewers to reach consensus with zero open issues before proceeding to PR creation. | Check merged reviewer findings report zero blocking issues. |
+| R6 | Read Grok's rendered screen via `--screen`, not the PTY line stream, to detect completion. | `--cursor` paging returns only one line with cursor stuck at `1`; `--screen` shows the agent's rendered output including the final report and completion sentinel. |
+| R7 | Confirm completion from screen content, not from `tui-idle` alone. | `tui-idle` returns `satisfied: true` mid-loop between renders — idle is not completion. |
+| R8 | Verify the final branch on `origin`, not from state/result files alone. | State files can be stale; authoritative truth: `git fetch origin <branch>` + `gh pr view <n>`. |
+| R9 | Per-PR summary/review markdown artifacts may not exist on disk even when referenced. | Treat them as advisory; rely on final screen block + origin git/gh state instead. |
 
 ## Routing
 

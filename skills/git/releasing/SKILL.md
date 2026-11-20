@@ -1,32 +1,58 @@
 ---
 name: releasing
-description: "Release, cut a release, ship a new version, publish or tag a release for the mergify CLI, recover a failed release run."
-when-to-use: 'Cut a CalVer release of the mergify CLI autonomously — bump via the bump script, open and merge a release prep PR, build and publish the draft through GitHub workflows, and recover failed release runs. Triggers: "release", "cut a release", "ship a new version", "publish a release", "tag a version", "release run recovery".'
+description: "Release, cut a release, ship a new version, publish or tag a release, recover a failed release run."
+when-to-use: 'Cut a CalVer release of any project autonomously — bump via the bump script in an Orca worktree, open and merge a release prep PR, build and publish the draft through GitHub workflows, and recover failed release runs. Triggers: "release", "cut a release", "ship a new version", "publish a release", "tag a version", "release run recovery".'
 argument-hint: "--tag <tag> --target_commitish <sha>"
 ---
 
-# Releasing `mergify-cli` — autonomous headless release agent
+# Releasing — autonomous headless release agent
 
-Execute end-to-end CalVer releases for the `mergify-cli` project through automated version bumps, release prep pull requests, artifact builds, and PyPI publishing.
+Execute end-to-end CalVer releases for any project through automated version bumps, release prep pull requests, artifact builds, and publishing.
 
 ## Rules
 
 | ID | Rule | Check |
 |----|------|-------|
-| R1 | Confirm repository remote is `Mergifyio/mergify-cli` with CalVer versioning scheme before proceeding. | Verify `git remote -v` and version format match `mergify-cli` requirements. |
-| R2 | Drive versioning strictly through `.github/workflows/release.yml`; never manually edit version strings in config files. | Verify placeholder version retention in `pyproject.toml` and `Cargo.toml`. |
-| R3 | Enforce mandatory prep PR flow: never commit version bumps directly to main or push tags manually. | Check that release branch PR is opened, approved, and merged with green CI. |
-| R4 | Never create releases via `gh release create` or the GitHub Releases UI, which bypasses workflow asset builders. | Ensure release drafts are initiated strictly by workflow dispatch. |
+| R1 | Confirm the repo has a CalVer or SemVer versioning scheme and a bump script at `scripts/bump.sh` or `scripts/bump.py` before proceeding. If missing, run the setup lane first (R9). | `git remote -v` and version format match the project's scheme. |
+| R2 | Drive versioning strictly through the bump script and release workflow; never manually edit version strings in config files. | Verify placeholder version retention in version files. |
+| R3 | Enforce mandatory prep PR flow: never commit version bumps directly to main or push tags manually. | Check that the release branch PR is opened, approved, and merged with green CI. |
+| R4 | Never create releases via `gh release create` or the GitHub Releases UI — releases are initiated only by workflow dispatch. | Ensure release drafts are initiated strictly by workflow dispatch. |
 | R5 | Treat Step 4 (Publish) as irreversible and autonomous, proceeding straight to publish without stopping for approval. | Verify automated transition from validated draft to published release. |
-| R6 | Report Homebrew tap PR merge as the only human-actionable manual step upon release completion. | Confirm final output highlights Homebrew tap merge link for manual sign-off. |
+| R6 | Label every release prep PR with `release` before merging. When the auto-release automation fires on a `pr_merged` event, check the merged PR's labels first. If the `release` label is present, skip — no new cycle. This prevents loop triggers. | `gh pr view <n> --json labels --jq '[.labels[].name]'` includes `"release"` before any action; absence means proceed. |
+| R7 | All release prep work happens in an Orca worktree. The main clone stays clean. | `orca worktree create` is called before any `git checkout -b` or `git commit` on the release branch. |
+| R8 | git-cliff is the mandatory changelog source. If `git-cliff` is not installed, install it before generating the changelog. If `cliff.toml` is missing, create it with a valid `commit_parsers` array. | `git-cliff` installed and `cliff.toml` exists before any release step finishes. |
+| R9 | Drive the repo's own release pipeline — read `repo.json` and the repo's `.github/workflows/` first; never invent a parallel release flow. Match the repo's release commit/tag conventions (e.g. `psd-timelapse` needs `chore(release): vX.Y.Z` titles for `tag-release-prs.yml` to fire). If `repo.json` marks a repo `release: needs-setup`, run the setup lane first. | The release is triggered through the repo's existing workflow, not a hand-built one; `repo.json`'s `release` field matches the lane actually run. |
+| R10 | Compute the next version from the last git tag, not the last GitHub release (a repo may tag without publishing, or publish without tagging). Verify with `git tag --list 'v*' --sort=-v:refname`. | Version math uses the tag list, not `gh release list` alone. |
 
 ## Routing
 
+Pick the lane from `repo.json`'s `release` field before running any step:
+
+| `repo.json` `release` | Lane | What to run |
+|---|---|---|
+| `"ready"` (or absent — default for known repos) | **release** | The steps under [`references/release/`](references/release/step-0-version-bump.md) |
+| `"needs-setup"` | **setup** | The steps under [`references/setup/`](references/setup/step-0-audit.md) first; after the repo has a full pipeline, set `release` to `"ready"` and run the release lane |
+
+A repo is "ready" when it has: (1) a version scheme stamped in a config file, (2) a release workflow in `.github/workflows/`, (3) a `cliff.toml` changelog source with git-cliff installed, and (4) a bump script. The setup lane is for new repos.
+
+Release lane (`release: ready` repos):
+
 | Step | Reference | Purpose |
 | ---- | --------- | ------- |
-| Step 0 | [`references/step-0-version-bump.md`](references/step-0-version-bump.md) | Version bump and changelog generation: compute `NEW_VERSION`, generate changelog with `git-cliff`, run the bump script (`scripts/bump.sh` / `scripts/bump.py`). Working directory: project root. |
-| Step 1 | [`references/step-1-prep-pr.md`](references/step-1-prep-pr.md) | Release prep PR: create branch, open PR, wait for green CI, auto-approve and merge with admin, switch back to main. |
-| Step 2 | [`references/step-2-preflight.md`](references/step-2-preflight.md) | Pre-flight checks: verify main is clean (CI green, no leftover draft release), report what ships since the previous tag. Stop on anything red. |
-| Step 3 | [`references/step-3-build-draft.md`](references/step-3-build-draft.md) | Build the draft: trigger `release.yml`, watch (~5–10 min), verify the draft carries exactly seven assets. Proceed immediately to Step 4. |
-| Step 4 | [`references/step-4-publish.md`](references/step-4-publish.md) | Publish: `gh release edit "$tag" --draft=false --latest`, watch the publish job (~5–10 min), confirm PyPI + Homebrew tap PR. |
-| Step 5 | [`references/step-5-verify.md`](references/step-5-verify.md) | Verify after publishing: confirm PyPI reports the new version and the Homebrew tap PR is open. Report final status. |
+| Step 0 | [`references/release/step-0-version-bump.md`](references/release/step-0-version-bump.md) | Resolve the repo's version scheme and changelog source from `repo.json` + the repo's own workflows. Drive the existing pipeline. Auto-install git-cliff + auto-create `cliff.toml` only when the repo uses git-cliff. Compute `NEW_VERSION`; generate the changelog; stamp the version and commit. |
+| Step 1 | [`references/release/step-1-prep-pr.md`](references/release/step-1-prep-pr.md) | Release prep PR in an Orca worktree: create worktree, run bump/changelog, push branch, open PR with `release` label, watch CI, auto-approve and merge with admin, retire worktree. |
+| Step 2 | [`references/release/step-2-preflight.md`](references/release/step-2-preflight.md) | Pre-flight checks: verify main is clean (CI green, no leftover draft release), report what ships since the previous tag. Stop on anything red. |
+| Step 3 | [`references/release/step-3-build-draft.md`](references/release/step-3-build-draft.md) | Trigger the repo's own release workflow (tag-driven), watch it, verify the release carries the expected assets. |
+| Step 4 | [`references/release/step-4-publish.md`](references/release/step-4-publish.md) | Draft-based repos only: undraft the release and watch the publish job. No-op for the two watched repos (they publish directly in Step 3). |
+| Step 5 | [`references/release/step-5-verify.md`](references/release/step-5-verify.md) | Verify the release is live (not a draft) with the expected assets; report final status and URL. |
+
+Setup lane (`release: needs-setup` repos):
+
+| Step | Reference | Purpose |
+| ---- | --------- | ------- |
+| Setup 0 | [`references/setup/step-0-audit.md`](references/setup/step-0-audit.md) | Audit which of the four requirements are missing. |
+| Setup 1 | [`references/setup/step-1-version-scheme.md`](references/setup/step-1-version-scheme.md) | Confirm or create the version file and scheme. |
+| Setup 2 | [`references/setup/step-2-changelog-source.md`](references/setup/step-2-changelog-source.md) | Install git-cliff and create `cliff.toml` with a `commit_parsers` array. |
+| Setup 3 | [`references/setup/step-3-release-workflow.md`](references/setup/step-3-release-workflow.md) | Scaffold `.github/workflows/release.yml` (tag-driven). |
+| Setup 4 | [`references/setup/step-4-bump-script.md`](references/setup/step-4-bump-script.md) | Scaffold `scripts/bump.sh` that stamps the version, runs git-cliff, and commits. |
+| Setup 5 | [`references/setup/step-5-handoff.md`](references/setup/step-5-handoff.md) | Update `repo.json` to `"ready"`, then run the release lane. |

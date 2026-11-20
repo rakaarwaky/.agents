@@ -31,7 +31,6 @@ Deduplicate: skip if `repo` is already present in `repos[].name`. Add entry with
   "default_branch": "<DEFAULT_BRANCH>",
   "mergify": true,
   "ci_workflow": "ci.yml",
-  "status": "watching",
   "main_ci": "unknown",
   "open_prs": []
 }

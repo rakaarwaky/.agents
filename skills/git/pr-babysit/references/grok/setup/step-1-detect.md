@@ -1,4 +1,4 @@
-# Step 0 — Detect Mergify (setup lane)
+# Step 1 — Detect Mergify (setup lane)
 
 When the user runs `/pr-babysit setup <number>`:
 

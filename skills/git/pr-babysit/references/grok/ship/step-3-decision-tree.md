@@ -1,4 +1,4 @@
-# Step 4 — Decision Tree and Auto-Fix Loop
+# Step 3 — Decision Tree and Auto-Fix Loop
 
 The core per-cycle pass. Runs on every `check` and on every scheduled `/loop` trigger. Single PR, single worktree — no subagent dispatch, no resume, no parallel groups.
 
@@ -94,7 +94,7 @@ gh run view <run_id> --log-failed 2>/dev/null | tail -100
 
 For each failed check:
 
-1. Read the log. Load [`ship/step-3-troubleshoot.md`](ship/step-3-troubleshoot.md) if the failure is ambiguous (flake vs real).
+1. Read the log. Load [`step-3-troubleshoot.md`](step-3-troubleshoot.md) if the failure is ambiguous (flake vs real).
 2. Fix the code in the worktree.
 3. Commit and push:
    ```bash
@@ -103,7 +103,7 @@ For each failed check:
    git push
    ```
 4. Set `last_status` to `"ci_failed"`. Increment `fix_count` once per successful check fix.
-   - If Mergify is available (`MERGIFY_AVAILABLE` is `"configured"` or `"installed"`), run Mergify CI diagnostics before the next fix pass — check flaky test quarantine, JUnit upload, and affected scopes ([`ship/step-5-mergify-diagnostics.md`](ship/step-5-mergify-diagnostics.md)).
+   - If Mergify is available (`MERGIFY_AVAILABLE` is `"configured"` or `"installed"`), run Mergify CI diagnostics before the next fix pass — check flaky test quarantine, JUnit upload, and affected scopes ([`step-5-mergify-diagnostics.md`](step-5-mergify-diagnostics.md)).
 
 ## Changes requested (review-level body)
 
@@ -331,7 +331,7 @@ All of:
 - No unresolved review threads (human or bot) — confirmed by the passes above
 - No open conversation-tab comment without a later `Addressed in ` closer
 
-Set `last_status` to `"healthy"`. The PR is ready to merge. Proceed to Mergify detect ([`ship/step-4-mergify-detect.md`](ship/step-4-mergify-detect.md)), then merge protections ([`ship/step-6-merge-protections.md`](ship/step-6-merge-protections.md)), then the merge step ([`ship/step-7-merge.md`](ship/step-7-merge.md)).
+Set `last_status` to `"healthy"`. The PR is ready to merge. Proceed to Mergify detect ([`step-4-mergify-detect.md`](step-4-mergify-detect.md)), then merge protections ([`step-6-merge-protections.md`](step-6-merge-protections.md)), then the merge step ([`step-7-merge.md`](step-7-merge.md)).
 
 ## Last-status precedence
 

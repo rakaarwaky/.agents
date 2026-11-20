@@ -2,7 +2,7 @@
 name: dogfood
 description: "Exploratory QA for web, terminal/TUI, desktop GUI, and mobile (Android) apps — finds bugs, captures evidence, and produces a structured report across all four target types."
 when-to-use: "Use when doing exploratory QA of any application surface — web (navigate, interact, screenshot, console errors), terminal or TUI apps (command execution, exit codes, output capture), desktop GUI apps (click, type, accessibility tree, screenshot), or Android apps on an emulator (adb taps, swipes, logcat, screencap). Produces a structured bug report with per-issue evidence."
-argument-hint: "<target> [--type web|terminal|desktop|mobile] [--scope <scope>] [--output-dir <dir>]"
+argument-hint: "<web|terminal|desktop|mobile> <scope>"
 ---
 
 # Dogfood — Exploratory QA

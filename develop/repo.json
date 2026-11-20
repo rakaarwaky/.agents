@@ -6,12 +6,9 @@
       "default_branch": "main",
       "mergify": true,
       "ci_workflow": "ci.yml",
-      "status": "watching",
-      "main_ci": "red",
-      "open_prs": [
-        "#301 draft",
-        999
-      ]
+      "main_ci": "green",
+      "release": "needs-setup",
+      "open_prs": []
     },
     {
       "owner": "rakaarwaky",
@@ -19,14 +16,9 @@
       "default_branch": "main",
       "mergify": true,
       "ci_workflow": "ci.yml",
-      "status": "watching",
-      "main_ci": "red",
+      "main_ci": "green",
+      "release": "needs-setup",
       "open_prs": []
     }
-  ],
-  "watch_all_new_prs": true,
-  "autofix_ci": true,
-  "merge_only_on_owner_approval": true,
-  "undraft_ready_prs": true,
-  "mergify_needed_repos": []
+  ]
 }

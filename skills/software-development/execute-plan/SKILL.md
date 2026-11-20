@@ -18,6 +18,16 @@ Orchestrate a PR Plan DAG end-to-end across parallel Orca worktrees, driving imp
 | R3 | Validate the PR Plan DAG using `sdc validate-plan` before dispatching worktrees or subagents. | Check plan validation command exit code before spawning implementers. |
 | R4 | Enforce modular branch creation and linearized merge ordering to prevent integration conflicts. | Verify branch preparation sequence follows DAG topological sort. |
 | R5 | Require full reviewer panel sign-off (5 reviewers, 0 open issues) on every modular branch before stack assembly. | Inspect reviewer verdict files for zero blocking issues prior to merge. |
+| R6 | Read Grok's rendered screen via `--screen`, not the PTY line stream, to detect completion. | `--cursor` paging returns only one line with cursor stuck at `1`; `--screen` shows the agent's rendered output including the final report and `EXECUTE_PLAN_COMPLETE` sentinel. |
+| R7 | Confirm completion from screen content, not from `tui-idle` alone. | `tui-idle` returns `satisfied: true` mid-loop between renders — idle is not completion. |
+| R8 | Verify the final branch on `origin`, not from `exec-plan-*.json` state file alone. | State file is written at start and often stale; authoritative truth: `git fetch origin <branch>` + `gh pr view <n>`. |
+| R9 | Per-PR `exec-summary-*`/`exec-review-*` markdown artifacts may not exist on disk even when state file references them. | Treat them as advisory; rely on final screen block + origin git/gh state instead. |
+| R10 | Treat poll-script heartbeat ticks as internal progress, not user turns — one short status line, then end the turn; do not re-read the screen on every tick. | A fresh `--screen` read per heartbeat wastes turns without new signal; spend one only past the expected runtime budget to confirm Grok is still progressing. |
+| R11 | Treat `terminal wait --for tui-idle` failures as busy, not errors — only `terminal read` failures count toward the poll-script CLI-error abort threshold. | `wait` timeouts mid-loop mean Grok is still processing; aborting on them kills a run that is progressing normally. |
+| R12 | Subagent lifecycle lines ("turn cancelled", "session shut down", subagent completed) do not mean Grok failed. | Grok continues with reviewers and later PRs after an implementer subagent finishes; only a literal failure report or a terminal exit without a final report means failure. |
+| R13 | For sequential DAGs (`max_parallelism=1`) with several PRs and fix loops, budget 4+ hours of polling — PR-1 alone (implementer + 5-reviewer panel + fix rounds) routinely runs past 40 minutes. | Under-budgeting the poll deadline reports a false timeout on a run that is still progressing. |
+| R14 | When a Grok session disconnects or times out mid-DAG, resume with `--resume <PLAN_ID>` instead of restarting the plan. | Resume keeps completed PR branches and reviewer verdicts, avoiding duplicate work. |
+| R15 | Before starting a new `sdc pool grok` poll loop, kill any existing `sdc pool grok` processes for the same terminal handle. | Multiple concurrent loops compete for the same Orca terminal session and cause `tcsetattr` / `bash: tcsetattr: Inappropriate ioctl for device` errors. |
 
 ## Routing
 

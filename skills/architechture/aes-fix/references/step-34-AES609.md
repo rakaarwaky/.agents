@@ -17,6 +17,7 @@ AES609 (rule code `AES609`, checker `capabilities_doc_frd` in the `doc-rules` cr
   - A protocol trait was added to the shared module without a matching FR heading in the FRD, or
   - An FR heading was removed from the FRD without removing its protocol trait, or
   - The counts were misaligned when the feature was scaffolded.
+- **`table_missing_columns` / `entry_missing_row`:** an FR's Technical Specification table is missing a required column or a declared outcome entry row. The Technical Specification is validated as a table; if its columns are incomplete or an expected row for a declared outcome is absent, AES609 fires even when `fr_count == protocol_count`.
 
 ## How to fix (concrete steps)
 
@@ -27,8 +28,9 @@ AES609 (rule code `AES609`, checker `capabilities_doc_frd` in the `doc-rules` cr
    - Count the protocol traits in the shared module (`grep -c 'pub trait I' crates/shared/src/<feature>/*.rs | awk '{s+=$1}END{print s}'`).
    - If `protocol_count > fr_count`: add the missing FR heading(s) to the FRD with full Business Logic / Edge Cases / Technical Specification / Test / Metric sections, and add a matching BACKLOG entry in `<feature>/BACKLOG.md`.
    - If `fr_count > protocol_count`: either split the FR into more protocol traits or merge the FR headings down to match the protocol count.
-4. Add the matching BACKLOG entry for any new FR ID (AES607 requires every FR/DATA/DESIGN ID to have a BACKLOG H3).
-5. Re-run `lint-arwaky-cli scan .` and confirm AES609 no longer fires.
+4. For `table_missing_columns` / `entry_missing_row`: add the missing table column(s) or the expected outcome row(s) to that FR's Technical Specification table so every declared outcome has a row and every required column is present, then add any new FR ID to BACKLOG.md.
+5. Add the matching BACKLOG entry for any new FR ID (AES607 requires every FR/DATA/DESIGN ID to have a BACKLOG H3).
+6. Re-run `lint-arwaky-cli scan .` and confirm AES609 no longer fires.
 
 ## Verify
 

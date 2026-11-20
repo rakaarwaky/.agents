@@ -1,0 +1,210 @@
+{
+  "plan_id": "8bb62ead",
+  "plan_doc_path": "/home/raka/.agents/develop/psd-timelapse/plan/plan-doc-8bb62ead.md",
+  "status": "completed",
+  "created_at": "2026-11-20T00:00:00Z",
+  "completed_at": "2026-11-21T00:27:00Z",
+  "max_concurrent": 1,
+  "linearized_order": [
+    "pr-1",
+    "pr-2",
+    "pr-3"
+  ],
+  "dag": {
+    "nodes": [
+      {
+        "id": "pr-1",
+        "number": "1",
+        "title": "Add Python `POST /api/upload` multipart endpoint",
+        "slug": "add-python-post-api-upload-multipart-endpoint",
+        "description": "New `UploadController` accepts a multipart `.psd`, validates extension + size + magic bytes, saves to `workspace_dir/uploads/<uuid>.psd`, returns `{path}`. Wired in `ApiController.__init__`. 7 unit tests covering valid upload, missing file, non-PSD extension, oversize, bad magic, workspace-dir placement, and UUID naming.",
+        "files": [
+          "`modules/api/src/surface_api_upload_controller.py`",
+          "`modules/api/src/surface_api_schema_view.py`",
+          "`modules/api/src/surface_api_controller.py`",
+          "`modules/api/tests/unit_api_upload.py`"
+        ],
+        "dependencies": [],
+        "level": 0,
+        "status": "done",
+        "branch": "execute-plan/8bb62ead-pr-1",
+        "base_sha": null,
+        "commit_sha": "dcf9f04b8f03f65c3c74e0e6edbf317a9ee4b9b3",
+        "subagent_id": null,
+        "worktree_path": "/home/raka/orca/workspaces/psd-timelapse/8bb62ead-pr-1",
+        "orca_worktree_id": null,
+        "worktree_cleaned": false,
+        "reviewer_configs": [
+          {
+            "subagent_id": null,
+            "specialization": "general",
+            "review_file": "/home/raka/.agents/develop/psd-timelapse/execute/exec-review-8bb62ead-pr-1.md"
+          },
+          {
+            "subagent_id": null,
+            "specialization": "tests",
+            "review_file": "/home/raka/.agents/develop/psd-timelapse/execute/exec-review-8bb62ead-pr-1.md"
+          },
+          {
+            "subagent_id": null,
+            "specialization": "simplicity",
+            "review_file": "/home/raka/.agents/develop/psd-timelapse/execute/exec-review-8bb62ead-pr-1.md"
+          },
+          {
+            "subagent_id": null,
+            "specialization": "lint",
+            "review_file": "/home/raka/.agents/develop/psd-timelapse/execute/exec-review-8bb62ead-pr-1.md"
+          },
+          {
+            "subagent_id": null,
+            "specialization": "user",
+            "review_file": "/home/raka/.agents/develop/psd-timelapse/execute/exec-review-8bb62ead-pr-1.md"
+          }
+        ],
+        "review_rounds": 1,
+        "review_passed": true,
+        "error": null
+      },
+      {
+        "id": "pr-2",
+        "number": "2",
+        "title": "Add client `upload_file` capability + protocol + orchestrator dispatch + transport FormData support",
+        "slug": "add-client-upload-file-capability-protocol-orchest",
+        "description": "New `ClientUpload` capability + `IClientUploadProtocol` + `upload_file` orchestrator dispatch + `uploadFile` convenience wrapper. `ClientTransport.post()` gains a FormData branch (no `Content-Type`, passthrough body). `ROUTE_UPLOAD` constant. 5 unit tests + protocol conformance update.",
+        "files": [
+          "`packages/shared/src/client/taxonomy_client_constant.ts`",
+          "`packages/shared/src/client/taxonomy_client_vo.ts`",
+          "`packages/shared/src/client/taxonomy_client_response.ts`",
+          "`packages/shared/src/client/contract_client_protocol.ts`",
+          "`packages/shared/src/client/contract_client_aggregate.ts`",
+          "`packages/shared/src/client/index.ts`",
+          "`packages/client/src/capabilities_client_upload.ts`",
+          "`packages/client/src/capabilities_client_transport.ts`",
+          "`packages/client/src/agent_client_orchestrator.ts`",
+          "`packages/client/src/root_client_container.ts`",
+          "`packages/client/tests/unit_client_upload.test.ts`",
+          "`packages/client/tests/contract_client_protocol.test.ts`"
+        ],
+        "dependencies": [
+          "pr-1"
+        ],
+        "level": 1,
+        "status": "done",
+        "branch": "execute-plan/8bb62ead-pr-2",
+        "base_sha": null,
+        "commit_sha": "a696cc9ca6513f0284963f2abfae71d103584ff9",
+        "subagent_id": null,
+        "worktree_path": "/home/raka/orca/workspaces/psd-timelapse/8bb62ead-pr-2",
+        "orca_worktree_id": null,
+        "worktree_cleaned": false,
+        "reviewer_configs": [
+          {
+            "subagent_id": null,
+            "specialization": "general",
+            "review_file": "/home/raka/.agents/develop/psd-timelapse/execute/exec-review-8bb62ead-pr-2.md"
+          },
+          {
+            "subagent_id": null,
+            "specialization": "tests",
+            "review_file": "/home/raka/.agents/develop/psd-timelapse/execute/exec-review-8bb62ead-pr-2.md"
+          },
+          {
+            "subagent_id": null,
+            "specialization": "simplicity",
+            "review_file": "/home/raka/.agents/develop/psd-timelapse/execute/exec-review-8bb62ead-pr-2.md"
+          },
+          {
+            "subagent_id": null,
+            "specialization": "lint",
+            "review_file": "/home/raka/.agents/develop/psd-timelapse/execute/exec-review-8bb62ead-pr-2.md"
+          },
+          {
+            "subagent_id": null,
+            "specialization": "user",
+            "review_file": "/home/raka/.agents/develop/psd-timelapse/execute/exec-review-8bb62ead-pr-2.md"
+          }
+        ],
+        "review_rounds": 1,
+        "review_passed": true,
+        "error": null
+      },
+      {
+        "id": "pr-3",
+        "number": "3",
+        "title": "Wire `packages/psd/` into StudioContainer + upload-on-render flow + StudioContainer `psdAggregate` prop + doc updates",
+        "slug": "wire-packages-psd-into-studiocontainer-upload-on-r",
+        "description": "StudioContainer imports `createPsdAggregate`, validates + parses picked files client-side (instant layers, no network), uploads on RENDER when `selectedFile` is set (then `startRender` with the server path), preserves manual server-path inspect as a fallback. New optional `psdAggregate` prop for testability. Server-path bar copy updated. 7 new StudioContainer tests + updates to existing render-wiring tests. Documentation and OpenAPI regenerated.",
+        "files": [
+          "`packages/root_web_smart_container.ts`",
+          "`packages/root_web_main_entry.ts`",
+          "`packages/studio/tests/unit_studio_client_psd_wiring.test.tsx`",
+          "`packages/studio/tests/unit_studio_render_wiring.test.tsx`",
+          "`packages/psd/FRD.md`",
+          "`packages/psd/BACKLOG.md`",
+          "`packages/studio/BACKLOG.md`",
+          "`modules/api/BACKLOG.md`",
+          "`fixtures/openapi.json`"
+        ],
+        "dependencies": [
+          "pr-1",
+          "pr-2"
+        ],
+        "level": 2,
+        "status": "done",
+        "branch": "execute-plan/8bb62ead-pr-3",
+        "base_sha": null,
+        "commit_sha": "aef4d492587f4bf7c9881a228c10f786182fe08e",
+        "subagent_id": null,
+        "worktree_path": "/home/raka/orca/workspaces/psd-timelapse/8bb62ead-pr-2",
+        "orca_worktree_id": null,
+        "worktree_cleaned": false,
+        "reviewer_configs": [
+          {
+            "subagent_id": null,
+            "specialization": "general",
+            "review_file": "/home/raka/.agents/develop/psd-timelapse/execute/exec-review-8bb62ead-pr-3.md"
+          },
+          {
+            "subagent_id": null,
+            "specialization": "tests",
+            "review_file": "/home/raka/.agents/develop/psd-timelapse/execute/exec-review-8bb62ead-pr-3.md"
+          },
+          {
+            "subagent_id": null,
+            "specialization": "simplicity",
+            "review_file": "/home/raka/.agents/develop/psd-timelapse/execute/exec-review-8bb62ead-pr-3.md"
+          },
+          {
+            "subagent_id": null,
+            "specialization": "lint",
+            "review_file": "/home/raka/.agents/develop/psd-timelapse/execute/exec-review-8bb62ead-pr-3.md"
+          },
+          {
+            "subagent_id": null,
+            "specialization": "user",
+            "review_file": "/home/raka/.agents/develop/psd-timelapse/execute/exec-review-8bb62ead-pr-3.md"
+          }
+        ],
+        "review_rounds": 1,
+        "review_passed": true,
+        "error": null
+      }
+    ]
+  },
+  "final_assembly_started": true,
+  "final_branch": "execute-plan/8bb62ead-final",
+  "final_branch_pushed": true,
+  "final_commit_sha": "aef4d492587f4bf7c9881a228c10f786182fe08e",
+  "final_orca_worktree_id": null,
+  "final_worktree_path": "/home/raka/orca/workspaces/psd-timelapse/8bb62ead-pr-2",
+  "final_review_rounds": 1,
+  "final_review_passed": true,
+  "modular_branches_deleted": false,
+  "final_worktree_retired": false,
+  "pr_urls": [
+    "https://github.com/rakaarwaky/psd-timelapse/pull/304"
+  ],
+  "user_instructions": "",
+  "gh_available": true,
+  "deferred_issues": []
+}

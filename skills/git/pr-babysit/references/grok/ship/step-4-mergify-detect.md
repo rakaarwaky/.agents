@@ -46,7 +46,7 @@ If declined, set `MERGIFY_AVAILABLE="declined"` and skip to the direct-merge pat
 
 ### Write the config
 
-Fetch the Mergify docs before writing — never invent config from memory. The authoritative template is [`../../setup/step-0-template.md`](../../setup/step-0-template.md).
+Fetch the Mergify docs before writing — never invent config from memory. The authoritative template is [`../setup/step-0-template.md`](../setup/step-0-template.md).
 
 **Security gate is mandatory.** Every config this lane writes MUST include `author = rakaarwaky` in `queue_rules.queue_conditions` and in `merge_protections_settings.auto_merge_conditions`. A config without that condition lets non-owner PRs into the merge queue and violates SOUL.md.
 

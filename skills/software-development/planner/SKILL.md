@@ -19,6 +19,9 @@ Orchestrate a structured write-review-revise loop using specialized writer and r
 | R4 | Validate the final PR plan using the plan validator tool before completing the hand-off to `/execute-plan`. | Check plan validation tool returns clean validation report. |
 | R5 | Retrieve the workspace memory top-N patterns (`sdc memory top --n 10`) at Grok Step 0 and inject the recurring-patterns briefing into the writer and reviewer prompts; degrade gracefully when the snapshot is empty or unavailable. | Verify the snapshot step ran (or a degradation note was logged) before the writer is spawned. |
 | R6 | Flush this run's generalized issue patterns back to the workspace memory file via `sdc memory update` at Grok Step 7 (fallback: Hermes Step 3); never fail the run over a memory flush. | Verify the spec file was written and the helper exited 0, or a degradation note was logged. |
+| R7 | Cross-check plan run completion via `ls ~/.agents/develop/<repo-slug>/plan/` and plan doc/summary mtimes, not cursor polling alone. | TUI redraws in place may emit zero stream lines for the entire loop; cursor can stay frozen at `1`. A changing mtime means the loop is still active. Treat "no mtime change across ~8 polls (~4 min) + plan-summary-* present" as completion when the cursor never advances. |
+| R8 | Confirm 0 open issues by reading the review file before Grok's cleanup removes it; if cleanup completed first, verify from `plan-summary-*` (all decisions resolved) + `plan-doc-*` (`## Open Questions: None`) as fallback. | Reviewer and cleanup can run inside one `terminal wait` window; polling may never observe `plan-review-*`. |
+| R9 | Orca may return `runtime_unavailable` right as Grok finishes — do not retry or treat as Grok failure. | Artifacts on disk are authoritative: if `plan-doc-*` and `plan-summary-*` exist and are complete, proceed to Step 2. |
 
 ## Routing
 

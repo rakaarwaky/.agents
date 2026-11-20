@@ -35,7 +35,7 @@ If `baseRefName` is another PR branch (not the repo default branch), stop and te
 
 ## Step 0.4 — Security: watchlist check
 
-Confirm `<OWNER_REPO>` is present in `/home/raka/.agents/develop/repo.json` (the source-of-truth watchlist, symlinked to `/home/raka/.orca/bots/reles/repo.json`).
+Confirm `<OWNER_REPO>` is present in `/home/raka/.agents/develop/repo.json` (the source-of-truth watchlist).
 
 If the repo is **not** in the watchlist, stop and report that the repo is not being watched. Add it first via `/pr-babysit repo add <owner/repo>`.
 

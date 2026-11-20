@@ -1,4 +1,4 @@
-# Step 1 — Configure Mergify Merge Rules (setup lane)
+# Step 2 — Configure Mergify Merge Rules (setup lane)
 
 After step 0 detects (or bootstraps) Mergify, write `.mergify.yml` from the lint-arwaky
 role model template, customized for this repo's facts and user answers.

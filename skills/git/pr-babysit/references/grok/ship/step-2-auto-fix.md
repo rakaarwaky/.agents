@@ -82,7 +82,7 @@ curl -s -L \
 cd /tmp && unzip -o ci-logs.zip -d ci-logs && cat ci-logs/*.txt
 ```
 
-Ambiguous failure? Load [`ship/step-3-troubleshoot.md`](ship/step-3-troubleshoot.md) to distinguish flake from real failure.
+Ambiguous failure? Load [`step-3-troubleshoot.md`](step-3-troubleshoot.md) to distinguish flake from real failure.
 
 ## Fix and Push
 
@@ -101,4 +101,4 @@ git push
 3. Fix the code in the worktree
 4. `git add -A && git commit -m "fix: ..." && git push` — commit title follows the grammar above
 5. Re-check CI status (step 1)
-6. Repeat while red. After any push, also run the decision-tree pass from [`ship/step-3-decision-tree.md`](ship/step-3-decision-tree.md) before declaring the PR green — a green CI does not guarantee review threads or bot findings are handled.
+6. Repeat while red. After any push, also run the decision-tree pass from [`step-3-decision-tree.md`](step-3-decision-tree.md) before declaring the PR green — a green CI does not guarantee review threads or bot findings are handled.

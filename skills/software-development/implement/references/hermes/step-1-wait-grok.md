@@ -4,38 +4,20 @@ Grok Build runs the full implement → review → fix loop itself, in its own Or
 
 ## Wait
 
-Poll with `orca terminal read --terminal <handle> --cursor <cursor> --limit 1000 --json` until the session is idle. A fresh long run may need `orca terminal wait --terminal <handle> --for tui-idle --timeout-ms 60000 --json`; if `satisfied: false`, retry with a larger timeout.
-
-- First read: use `--cursor 0`. The JSON response reports `result.terminal.nextCursor` (the paging token for the next read) and `result.terminal.status` (`running` | `exited` | `unknown`).
-- Subsequent reads: pass the previous `nextCursor` as `--cursor` so only new output since that read is returned. Stop paging when `nextCursor` is null or unchanged from `latestCursor`.
-- `limit` defaults to 120 for tail previews; use `--limit 1000` for long agent responses.
-- `orca terminal status --terminal <handle>` is **not** a valid subcommand (returns `invalid_argument`). Use `terminal wait --for tui-idle` to test idle and `terminal read` to drain output.
-- Do NOT send text while waiting.
-
-### Automated Polling Script
-
-Execute this loop in `terminal` (set `timeout=600`):
+Run `sdc pool grok <terminal_handle> --wait` to poll until Grok finishes. The `sdc pool` command is the standardized grok-session poller — it reads the rendered screen (`orca terminal read --screen --json`), paces with `orca terminal wait --for tui-idle`, and detects completion from either the `EXECUTE_PLAN_COMPLETE` sentinel or a final-report shape (PR marker + settled prompt) on an idle screen.
 
 ```bash
-ORCA="${ORCA_CLI_COMMAND:-$(command -v orca-ide || echo "$HOME/.local/bin/orca-ide")}"
-cursor=0
-while true; do
-  wait_res=$("$ORCA" terminal wait --terminal "<handle>" --for tui-idle --timeout-ms 60000 --json 2>/dev/null || true)
-  satisfied=$(echo "$wait_res" | jq -r '.result.satisfied // false' 2>/dev/null || echo "false")
-  if [[ "$satisfied" == "true" ]]; then
-    echo "Terminal reached tui-idle."
-    break
-  fi
-  read_res=$("$ORCA" terminal read --terminal "<handle>" --cursor "$cursor" --limit 100 --json 2>/dev/null || true)
-  cursor=$(echo "$read_res" | jq -r '.result.terminal.nextCursor // empty' 2>/dev/null || echo "$cursor")
-  status=$(echo "$read_res" | jq -r '.result.terminal.status // empty' 2>/dev/null || echo "")
-  if [[ "$status" == "exited" ]]; then
-    echo "Terminal process exited."
-    break
-  fi
-  sleep 5
-done
+sdc pool grok <terminal_handle> --wait
 ```
+
+- Without `--wait`, `sdc pool grok <terminal_handle>` performs a single probe and returns immediately with JSON status.
+- With `--wait`, it blocks until completion, failure, or deadline (default 2 hours).
+- Exit codes: `0` = success (done), `1` = runtime error (orca CLI failure or terminal exited without final report), `3` = deadline exceeded (status still running, `timed_out=true`).
+- Override pacing with `--wait-ms` (default 15000), `--idle-confirm` (default 2), `--tail` (default 50), `--sentinel`, `--orca` (default `orca-ide`).
+- Heartbeat progress lines go to stderr; the JSON result goes to stdout.
+- `tui-idle` returning not-satisfied means Grok is BUSY, not that the poll failed — keep polling. Only a genuine CLI/parse failure counts as an error.
+- Run exactly one poll loop at a time. Before starting a fresh loop, kill any existing `sdc pool grok` processes for the same terminal handle.
+- Long runtime is not a stall signal — do not escalate, interrupt, or re-spawn before ~90 minutes.
 
 ## When Grok Is Done
 
