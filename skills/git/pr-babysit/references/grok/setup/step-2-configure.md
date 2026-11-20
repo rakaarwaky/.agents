@@ -5,7 +5,7 @@ role model template, customized for this repo's facts and user answers.
 
 ## Template reference
 
-The authoritative template is in [`config.md`](config.md). Use that
+The authoritative template is in [`step-0-template.md`](step-0-template.md). Use that
 file as the source for all YAML structure, placeholders, and customization rules.
 
 Key points from the template:

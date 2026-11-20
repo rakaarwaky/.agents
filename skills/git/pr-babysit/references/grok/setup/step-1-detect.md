@@ -56,7 +56,7 @@ gh api "repos/$OWNER_REPO/commits/$SHA/check-runs" \
 
 ## Template reference
 
-The authoritative `.mergify.yml` template is in [`config.md`](config.md).
+The authoritative `.mergify.yml` template is in [`step-0-template.md`](step-0-template.md).
 Step 1 reads that file and substitutes placeholders with the facts and user answers collected
 in this step. Do not inline or duplicate the template here.
 
