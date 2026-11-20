@@ -27,7 +27,7 @@ logger = logging.getLogger("pr-babysit-webhook")
 DEFAULT_PORT = 8080
 DEFAULT_WORKSPACE = "/home/raka/.agents"
 STATE_DIR = Path.home() / ".agents" / "develop"
-WATCHLIST_FILE = STATE_DIR / "repo-watchlist.json"
+WATCHLIST_FILE = STATE_DIR / "repo.json"
 
 
 def resolve_orca_cli() -> str:
@@ -48,19 +48,18 @@ def resolve_orca_cli() -> str:
 
 
 def load_watchlist() -> dict:
-    """Load the watched repositories from state file."""
+    """Load the watched repositories from the source-of-truth repo.json file."""
     if not WATCHLIST_FILE.exists():
-        return {"watched_repos": {}}
+        return {"repos": []}
     try:
         with open(WATCHLIST_FILE, "r", encoding="utf-8") as f:
             return json.load(f)
     except Exception as exc:
         logger.warning("Failed to parse watchlist file %s: %s", WATCHLIST_FILE, exc)
-        return {"watched_repos": {}}
-
+        return {"repos": []}
 
 def save_watchlist(data: dict) -> None:
-    """Persist watchlist updates to state file."""
+    """Persist watchlist updates to the source-of-truth file."""
     STATE_DIR.mkdir(parents=True, exist_ok=True)
     tmp_path = WATCHLIST_FILE.with_suffix(".tmp")
     with open(tmp_path, "w", encoding="utf-8") as f:
@@ -68,18 +67,32 @@ def save_watchlist(data: dict) -> None:
     tmp_path.replace(WATCHLIST_FILE)
 
 
-def record_pr_seen(repo_name: str, pr_number: int) -> bool:
-    """Check if PR is already known; record and return True if new."""
+def is_repo_watched(repo_full_name: str) -> bool:
+    """Check if a repository is in the watchlist (repos array in repo.json)."""
     watchlist = load_watchlist()
-    repos = watchlist.setdefault("watched_repos", {})
-    repo_entry = repos.setdefault(repo_name.lower(), {"known_prs": []})
+    repos = watchlist.get("repos", [])
+    return any(
+        r.get("owner", "").lower() + "/" + r.get("name", "").lower() == repo_full_name.lower()
+        for r in repos
+    )
 
-    if pr_number in repo_entry["known_prs"]:
-        return False
 
-    repo_entry["known_prs"].append(pr_number)
-    save_watchlist(watchlist)
-    return True
+def record_pr_seen(repo_full_name: str, pr_number: int) -> bool:
+    """Check if PR is already known in the repo's open_prs; record and return True if new."""
+    watchlist = load_watchlist()
+    repos = watchlist.get("repos", [])
+    for repo_entry in repos:
+        if repo_entry.get("owner", "").lower() + "/" + repo_entry.get("name", "").lower() == repo_full_name.lower():
+            known = repo_entry.setdefault("open_prs", [])
+            if pr_number in known:
+                return False
+            known.append(pr_number)
+            save_watchlist(watchlist)
+            return True
+
+    # Repo not in watchlist — reject
+    logger.warning("Repository %s is not in watchlist; rejecting PR #%s", repo_full_name, pr_number)
+    return False
 
 
 class WebhookHandler(BaseHTTPRequestHandler):
@@ -128,6 +141,7 @@ class WebhookHandler(BaseHTTPRequestHandler):
 
         pr = payload.get("pull_request", {})
         repo = payload.get("repository", {})
+        author = pr.get("user", {}).get("login", "")
         pr_number = pr.get("number")
         pr_url = pr.get("html_url")
         repo_full = repo.get("full_name")
@@ -140,7 +154,23 @@ class WebhookHandler(BaseHTTPRequestHandler):
             self.wfile.write(b"Missing PR fields")
             return
 
-        logger.info("Received %s event: PR #%s on %s (%s)", action, pr_number, repo_full, pr_url)
+        # Security gate: reject PRs not authored by rakaarwaky
+        if author != "rakaarwaky":
+            logger.warning("Rejecting PR #%s on %s: author=%s (not rakaarwaky)", pr_number, repo_full, author)
+            self.send_response(200)
+            self.end_headers()
+            self.wfile.write(b"Rejected: non-owner PR")
+            return
+
+        logger.info("Received %s event: PR #%s on %s (%s) by %s", action, pr_number, repo_full, pr_url, author)
+
+        # Check if repo is in watchlist
+        if not is_repo_watched(repo_full):
+            logger.warning("Repository %s is not in watchlist; rejecting PR #%s", repo_full, pr_number)
+            self.send_response(200)
+            self.end_headers()
+            self.wfile.write(b"Repository not watched")
+            return
 
         is_new = record_pr_seen(repo_full, pr_number)
         if not is_new:
