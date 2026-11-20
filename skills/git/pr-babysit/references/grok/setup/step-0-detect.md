@@ -54,6 +54,12 @@ gh api "repos/$OWNER_REPO/commits/$SHA/check-runs" \
   -q '.check_runs[].name' 2>/dev/null | sort -u
 ```
 
+## Template reference
+
+The authoritative `.mergify.yml` template is in [`config.md`](config.md).
+Step 1 reads that file and substitutes placeholders with the facts and user answers collected
+in this step. Do not inline or duplicate the template here.
+
 ## Bootstrap `.mergify.yml` (when `MERGIFY_AVAILABLE` is `"none"` or `"installed"`)
 
 ### Ask the user

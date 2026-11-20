@@ -3,122 +3,19 @@
 After step 0 detects (or bootstraps) Mergify, write `.mergify.yml` from the lint-arwaky
 role model template, customized for this repo's facts and user answers.
 
-## Role model: lint-arwaky `.mergify.yml`
+## Template reference
 
-The lint-arwaky repo at `/home/raka/.agents/skills/architechture/tools/.mergify.yml` is the
-role model. Its structure:
+The authoritative template is in [`config.md`](config.md). Use that
+file as the source for all YAML structure, placeholders, and customization rules.
 
-```
-defaults:
-  queue_rule:
-    update_method: <merge|rebase>       # how queue updates PR before testing
-    merge_method: <squash|merge|rebase>  # how queue merges into base branch
-    checks_timeout: <duration>           # max queue wait per PR
-    merge_conditions:                    # checks that must pass before merge
-      - check-success = <check-name>     # one per CI check
-
-merge_queue:
-  max_parallel_checks: <N>               # 1 = serial (recommended)
-  status_comments: outcomes
-  queue_controls_comment: true
-
-merge_protections_settings:
-  auto_merge_conditions:                 # conditions to auto-enter queue
-    - base = <BASE_BRANCH>
-    - -draft
-    - -conflict
-  post_comment: true
-  reporting_method: check-runs
-
-queue_rules:
-  - name: default
-
-priority_rules:                          # optional, if include_priority_rules=yes
-  - name: hotfixes-first
-    conditions:
-      - label = hotfix
-    priority: high
-    allow_checks_interruption: true
-  - name: refactors-last
-    conditions:
-      - label = refactor
-    priority: low
-
-pull_request_rules:
-  - name: keep-prs-up-to-date            # optional, if include_keep_up_to_date=yes
-    conditions:
-      - base = <BASE_BRANCH>
-      - -draft
-      - -merged
-      - -closed
-      - -conflict
-    actions:
-      update: {}
-
-  - name: warn-on-conflicts
-    conditions:
-      - conflict
-      - -merged
-      - -closed
-    actions:
-      label:
-        add:
-          - conflict
-
-  - name: stale-cleanup                  # optional, if include_stale_cleanup=yes
-    conditions:
-      - base = <BASE_BRANCH>
-      - -merged
-      - -closed
-      - -label = stale
-      - updated-at < 14 days ago
-      - created-at < 30 days ago
-    actions:
-      comment:
-        message: >
-          This PR has been open for 30 days with no commits for 14. If you're still working on it, push a commit or leave a comment. Otherwise, this PR will auto-close in 7 days.
-      label:
-        add:
-          - stale
-
-  - name: close-abandoned-stale          # optional, if include_stale_cleanup=yes
-    conditions:
-      - base = <BASE_BRANCH>
-      - -merged
-      - -closed
-      - label = stale
-      - updated-at < 7 days ago
-    actions:
-      close:
-        message: 'Closed automatically — no activity for 7+ days after a stale warning.'
-      label:
-        remove:
-          - stale
-
-  - name: welcome-new-pr                 # optional, if include_welcome_comment=yes
-    conditions:
-      - base = <BASE_BRANCH>
-      - -merged
-      - -closed
-      - -label = stale
-      - created-at < 5 minutes ago
-    actions:
-      comment:
-        message: >
-          Thanks for the PR! CI is running — the merge queue will pick it up automatically once all checks pass.
-
-  - name: merged-notification
-    conditions:
-      - merged
-      - base = <BASE_BRANCH>
-    actions:
-      comment:
-        message: Merged via the merge queue. Thanks for the contribution!
-
-scopes:
-  source:
-    files: {}
-```
+Key points from the template:
+- `defaults.queue_rule` block: `update_method`, `merge_method`, `checks_timeout`, `merge_conditions`
+- `merge_queue` block: `max_parallel_checks`, `status_comments`, `queue_controls_comment`
+- `merge_protections_settings` block: `auto_merge_conditions`, `post_comment`, `reporting_method`
+- `queue_rules`: at least one `default` rule
+- `priority_rules` (optional): hotfix/high, refactor/low
+- `pull_request_rules`: keep-prs-up-to-date, warn-on-conflicts, stale-cleanup, welcome-new-pr, auto-merge-queue, merged-notification
+- `scopes.source.files`: empty map
 
 ## 1. Write `.mergify.yml` from template
 

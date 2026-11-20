@@ -44,4 +44,4 @@ Watch pull requests, parse failing CI logs, push incremental fixes, configure Me
 | Grok Repo 0 | [`references/grok/repo/step-0-add-repo.md`](references/grok/repo/step-0-add-repo.md) | Register repo in watchlist; initialize known PRs |
 | Grok Repo 1 | [`references/grok/repo/step-1-detect-new-prs.md`](references/grok/repo/step-1-detect-new-prs.md) | Detect new PRs via GitHub webhook forwarding or polling |
 | Grok Repo 2 | [`references/grok/repo/step-2-spawn-session.md`](references/grok/repo/step-2-spawn-session.md) | Spawn isolated Grok session in Orca worktree for new PR |
-| Mergify Config | [`references/mergify/config.md`](references/mergify/config.md) | Mergify configuration reference and examples |
+| Mergify Config | [`references/grok/setup/config.md`](references/grok/setup/config.md) | Mergify configuration reference and examples |
