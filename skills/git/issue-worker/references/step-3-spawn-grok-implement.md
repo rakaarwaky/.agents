@@ -82,6 +82,15 @@ When `satisfied: true`, dispatch the `/implement` brief composed in Step 2:
 
 Confirm `"accepted": true` in the output JSON.
 
+**Handle resilience (R12):** If `terminal wait` or `terminal send` returns `terminal_handle_stale`, or if `terminal read` segfaults, re-resolve the handle instead of failing:
+
+```bash
+FRESH_HANDLE="$(orca terminal list --json | jq -r --arg WT "$WT_ID" '.result.terminals[] | select(.worktreeId==$WT) | .handle')"
+TERMINAL_HANDLE="$FRESH_HANDLE"
+```
+
+Then retry `terminal wait` / `terminal send` once with `$TERMINAL_HANDLE`.
+
 **Strict Protocol**:
 After sending the brief, do not send follow-up questions, status inquiries, or intermediate messages to the running Grok session.
 

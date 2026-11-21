@@ -12,6 +12,8 @@ git -C "$WT_PATH" push --force-with-lease origin "$WT_BRANCH"
 
 Never use bare `--force`. If the push is rejected due to remote updates, fetch origin, rebase locally in `$WT_PATH`, re-verify, and push with `--force-with-lease`.
 
+**Commit message escaping (before push):** Write commit messages to a file and use `git commit -F <message-file>` rather than `git commit -m "..."` when the message contains backticks, `&&`, or other shell-special characters (common when citing code like `` `feature_protocol_count == 1 && injected == 1` ``). Shell double-quotes will otherwise eat backticks via command substitution.
+
 ## 5b: Open Draft Pull Requests
 
 Open exactly one draft PR per issue group:

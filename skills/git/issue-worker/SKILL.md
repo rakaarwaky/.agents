@@ -24,6 +24,7 @@ End-to-end workflow for resolving GitHub issues: parse issue hints, verify claim
 | R9 | **Concurrency and wave ceilings.** Maximum concurrent worktrees ≤ 10. Groups beyond the wave limit execute in subsequent waves after active worktrees complete. | Active concurrent worktrees do not exceed 10. |
 | R10 | **Worktree teardown & final report.** Verified worktrees are marked `in-review` during inspection, then retired via `orca worktree rm` after push and PR creation. Orchestrator synthesizes a comprehensive final report. | Worktrees cleaned up via `orca worktree rm`; final summary reports all issues, groups, and PRs. |
 | R11 | **Zero-issue graceful halt.** If the repository has issues disabled, contains zero open issues, or no issues match the query, report the exact status cleanly, spawn zero worktrees, and halt without error. Suggest `/issue-maker` when spec docs exist. | Query returns zero matching issues or issues disabled; run halts immediately with clean status. |
+| R12 | **Terminal handle resilience.** Stale or segfaulted terminal handles are re-resolved via `orca terminal list` filtered by `worktreeId`, and direct worktree-path inspection (`git -C "$WT_PATH" …`) is an acceptable fallback for independent verification. | Any `terminal_handle_stale` / segfault triggers a re-resolve-and-retry before failing. |
 
 ## Routing
 
