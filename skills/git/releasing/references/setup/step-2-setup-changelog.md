@@ -1,4 +1,6 @@
-# Setup step 2 — git-cliff + cliff.toml
+# Setup step 2 — changelog source (git-cliff + cliff.toml)
+
+**All setup work happens in an Orca worktree, never in the main clone.**
 
 git-cliff is the changelog source. There is no alternative.
 

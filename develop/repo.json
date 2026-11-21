@@ -4,21 +4,17 @@
       "owner": "rakaarwaky",
       "name": "psd-timelapse",
       "default_branch": "main",
-      "mergify": true,
-      "ci_workflow": "ci.yml",
-      "main_ci": "green",
-      "release": "ready",
-      "open_prs": []
+      "ci.yaml": "ready",
+      "mergify.yaml": "ready",
+      "release.yaml": "ready"
     },
     {
       "owner": "rakaarwaky",
       "name": "lint-arwaky",
       "default_branch": "main",
-      "mergify": true,
-      "ci_workflow": "ci.yml",
-      "main_ci": "green",
-      "release": "needs-setup",
-      "open_prs": []
+      "ci.yaml": "ready",
+      "mergify.yaml": "ready",
+      "release.yaml": "need-setup"
     }
   ]
 }

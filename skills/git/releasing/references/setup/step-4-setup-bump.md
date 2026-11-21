@@ -1,11 +1,15 @@
 # Setup step 4 — bump script
 
-Copy the template from [`../../templates/bump.sh`](../../templates/bump.sh) into the target repo:
+## Copy into the Orca worktree
+
+## Copy into the Orca worktree
+
+Set up the bump script inside an Orca worktree for the target repo — never in the main clone. The main clone stays clean.
 
 ```shell
-cp <skill>/templates/bump.sh <repo>/scripts/bump.sh
-cp <skill>/templates/changelog.sh <repo>/scripts/changelog.sh
-chmod +x <repo>/scripts/bump.sh <repo>/scripts/changelog.sh
+cp <skill>/templates/bump.sh <worktree path>/scripts/bump.sh
+cp <skill>/templates/changelog.sh <worktree path>/scripts/changelog.sh
+chmod +x <worktree path>/scripts/bump.sh <worktree path>/scripts/changelog.sh
 ```
 
 The template is a **multi-package, multi-language** bumper. One run stamps the version into every package that exists in the project — no exceptions.

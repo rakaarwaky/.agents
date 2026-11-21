@@ -2,6 +2,9 @@
 
 Which command depends on the repo. Read `repo.json` and the repo's own `.github/workflows/` before choosing.
 
+**Worktree rule:** do all of this work in an Orca worktree — never in the main clone. The main clone stays clean.
+
+
 ## Pre-check: tag exists
 
 Before triggering the workflow, confirm the tag exists on the remote:

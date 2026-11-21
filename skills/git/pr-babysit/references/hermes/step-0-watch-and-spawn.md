@@ -69,7 +69,7 @@ Compose the brief (Grok has zero context):
 
 1. **Goal** — Bring PR `<number>` to green and merge-ready:
    - Fix every failing check, resolve conflicts, address every review thread (commit titles follow Conventional Commits).
-   - **Mergify detection & bootstrap** (`grok/ship/step-4-mergify-detect.md`): Detect `.mergify.yml` or Mergify app on repo. If missing and `ship` argument is used, bootstrap a minimal validated `.mergify.yml` on a separate PR branch.
+   - **Mergify detection & bootstrap** (`grok/ship/step-4-mergify-detect.md`): Detect a Mergify config (`.github/workflows/mergify.yml` or any other supported location) or the Mergify app on the repo. If missing and `ship` argument is used, bootstrap a minimal validated `.github/workflows/mergify.yml` on a separate PR branch.
    - **CI diagnostics** (`grok/ship/step-5-mergify-diagnostics.md`): If CI fails, inspect `mergify events`, detect scopes via `mergify ci scopes`, and quarantine flaky tests via `mergify tests quarantines add`.
    - **Merge protections** (`grok/ship/step-6-merge-protections.md`): Before merging, check `mergify freeze list`, `Depends-On:`, `Merge-After:`, and handle stacked PRs (`mergify stack list`).
    - **Merge** (`grok/ship/step-7-merge.md`): If `ship` argument is true and PR is healthy, merge via Mergify queue (`@mergifyio queue`); fallback to `gh pr merge --squash --delete-branch` if Mergify is unavailable.

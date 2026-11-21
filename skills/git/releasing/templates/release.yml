@@ -142,8 +142,9 @@ jobs:
       - name: Extract version from PR title
         id: version
         run: |
-          VERSION=$(git log -1 --format=%s "${{ github.event.pull_request.merge_commit_sha }}" | sed -E 's/^chore\(release\): v?//' | xargs)
-          echo "tag=v${VERSION}" >> "$GITHUB_OUTPUT"
+          RAW_SUBJECT=$(git log -1 --format=%s "${{ github.event.pull_request.merge_commit_sha }}")
+          VERSION=$(echo "$RAW_SUBJECT" | sed -E -e 's/^chore\(release\):[[:space:]]*v?//' -e 's/[[:space:]]*\(#[0-9]+\)$//' | xargs)
+          echo "tag=${VERSION}" >> "$GITHUB_OUTPUT"
 
       - name: Create and push tag
         run: |

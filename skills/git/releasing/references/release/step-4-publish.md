@@ -1,5 +1,7 @@
 # Step 4 — publish (draft-based repos only)
 
+**Worktree rule:** the undraft/publish command itself runs from the Orca worktree where the release prep happened — never the main clone. The main clone stays clean.
+
 Most repos (including the two watched ones) publish directly in Step 3's workflow — there is no separate draft/publish split, so Step 4 is a no-op for them. Proceed straight to [step-5-verify.md](step-5-verify.md).
 
 For a repo that builds a **draft** release and needs a separate undraft step (e.g. a `softprops/action-gh-release` draft, or a registry that must be undrafted after build):

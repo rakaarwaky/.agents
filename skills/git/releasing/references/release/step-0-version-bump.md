@@ -1,6 +1,6 @@
 # Step 0 — version bump
 
-Working directory: the Orca worktree created in Step 1.
+**All work happens in an Orca worktree created in Step 1. Never edit version files in the main clone.**
 
 Before touching versions, resolve what this repo uses. Read `repo.json` and the repo's own release workflow.
 

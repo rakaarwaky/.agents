@@ -105,7 +105,6 @@ git push origin --delete <head_ref>
 
 - Comment on linked issue (if any): PR link + one-line note
 - Update state: `last_status: "merged"`, `merge_method: "queue" | "direct"`
-- Remove the PR number from the repo's `open_prs` array in `/home/raka/.agents/develop/repo.json`
 - Delete branch if not already deleted
 
 ## Report to Hermes

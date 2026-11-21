@@ -1,9 +1,13 @@
 # Setup step 3 — release workflow
 
-Copy the template from [`../../templates/release.yml`](../../templates/release.yml) into the target repo:
+**All setup work happens in an Orca worktree, never in the main clone.**
+
+Copy the template from [`../../templates/release.yml`](../../templates/release.yml) into the target repo (inside an Orca worktree):
 
 ```shell
-cp <skill>/templates/release.yml <repo>/.github/workflows/release.yml
+orca worktree create --repo path:<repo> --name "setup/release-workflow" --agent grok --no-parent --json
+cd <worktree path>
+cp <skill>/templates/release.yml .github/workflows/release.yml
 ```
 
 ## If the repo already has release workflows
@@ -14,7 +18,7 @@ If the repo has any existing release workflow(s) (e.g. `auto-release.yml`, `tag-
 2. **Merge into a single `release.yml`** using the template structure:
    - `open-release-pr` job (workflow_dispatch only): compute version, bump, open PR to `main` with `release` label
    - `create-tag` job (on merged PR with `release` label): extract version, create and push the tag
-   - `test` → `build` → `smoke-test` → `provenance` → `release` jobs (on tag push): build and publish
+   - `build` → `smoke-test` → `provenance` → `release` jobs (on tag push): build and publish
 3. **Delete the other release workflow files** (any workflow that the merged `release.yml` now replaces) after confirming the merged `release.yml` covers their triggers.
 4. **Adapt the template to the repo's language:**
    - Build command: `uv build` (Python), `cargo build --release` (Rust), `npm run build` (Node)
@@ -24,7 +28,7 @@ If the repo has any existing release workflow(s) (e.g. `auto-release.yml`, `tag-
 
 ## CI gate
 
-Add or keep a `ci.yml` that runs tests + build on every push and PR. The `test` job in `release.yml` must pass before the release jobs run. If the repo uses `workflow_run` gating, keep it — but the release `test` job is the authoritative gate for the release pipeline.
+Add or keep a `ci.yml` that runs tests + build on every push and PR. The test shards in `ci.yml` are the authoritative gate — they run on every PR and block merges. The release workflow's `build` job assumes CI has already passed; it does not re-run the full test suite.
 
 ## Verification
 
@@ -36,3 +40,15 @@ python3 -c "import yaml; yaml.safe_load(open('.github/workflows/release.yml'))"
 ```
 
 IF `python3` with PyYAML is not available, use `ruby -ryaml -e "YAML.load_file('.github/workflows/release.yml')" || true` as a fallback.
+
+## Merge the setup PR
+
+```shell
+git push -u origin "setup/release-workflow"
+gh pr create --base main --head "setup/release-workflow" \
+  --title "setup: release workflow" \
+  --body "Adds release.yml and ci.yml for automated releases."
+# Label setup PRs so the PR babysitter knows to skip auto-queuing.
+gh pr edit <number> --add-label setup
+orca worktree rm --worktree <worktree id> --json
+```

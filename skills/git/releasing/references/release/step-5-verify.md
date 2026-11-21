@@ -1,6 +1,6 @@
 # Step 5 — verify after publishing
 
-Confirm the release workflow finished green and the release is live:
+Confirm the release workflow finished green and the release is live. Run these commands from the Orca worktree — never from the main clone.
 
 ```shell
 gh run list --workflow=release.yml -R <owner>/<repo> --limit 2      # publish job green

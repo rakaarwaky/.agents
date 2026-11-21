@@ -1,6 +1,6 @@
 # Step 1 — release prep PR
 
-The prep PR commits the version stamp and changelog that the workflow reads; it is not a manual edit of version files. All work happens in an Orca worktree so the main clone stays clean.
+The prep PR commits the version stamp and changelog that the workflow reads; it is not a manual edit of version files. **All work happens in an Orca worktree so the main clone stays clean. Never edit files in the main clone.**
 
 1. Create an Orca worktree for the release branch:
 
@@ -53,10 +53,13 @@ The prep PR commits the version stamp and changelog that the workflow reads; it 
 6. Create and push the git tag (if the repo's release pipeline is tag-driven and no auto-tag workflow exists):
 
    ```shell
-   git checkout main
-   git pull origin main
+   cd <worktree path>
+   git fetch origin main
+   git checkout -b temp-tagging origin/main
    git tag -a "$NEW_VERSION" -m "Release $NEW_VERSION"
    git push origin "$NEW_VERSION"
+   git checkout -
+   git branch -D temp-tagging
    ```
 
    IF the repo has an auto-tag workflow (e.g. a `release.yml` `create-tag` job that tags on `chore(release):` PR merge) -> skip this step; the workflow creates the tag automatically.
@@ -66,5 +69,7 @@ The prep PR commits the version stamp and changelog that the workflow reads; it 
    ```shell
    orca worktree rm --worktree <worktree id> --json
    ```
+
+**Never touch the main clone.** If the workflow or bump script itself needs fixing (e.g. a workflow expression bug, a test gate misconfiguration), create a separate Orca worktree for that fix, push a branch, open a PR to main, and merge it. Only then continue the release prep PR.
 
 Recovery: if the prep PR merge failed, fix in the same worktree branch, re-push, re-merge, then retire the worktree and continue from Step 2.

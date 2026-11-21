@@ -60,7 +60,7 @@ Upload failure does not block the pipeline.
 ## 4. Scope detection (informational)
 
 ```bash
-mergify ci scopes --config .mergify.yml 2>/dev/null
+mergify ci scopes --config .github/workflows/mergify.yml 2>/dev/null
 ```
 
 Include affected scopes in the report.

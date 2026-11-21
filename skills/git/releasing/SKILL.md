@@ -21,7 +21,7 @@ Execute end-to-end releases for any project through automated version bumps, rel
 | R6 | Label every release prep PR with `release` before merging. When the auto-release automation fires on a `pr_merged` event, check the merged PR's labels first. If the `release` label is present, skip — no new cycle. This prevents loop triggers. | `gh pr view <n> --json labels --jq '[.labels[].name]'` includes `"release"` before any action; absence means proceed. |
 | R7 | All release prep work happens in an Orca worktree. The main clone stays clean. | `orca worktree create` is called before any `git checkout -b` or `git commit` on the release branch. |
 | R8 | git-cliff is the mandatory changelog source. If `git-cliff` is not installed, install it before generating the changelog. If `cliff.toml` is missing, create it with a valid `commit_parsers` array. | `git-cliff` installed and `cliff.toml` exists before any release step finishes. |
-| R9 | Drive the repo's own release pipeline — read `repo.json` and the repo's `.github/workflows/` first; never invent a parallel release flow. Match the repo's release commit/tag conventions. If `repo.json` marks a repo `release: needs-setup`, run the setup lane first. | The release is triggered through the repo's existing workflow, not a hand-built one; `repo.json`'s `release` field matches the lane actually run. |
+| R9 | Drive the repo's own release pipeline — read `repo.json` and the repo's `.github/workflows/` first; never invent a parallel release flow. Match the repo's release commit/tag conventions. If `repo.json` marks a repo `release.yaml: need-setup`, run the setup lane first. | The release is triggered through the repo's existing workflow, not a hand-built one; `repo.json`'s `release.yaml` field matches the lane actually run. |
 | R10 | Compute the next version from the last git tag, not the last GitHub release (a repo may tag without publishing, or publish without tagging). Verify with `git tag --list 'v*' --sort=-v:refname`. | Version math uses the tag list, not `gh release list` alone. |
 | R11 | Scope ceilings: max 1 Orca worktree per release cycle; max 1 release prep PR per cycle; max 2 fix-and-retry attempts per failing check before stopping and reporting to the owner. Forbidden actions: editing files outside the target repo, deleting branches or worktrees other than the one this run created, force-pushing to any branch, rewriting published release history. | `orca worktree ps` shows at most 1 active worktree for this run; no force-push in reflog; release count matches PR count. |
 | R12 | Forbidden tools: never `gh release create` (R4), never `git tag -f` on an existing tag, never edit `.github/workflows/release.yml` in the main clone (only in a worktree). | No `gh release create` or `git tag -f` in shell history; workflow files unchanged on main. |
@@ -30,18 +30,18 @@ Execute end-to-end releases for any project through automated version bumps, rel
 
 ## Routing
 
-Pick the lane from `repo.json`'s `release` field before running any step:
+Pick the lane from `repo.json`'s `release.yaml` field before running any step:
 
-| `repo.json` `release` | Lane | What to run |
+| `repo.json` `release.yaml` | Lane | What to run |
 |---|---|---|
 | `"ready"` (or absent — default for known repos) | **release** | The steps under [`references/release/`](references/release/step-0-version-bump.md) |
-| `"needs-setup"` | **setup** | The steps under [`references/setup/`](references/setup/step-0-audit.md) first; after the repo has a full pipeline, set `release` to `"ready"` and run the release lane |
+| `"need-setup"` | **setup** | The steps under [`references/setup/`](references/setup/step-0-audit.md) first; after the repo has a full pipeline, set `release.yaml` to `"ready"` and run the release lane |
 
 A repo is "ready" when it has: (1) a version scheme stamped in a config file, (2) a release workflow in `.github/workflows/`, (3) a `cliff.toml` changelog source with git-cliff installed, and (4) a bump script. The setup lane is for new repos.
 
 **Output format:** a published GitHub release (not a draft) with the expected build artifacts attached, plus the release URL reported back in the thread.
 
-Release lane (`release: ready` repos):
+Release lane (`release.yaml: ready` repos):
 
 | Step | Reference | Purpose |
 | ---- | --------- | ------- |
@@ -52,13 +52,14 @@ Release lane (`release: ready` repos):
 | Step 4 | [`references/release/step-4-publish.md`](references/release/step-4-publish.md) | Draft-based repos only: undraft the release and watch the publish job. No-op for the two watched repos (they publish directly in Step 3). |
 | Step 5 | [`references/release/step-5-verify.md`](references/release/step-5-verify.md) | Verify the release is live (not a draft) with the expected assets; report final status and URL. |
 
-Setup lane (`release: needs-setup` repos):
+Setup lane (`release.yaml: need-setup` repos):
 
 | Step | Reference | Purpose |
 | ---- | --------- | ------- |
-| Setup 0 | [`references/setup/step-0-audit.md`](references/setup/step-0-audit.md) | Audit which of the four requirements are missing. |
-| Setup 1 | [`references/setup/step-1-version-scheme.md`](references/setup/step-1-version-scheme.md) | Confirm or create the version file and scheme. |
-| Setup 2 | [`references/setup/step-2-changelog-source.md`](references/setup/step-2-changelog-source.md) | Install git-cliff, create `cliff.toml` with a `commit_parsers` array and the 2-release header, and copy `templates/changelog.sh` into the repo. |
-| Setup 3 | [`references/setup/step-3-release-workflow.md`](references/setup/step-3-release-workflow.md) | Copy `templates/release.yml` into the repo. If the repo already has release workflows, merge them into a single `release.yml` and delete the rest. Base branch is `main`. |
-| Setup 4 | [`references/setup/step-4-bump-script.md`](references/setup/step-4-bump-script.md) | Scaffold `scripts/bump.sh` that stamps the version, runs git-cliff, trims to 2 releases, and commits. |
-| Setup 5 | [`references/setup/step-5-handoff.md`](references/setup/step-5-handoff.md) | Update `repo.json` to `"ready"`, then run the release lane. |
+| Setup 0 | [`references/setup/step-0-add-repo.md`](references/setup/step-0-add-repo.md) | Add the repo to `repo.json` (owner/repo/default_branch + the three `need-setup`/`ready` fields). Confirm with owner before editing. |
+| Setup 1 | [`references/setup/step-1-pre-setup.md`](references/setup/step-1-pre-setup.md) | Audit what is missing (version file, release workflow, cliff.toml, bump script) and pick the version scheme. |
+| Setup 2 | [`references/setup/step-2-setup-changelog.md`](references/setup/step-2-setup-changelog.md) | Install git-cliff, create `cliff.toml` with a `commit_parsers` array and the 2-release header, and copy `templates/changelog.sh` into the repo. |
+| Setup 3 | [`references/setup/step-3-setup-release.md`](references/setup/step-3-setup-release.md) | Copy `templates/release.yml` into the repo. If the repo already has release workflows, merge them into a single `release.yml` and delete the rest. Base branch is `main`. |
+| Setup 4 | [`references/setup/step-4-setup-bump.md`](references/setup/step-4-setup-bump.md) | Scaffold `scripts/bump.sh` that stamps the version, runs git-cliff, trims to 2 releases, and commits. |
+| Setup 5 | [`references/setup/step-5-open-pr.md`](references/setup/step-5-open-pr.md) | Open the setup PR with the `setup` label, mark all three `repo.json` fields `"ready"` after merge, then run the release lane. |
+| Setup 6 | [`references/setup/step-6-automation.md`](references/setup/step-6-automation.md) | Update the Orca release automation's `in` filter to include the new repo's `github:<owner-id>:<repo-id>` so `pr_merged` events fire. |

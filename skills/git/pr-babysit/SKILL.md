@@ -1,13 +1,13 @@
 ---
 name: pr-babysit
 description: "Watch pull requests, fix failing CI, merge via Mergify queue."
-when-to-use: "Triggers on \"/pr-babysit\". Phrasing: \"watch PR 123 until green\", \"babysit PR 123 and merge when ready\", \"fix issue #123 and open a PR\", \"keep fixing PR 123 until it can merge\", \"pr-babysit ship 123\", \"pr-babysit setup 123\", \"pr-babysit repo add owner/repo\", \"pr-babysit repo remove owner/repo\", \"watch repo for new prs\"."
-argument-hint: "<ship|setup|repo|sweep> <pr link|number|repo name>"
+when-to-use: "Triggers on \"/pr-babysit\". Phrasing: \"watch PR 123 until green\", \"babysit PR 123 and merge when ready\", \"fix issue #123 and open a PR\", \"keep fixing PR 123 until it can merge\", \"pr-babysit ship 123\", \"pr-babysit setup 123\", \"pr-babysit setup add repo\", \"pr-babysit setup remove repo\", \"pr-babysit sweep\"."
+argument-hint: "<ship|setup|sweep> <pr link|number|repo name>"
 ---
 
 # PR Babysitter
 
-Watch pull requests, parse failing CI logs, push incremental fixes, configure Mergify merge queues, and merge through coordinated agent lanes. Operates in four lanes — `ship` (babysit a single PR end to end), `setup` (bootstrap Mergify merge rules for a repo), `repo` (register or remove a repo from the watchlist, detect and dispatch new PRs), and `sweep` (nightly main-CI health check across all watched repos). Only PRs authored by `rakaarwaky` are ever processed, fixed, or merged; the author gate is enforced at three layers — Orca automation `from=me` filter, Mergify `author = rakaarwaky` in every repo's `.mergify.yml`, and the skill's own author check in `ship/step-0-add-pr.md` and `ship/step-7-merge.md`. The watchlist lives at `/home/raka/.agents/develop/repo.json` (symlinked to `/home/raka/.orca/bots/nany-pr-babysit/repo.json`); a repo absent from it is never watched.
+Watch pull requests, parse failing CI logs, push incremental fixes, configure Mergify merge queues, and merge through coordinated agent lanes. Operates in three lanes — `ship` (babysit a single PR end to end), `setup` (register a repo in `repo.json`, bootstrap CI and Mergify configs, register the repo in the Orca event automation so PR/CI events fire), and `sweep` (nightly main-CI health check across all watched repos). Only PRs authored by `rakaarwaky` are ever processed, fixed, or merged; the author gate is enforced at three layers — Orca automation `from=me` filter, Mergify `author = rakaarwaky` in every repo's Mergify config (`.github/workflows/mergify.yml`), and the skill's own author check in `ship/step-0-add-pr.md` and `ship/step-7-merge.md`. The watchlist lives at `/home/raka/.agents/develop/repo.json` (symlinked to `/home/raka/.orca/bots/nany-pr-babysit/repo.json`); a repo absent from it is never watched.
 
 ## Rules
 
@@ -33,16 +33,16 @@ Watch pull requests, parse failing CI logs, push incremental fixes, configure Me
 | Grok Ship 1 | [`references/grok/ship/step-1-watch-ci.md`](references/grok/ship/step-1-watch-ci.md) | Watch CI until green |
 | Grok Ship 2 | [`references/grok/ship/step-2-auto-fix.md`](references/grok/ship/step-2-auto-fix.md) | CI red: parse logs, fix code, Conventional Commits, push |
 | Grok Ship 3 | [`references/grok/ship/step-3-decision-tree.md`](references/grok/ship/step-3-decision-tree.md) | Conflict resolution, review threads; troubleshooter: [`references/grok/ship/step-3-troubleshoot.md`](references/grok/ship/step-3-troubleshoot.md) |
-| Grok Ship 4 | [`references/grok/ship/step-4-mergify-detect.md`](references/grok/ship/step-4-mergify-detect.md) | Detect Mergify; bootstrap `.mergify.yml` with author gate if missing |
+| Grok Ship 4 | [`references/grok/ship/step-4-mergify-detect.md`](references/grok/ship/step-4-mergify-detect.md) | Detect Mergify; bootstrap `.github/workflows/mergify.yml` with author gate if missing |
 | Grok Ship 5 | [`references/grok/ship/step-5-mergify-diagnostics.md`](references/grok/ship/step-5-mergify-diagnostics.md) | Check `mergify events`, quarantine flaky tests, upload JUnit |
 | Grok Ship 6 | [`references/grok/ship/step-6-merge-protections.md`](references/grok/ship/step-6-merge-protections.md) | Check active freezes (`mergify freeze`), dependencies, stacked PRs |
 | Grok Ship 7 | [`references/grok/ship/step-7-merge.md`](references/grok/ship/step-7-merge.md) | Re-check author gate, auto-merge via Mergify queue, monitor queue, fallback |
-| Grok Setup 0 | [`references/grok/setup/step-0-template.md`](references/grok/setup/step-0-template.md) | Mergify config template with mandatory `author = rakaarwaky` gate |
-| Grok Setup 1 | [`references/grok/setup/step-1-detect.md`](references/grok/setup/step-1-detect.md) | Detect Mergify config; bootstrap `.mergify.yml` if missing |
-| Grok Setup 2 | [`references/grok/setup/step-2-configure.md`](references/grok/setup/step-2-configure.md) | Write merge rules, validate, open configuration PR |
-| Grok Repo 0 | [`references/grok/repo/step-0-add-repo.md`](references/grok/repo/step-0-add-repo.md) | Register/remove repo in `repo.json`; initialize known PRs |
-| Grok Repo 1 | [`references/grok/repo/step-1-detect-new-prs.md`](references/grok/repo/step-1-detect-new-prs.md) | Detect new PRs via GitHub webhook forwarding or polling |
-| Grok Repo 2 | [`references/grok/repo/step-2-spawn-session.md`](references/grok/repo/step-2-spawn-session.md) | Spawn isolated Grok session in Orca worktree for new PR |
+| Grok Setup 0 | [`references/grok/setup/step-0-add-repo.md`](references/grok/setup/step-0-add-repo.md) | Register/remove repo in `repo.json`; initialize known PRs |
+| Grok Setup 1 | [`references/grok/setup/step-1-presetup.md`](references/grok/setup/step-1-presetup.md) | Collect repo facts and customization answers; read templates |
+| Grok Setup 2 | [`references/grok/setup/step-2-setup-ci.md`](references/grok/setup/step-2-setup-ci.md) | Detect language, write `.github/workflows/ci.yml` with lint-arwaky, build, test |
+| Grok Setup 3 | [`references/grok/setup/step-3-setup-mergify.md`](references/grok/setup/step-3-setup-mergify.md) | Detect Mergify, write `.github/workflows/mergify.yml` from template, commit and push branch |
+| Grok Setup 4 | [`references/grok/setup/step-4-open-pr.md`](references/grok/setup/step-4-open-pr.md) | Open configuration PR with `setup` label |
+| Grok Setup 5 | [`references/grok/setup/step-5-automation.md`](references/grok/setup/step-5-automation.md) | Register new repo in Orca event automation `in` list so PR/CI events fire |
 | Grok Sweep 0 | [`references/grok/sweep/step-0-init-sweep.md`](references/grok/sweep/step-0-init-sweep.md) | Verify auth, read watchlist from `repo.json`, initialize sweep |
 | Grok Sweep 1 | [`references/grok/sweep/step-1-check-main-ci.md`](references/grok/sweep/step-1-check-main-ci.md) | Check latest CI run on default branch for each watched repo |
 | Grok Sweep 2 | [`references/grok/sweep/step-2-fix-main-ci.md`](references/grok/sweep/step-2-fix-main-ci.md) | Fix main CI failures via Orca worktree worker, open fix PR |
