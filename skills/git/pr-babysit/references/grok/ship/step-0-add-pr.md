@@ -20,6 +20,14 @@ AUTHOR=$(gh pr view <number> --json author --jq '.author.login')
 
 If `AUTHOR` is not `rakaarwaky`, stop immediately. Report the PR number, author, and that it was rejected for security. Do **not** process, fix, or merge the PR. This gate is enforced at the skill level; Orca automation `from=me` and Mergify `author = rakaarwaky` enforce it at two more layers.
 
+### Release-label gate (mandatory)
+
+```bash
+gh pr view <number> --json labels --jq '[.labels[].name] | index("release")'
+```
+
+If the result is not `null` (the PR carries the `release` label), stop immediately. Report the PR number and that it is owned by Risa-AutoRelease. Do **not** process, fix, comment on, or merge the PR. This gate enforces R7 in `SKILL.md`.
+
 ## Step 0.3 — Verify PR details
 
 ```bash

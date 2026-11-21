@@ -22,6 +22,14 @@ AUTHOR=$(gh pr view <number> -R <owner>/<repo> --json author --jq '.author.login
 
 If `AUTHOR` is not `rakaarwaky`, skip this PR. Do not undraft, comment, or process it in any way.
 
+### Release-label gate
+
+```bash
+gh pr view <number> -R <owner>/<repo> --json labels --jq '[.labels[].name] | index("release")'
+```
+
+If the result is not `null` (the PR carries the `release` label), skip this PR. Do not undraft, comment, or process it in any way. This gate enforces R7 in `SKILL.md` — release PRs are owned by Risa-AutoRelease.
+
 ## Step 3.3 — Undraft when CI is green
 
 For each draft PR by `rakaarwaky`:

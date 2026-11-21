@@ -16,7 +16,7 @@ The prep PR commits the version stamp and changelog that the workflow reads; it 
    cd <worktree path>
    bash scripts/bump.sh "$NEW_VERSION"
    git add -A
-   git commit -m "release: bump to $NEW_VERSION"
+   git commit -m "chore(release): $NEW_VERSION"
    ```
 
 3. Push the branch and open the PR with the `release` label:
@@ -24,7 +24,7 @@ The prep PR commits the version stamp and changelog that the workflow reads; it 
    ```shell
    git push -u origin "release/$NEW_VERSION"
    gh pr create --base main --head "release/$NEW_VERSION" \
-     --title "release: $NEW_VERSION" \
+     --title "chore(release): $NEW_VERSION" \
      --body "Calver release prep for $NEW_VERSION." \
      --label release
    ```
@@ -50,7 +50,18 @@ The prep PR commits the version stamp and changelog that the workflow reads; it 
    gh pr merge <pr-number> --admin --squash
    ```
 
-6. Retire the worktree:
+6. Create and push the git tag (if the repo's release pipeline is tag-driven and no auto-tag workflow exists):
+
+   ```shell
+   git checkout main
+   git pull origin main
+   git tag -a "$NEW_VERSION" -m "Release $NEW_VERSION"
+   git push origin "$NEW_VERSION"
+   ```
+
+   IF the repo has an auto-tag workflow (e.g. a `release.yml` `create-tag` job that tags on `chore(release):` PR merge) -> skip this step; the workflow creates the tag automatically.
+
+7. Retire the worktree:
 
    ```shell
    orca worktree rm --worktree <worktree id> --json

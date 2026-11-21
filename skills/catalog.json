@@ -25,6 +25,12 @@
       "category": "architechture"
     },
     {
+      "name": "capability-lifecycle",
+      "description": "Remove, replace, or add an AES capability across all layers.",
+      "when_to_use": "Add, remove, or replace an AES capability across all layers: contract, taxonomy, utility, capabilities, agent, surface, root, plus tests, FRD/BACKLOG/README/PRD docs, and skill step files.",
+      "category": "architechture"
+    },
+    {
       "name": "android-emulator-linux-gps",
       "description": "Use when running or installing Android apps on a Linux host with the AOSP emulator and spoofing GPS via adb emu geo fix, including AVD setup, x86 image ABI selection, and apkpure/apkcombo APK retrieval.",
       "when_to_use": "Use when the user wants the Android emulator on Linux, Deepin or X11 hosts, an AVD that boots headlessly, 32-bit ARM APK installation, Android GPS spoofing or mock location, or apkpure/apkcombo APK downloads without browser automation.",
@@ -41,6 +47,12 @@
       "description": "Automate Qwen AI Web (chat.qwen.ai) with the Qwen3.8-Max intelligence model — zero API keys, persistent browser sessions — and develop the qwen-web-arwaky repo source (TUI, slots, tests). Use when an AI agent needs to send prompts, review code, or analyze attachments via CLI/MCP tools, or edit the internal/qwen-web-arwaky source.",
       "when_to_use": "Use when the user runs /qwen-web, sends a prompt to Qwen AI Web, sends prompt files or attachments for Qwen analysis or code review with role templates, sets up or resets the Qwen browser session, initializes the qwen-web workspace, or asks to develop or fix the internal/qwen-web-arwaky repo.",
       "category": "automation"
+    },
+    {
+      "name": "bot-manager",
+      "description": "Design new bots and manage the whole bot roster — create, configure, delegate tasks, automate recurring work, and retire bots via Orca.",
+      "when_to_use": "Use when the owner asks to design, create, configure, retire, or delegate a task to a bot; mentions bot roster, bot lifecycle, bot automations, or asks 'what bots exist', 'make a new bot', 'manage bots', 'bikin bot', 'buatkan bot baru', 'kelola bot', 'delegate', 'otomasi', 'retire bot'. Not for writing code itself — route code work to workers via delegation.",
+      "category": "autonomous-ai-agents"
     },
     {
       "name": "grok-build",
@@ -82,6 +94,12 @@
       "name": "dogfood",
       "description": "Exploratory QA for web, terminal/TUI, desktop GUI, and mobile (Android) apps — finds bugs, captures evidence, and produces a structured report across all four target types.",
       "when_to_use": "Use when doing exploratory QA of any application surface — web (navigate, interact, screenshot, console errors), terminal or TUI apps (command execution, exit codes, output capture), desktop GUI apps (click, type, accessibility tree, screenshot), or Android apps on an emulator (adb taps, swipes, logcat, screencap). Produces a structured bug report with per-issue evidence.",
+      "category": "code-quality"
+    },
+    {
+      "name": "review-triage",
+      "description": "Use when triaging external review reports against code.",
+      "when_to_use": "Use when handed a review/audit/UX/security report (markdown, PDF, or text) and asked to validate its findings against the repo, then fix whatever is actually wrong. Best for reports that allege bugs, gaps, or contradictions across multiple files.",
       "category": "code-quality"
     },
     {
@@ -254,14 +272,14 @@
     },
     {
       "name": "pr-babysit",
-      "description": "Watch a PR, fix CI, merge via Mergify queue.",
-      "when_to_use": "Triggers on \\\"/pr-babysit\\\". Phrasing: \\\"watch PR 123 until green\\\", \\\"babysit PR 123 and merge when ready\\\", \\\"fix issue #123 and open a PR\\\", \\\"keep fixing PR 123 until it can merge\\\", \\\"pr-babysit add 123\\\", \\\"pr-babysit ship 123\\\", \\\"pr-babysit setup 123\\\".",
+      "description": "Watch pull requests, fix failing CI, merge via Mergify queue.",
+      "when_to_use": "Triggers on \\\"/pr-babysit\\\". Phrasing: \\\"watch PR 123 until green\\\", \\\"babysit PR 123 and merge when ready\\\", \\\"fix issue #123 and open a PR\\\", \\\"keep fixing PR 123 until it can merge\\\", \\\"pr-babysit ship 123\\\", \\\"pr-babysit setup 123\\\", \\\"pr-babysit repo add owner/repo\\\", \\\"pr-babysit repo remove owner/repo\\\", \\\"watch repo for new prs\\\".",
       "category": "git"
     },
     {
       "name": "releasing",
-      "description": "Release, cut a release, ship a new version, publish or tag a release for the mergify CLI, recover a failed release run.",
-      "when_to_use": "Cut a CalVer release of the mergify CLI autonomously — bump via the bump script, open and merge a release prep PR, build and publish the draft through GitHub workflows, and recover failed release runs. Triggers: \"release\", \"cut a release\", \"ship a new version\", \"publish a release\", \"tag a version\", \"release run recovery\".",
+      "description": "Release, cut a release, ship a new version, publish or tag a release, recover a failed release run.",
+      "when_to_use": "Cut a CalVer release of any project autonomously — bump via the bump script in an Orca worktree, open and merge a release prep PR, build and publish the draft through GitHub workflows, and recover failed release runs. Triggers: \"release\", \"cut a release\", \"ship a new version\", \"publish a release\", \"tag a version\", \"release run recovery\".",
       "category": "git"
     },
     {

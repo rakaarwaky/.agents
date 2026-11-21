@@ -2,15 +2,26 @@
 
 Which command depends on the repo. Read `repo.json` and the repo's own `.github/workflows/` before choosing.
 
-## psd-timelapse (SemVer tags)
+## Pre-check: tag exists
 
-The pipeline is tag-driven, not draft-driven:
+Before triggering the workflow, confirm the tag exists on the remote:
 
-1. `auto-release.yml` opens a `chore(release): vX.Y.Z` PR on `develop` after CI passes.
-2. `tag-release-prs.yml` watches that PR; on merge it creates the `vX.Y.Z` tag and dispatches `release.yml`.
-3. `release.yml` runs test → build → smoke-test → provenance → publishes the GitHub release (assets + auto-generated notes).
+```shell
+git ls-remote --tags origin "$NEW_VERSION" | grep -q "$NEW_VERSION" \
+  || { echo "tag $NEW_VERSION not found on remote — create it in step 1 (or via the repo's auto-tag workflow)"; exit 1; }
+```
 
-To trigger it manually with a known version:
+IF the tag is missing -> go back to [step-1-prep-pr.md](step-1-prep-pr.md) step 6 and create it.
+
+## Tag-driven pipeline
+
+The standard pipeline is a single self-contained `release.yml`:
+
+1. A `create-tag` job watches for merged PRs with the `release` label whose title starts with `chore(release):`.
+2. On merge, it creates the `vX.Y.Z` tag and pushes it.
+3. The tag push triggers the build → test → smoke-test → publish jobs in the same workflow.
+
+To trigger it manually with a known version (if the tag already exists):
 
 ```shell
 gh workflow run release.yml -f tag="$NEW_VERSION" -R <owner>/<repo>
@@ -23,25 +34,10 @@ gh run list --workflow=release.yml -R <owner>/<repo> --limit 1
 gh run watch <run-id> -R <owner>/<repo> --exit-status
 ```
 
-Verify assets match the expected dist outputs (`dist/*` wheel + sdist from `uv build`):
+Verify assets match the expected dist outputs for the repo's build command (e.g. `dist/*` for Python, `target/release/*` for Rust, package tarball for Node):
 
 ```shell
 gh release list -R <owner>/<repo> --limit 1
-gh release view "$NEW_VERSION" -R <owner>/<repo> --json assets,url --jq '{url:.url,assets:[.assets[].name]}'
-```
-
-## lint-arwaky (SemVer, hand-maintained CHANGELOG)
-
-Same tag-driven model via its `release.yml` / `release-tag.yml`. Prepend the drafted notes to `CHANGELOG.md` in Step 1's prep PR, commit the version bump, then dispatch:
-
-```shell
-gh workflow run release.yml -f tag="$NEW_VERSION" -R <owner>/<repo>
-gh run watch <run-id> -R <owner>/<repo> --exit-status
-```
-
-Watch it (~5–10 min). Verify the release is live with the expected assets:
-
-```shell
 gh release view "$NEW_VERSION" -R <owner>/<repo> --json assets,url --jq '{url:.url,assets:[.assets[].name]}'
 ```
 

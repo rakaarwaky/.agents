@@ -19,6 +19,7 @@ Watch pull requests, parse failing CI logs, push incremental fixes, configure Me
 | R4 | Never modify skills outside `.agents/skills/pr-babysit/` during babysitting runs. | Check modified files match babysit skill path. |
 | R5 | Verify live CI status and merge state directly on GitHub before declaring PR babysitting complete. | Run `gh pr view` to verify CI check runs and merge status. |
 | R6 | Reject any PR whose author is not `rakaarwaky`, and any repo absent from `repo.json`. | Check author and watchlist before processing. |
+| R7 | Reject any PR carrying the `release` label — release PRs are owned by Risa-AutoRelease and must not be processed, fixed, or merged by this skill. | Check `gh pr view <number> --json labels` for `release` label before processing; skip if present. |
 
 ## Routing
 

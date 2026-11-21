@@ -8,7 +8,7 @@ gh release view "$NEW_VERSION" -R <owner>/<repo> --json url,isDraft,assets --jq 
 ```
 
 - `isDraft` must be `false` (published).
-- The asset list must match the repo's expected outputs (e.g. `psd-timelapse`: wheel + sdist under `dist/*`).
+- The asset list must match the repo's expected outputs (e.g. Python: wheel + sdist; Node: tarball; Rust: binary).
 - For registries beyond GitHub, check the registry endpoint named in `repo.json` or the repo's CI config.
 
 Report the final status:

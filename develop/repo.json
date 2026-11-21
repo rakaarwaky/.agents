@@ -7,7 +7,7 @@
       "mergify": true,
       "ci_workflow": "ci.yml",
       "main_ci": "green",
-      "release": "needs-setup",
+      "release": "ready",
       "open_prs": []
     },
     {

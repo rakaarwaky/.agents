@@ -11,6 +11,14 @@ AUTHOR=$(gh pr view <number> --json author --jq '.author.login')
 
 If the author is not `rakaarwaky`, refuse the merge and report to the owner. Do not queue, do not direct-merge.
 
+### Release-label gate (re-check before merging)
+
+```bash
+gh pr view <number> --json labels --jq '[.labels[].name] | index("release")'
+```
+
+If the result is not `null` (the PR carries the `release` label), refuse the merge and report to the owner. Do not queue, do not direct-merge. This gate enforces R7 in `SKILL.md` — release PRs are owned by Risa-AutoRelease.
+
 ## Auto-merge authorized
 
 SOUL.md authorizes auto-merge for `rakaarwaky`-authored PRs. Once the pre-merge checks below pass, queue the PR immediately — do not ask the owner for merge permission.
