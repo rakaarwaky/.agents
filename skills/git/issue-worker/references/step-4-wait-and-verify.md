@@ -36,6 +36,13 @@ A child agent's closing summary is a self-report, not verified truth. The orches
    ```
    Confirm modifications are strictly confined to the in-scope paths declared in Step 2.
 
+**Fallback when the terminal is stale:** If `orca terminal read`/`wait` segfaults or returns `terminal_handle_stale`, re-resolve the handle per Step 3d (R12), or fall back to direct worktree-path inspection using `git -C "$WT_PATH" ...` commands below. Terminal output is a convenience, not a requirement for R7.
+
+**Discover the Cargo package name** before running tests — `cargo test -p <pkg>` uses the `name` field in `Cargo.toml`, which may differ from the directory name:
+```bash
+PKG="$(grep -m1 '^name' "$WT_PATH/crates/<crate>/Cargo.toml" | sed 's/.*= *//; s/"//g')"
+```
+
 3. **Re-execute Symptom Reproduction Commands**:
    For every issue grouped into this worktree, execute the reproduction command formulated during Step 1:
    ```bash

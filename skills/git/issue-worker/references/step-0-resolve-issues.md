@@ -106,6 +106,23 @@ For all validated issues, extract and stage the core operational metadata:
 3. **Reported Symptoms**: Expected vs actual behavior, steps to reproduce, error snippets.
 4. **Labels**: Categorization (`bug`, `enhancement`, `refactor`, `documentation`).
 
-Stage the resolved issues in `/tmp/issue-worker/staged-issues.json` so subsequent steps do not repeatedly query the GitHub API.
+Stage the resolved issues in `/tmp/issue-worker/staged-issues.json` so subsequent steps do not repeatedly query the GitHub API. Use this schema:
+
+```json
+[
+  {
+    "number": 1456,
+    "title": "AES405: ...",
+    "body": "## Problem\n\n...",
+    "labels": ["bug", "code-analysis", "rust", "edge-case"],
+    "createdAt": "2026-11-20T16:50:30Z",
+    "updatedAt": "2026-11-20T16:50:53Z",
+    "state": "OPEN",
+    "url": "https://github.com/rakaarwaky/lint-arwaky/issues/1456"
+  }
+]
+```
+
+Write the file with `cat > /tmp/issue-worker/staged-issues.json << 'EOF' ... EOF` (use a quoted heredoc delimiter to preserve backticks and shell-special characters in the body). One object per issue. Subsequent steps (1–2) read from this file instead of re-querying `gh`.
 
 Proceed to Step 1 (`step-1-triage-and-verify.md`).
